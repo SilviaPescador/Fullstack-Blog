@@ -1,4 +1,5 @@
 const pool = require("../db/connection");
+const fs = require("fs");
 
 class PostController {
 	static async getAllPosts(req, res) {
@@ -13,10 +14,19 @@ class PostController {
 	}
 
 	static async createPost(req, res) {
+		const image = req.body.image || "";
+		let imageUrl 
+
+		if (image) {
+			const imagePath = path.join(__dirname, "../public/images", image.name);
+			fs.writeFileSync(imagePath, image.data);
+			imageUrl = `/images/${image.name}` || "";
+		}
+
 		try {
 			const [posts] = await pool.query(
-				"INSERT INTO posts (title, content, author) VALUES (?, ?, ?)",
-				[req.body.title, req.body.content, req.body.author]
+				"INSERT INTO posts (title, image, content, author) VALUES (?, ?, ?, ?)",
+				[req.body.title, imageUrl, req.body.content, req.body.author]
 			);
 			console.log(posts);
 			res.status(200).json({ insertId: posts.insertId });
@@ -73,14 +83,13 @@ class PostController {
 		}
 	}
 
-      static async deletePost(req, res) {
-            const { id } = req.params;
+	static async deletePost(req, res) {
+		const { id } = req.params;
 
 		try {
-			const [result] = await pool.query(
-				"SELECT * FROM posts WHERE id = ? ",
-				[id]
-			);
+			const [result] = await pool.query("SELECT * FROM posts WHERE id = ? ", [
+				id,
+			]);
 
 			if (result.length === 0) {
 				res
@@ -97,7 +106,7 @@ class PostController {
 			console.error(error);
 			res.status(500).json(error);
 		}
-      }
+	}
 }
 
 module.exports = PostController;
