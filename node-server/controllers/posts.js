@@ -6,8 +6,19 @@ class PostController {
 	static async getAllPosts(req, res) {
 		try {
 			const [posts] = await pool.query("SELECT * FROM posts");
-			console.log(posts);
-			res.status(200).json(posts);
+			const postsWithImageUrl = posts.map((post) =>
+				post.image
+					? {
+							...post,
+							image: `${req.protocol}://${req.get("host")}/${post.image}`,
+					  }
+					: {
+							...post,
+							image: null,
+					  }
+			);
+			console.log(postsWithImageUrl);
+			res.status(200).json(postsWithImageUrl);
 		} catch (err) {
 			console.log(err);
 			res.status(500).json(err);
@@ -21,7 +32,11 @@ class PostController {
 		let imageUrl = "";
 
 		if (image) {
-			const imagePath = path.join(__dirname, "../public/images", image.originalname);
+			const imagePath = path.join(
+				__dirname,
+				"../public/images",
+				image.originalname
+			);
 			await fs.promises.rename(image.path, imagePath);
 			imageUrl = `/images/${image.originalname}` || "";
 		}
