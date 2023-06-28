@@ -2,7 +2,6 @@ const pool = require("../db/connection");
 const path = require("path");
 const fs = require("fs");
 
-
 class PostController {
 	static async getAllPosts(req, res) {
 		try {
@@ -17,14 +16,14 @@ class PostController {
 
 	static async createPost(req, res) {
 		const { title, content, author } = req.body;
-		const { image }= req.body.image; 
-		console.log(image)
+		const image = req.file;
+
 		let imageUrl = "";
 
 		if (image) {
-			const imagePath = path.join(__dirname, "../public/images", image.name);
+			const imagePath = path.join(__dirname, "../public/images", image.originalname);
 			await fs.promises.rename(image.path, imagePath);
-			imageUrl = `/images/${image.name}` || "";
+			imageUrl = `/images/${image.originalname}` || "";
 		}
 
 		try {
@@ -32,7 +31,7 @@ class PostController {
 				"INSERT INTO posts (title, image, content, author) VALUES (?, ?, ?, ?)",
 				[title, imageUrl, content, author]
 			);
-			
+
 			res.status(200).json({ insertId: result.insertId });
 		} catch (err) {
 			console.log(err);
