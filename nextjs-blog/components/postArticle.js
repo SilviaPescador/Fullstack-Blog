@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import formatDate from "../common/formatDate";
+import PostService from "../services/postService";
+import Swal from "sweetalert2";
 
 export default function PostArticle({ postData }) {
 	const [truncatedContent, setTruncatedContent] = useState("");
@@ -15,7 +17,30 @@ export default function PostArticle({ postData }) {
 		}
 	}, []);
 	const handleDelete = async (id) => {
-		alert("deleted " + id);
+		try {
+			const postService = new PostService();
+			const result = await Swal.fire({
+				title: "Confirm Deletion",
+				text: "Are you sure you want to delete this post?",
+				icon: "warning",
+				showCancelButton: true,
+				confirmButtonText: "Delete",
+				cancelButtonText: "Cancel",
+				customClass: {
+					confirmButton: "btn btn-danger",
+					cancelButton: "btn btn-secondary",
+				},
+			});
+
+			if (result.isConfirmed) {
+				const response = await postService.deletePost(id);
+				Swal.fire("Success", response.message, "success");
+			} else {
+				Swal.fire("Cancelled", "The deletion was cancelled", "info");
+			}
+		} catch (error) {
+			Swal.fire("Error", error.message, "error");
+		}
 	};
 
 	return (

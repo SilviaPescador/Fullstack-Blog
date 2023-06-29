@@ -17,7 +17,7 @@ class PostController {
 							image: null,
 					  }
 			);
-			console.log(postsWithImageUrl);
+			
 			res.status(200).json(postsWithImageUrl);
 		} catch (err) {
 			console.log(err);
