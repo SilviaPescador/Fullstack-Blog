@@ -1,7 +1,10 @@
-import { useForm } from "react-hook-form";
-import ImageUploader from "./imageUploader";
-import PostService from "../services/postService";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useRouter } from 'next/router'
+
+import PostService from "../services/postService";
+import ImageUploader from "./imageUploader";
+import Swal from 'sweetalert2'
 
 export default function NewPostCard() {
 	const [selectedImage, setSelectedImage] = useState(null);
@@ -11,6 +14,7 @@ export default function NewPostCard() {
 		reset,
 		formState: { errors },
 	} = useForm();
+	const router = useRouter()
 
 	const handleImageUpload = (image) => {
 		setSelectedImage(image);
@@ -18,16 +22,18 @@ export default function NewPostCard() {
 
 	const onSubmit = async (data) => {
 		data.image = selectedImage;
-		console.log(data);
 		try {
 			const postService = new PostService();
 			const response = await postService.createPost(data);
-			console.log(response);
 			alert("Yeah!! new post");
-			reset();
+			router.push(`/posts/${response.insertId}`)
 		} catch (error) {
 			console.log(error);
-			alert(`ooops... error: ${error}`);
+			Swal.fire({
+				icon: 'error',
+				title: 'Oops...',
+				text: `Something went wrong!: ${error}`,
+			    })
 			reset();
 		}
 	};

@@ -13,7 +13,7 @@ export default function Home() {
 	if (!data) return <div>Loading...</div>;
 	
 
-	const resetPosts = async (postId) =>{
+	const resetPosts = async () =>{
 		mutate("http://localhost:3001/posts")
 	}
 
@@ -27,7 +27,7 @@ export default function Home() {
 			</section>
 			<section>
 				{data.map((post) => (
-					<PostArticle postData={post} key={post.id} onDelete={resetPosts} fullPost={false}/>
+					<PostArticle postData={post} key={post.id} onDelete={resetPosts} fullPost={false} home/>
 				))}
 			</section>
 		</Layout>

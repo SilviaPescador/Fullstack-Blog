@@ -23,47 +23,52 @@ export default function Layout({ children, home }) {
 				<meta name="og:title" content={siteTitle} />
 				<meta name="twitter:card" content="summary_large_image" />
 			</Head>
-			<header className={styles.header}>
-				{home ? (
-					<>
-						<Link href="/posts/create-new">
-							<Image
-								priority
-								src="/images/sil-400.jpg"
-								className={utilStyles.borderCircle}
-								height={144}
-								width={144}
-								alt=""
-							/>
-						</Link>
-						<h1 className={utilStyles.heading2Xl}>{name}</h1>
-					</>
-				) : (
-					<>
-						<Link href="/">
-							<Image
-								priority
-								src="/images/sil-400.jpg"
-								className={utilStyles.borderCircle}
-								height={108}
-								width={108}
-								alt=""
-							/>
-						</Link>
-						<h2 className={utilStyles.headingLg}>
-							<Link href="/" className={utilStyles.colorInherit}>
-								{name}
+			<body>
+				<header className={styles.header}>
+					{home ? (
+						<>
+							<Link href="/posts/create-new">
+								<Image
+									priority
+									src="/images/sil-400.jpg"
+									className={utilStyles.borderCircle}
+									height={144}
+									width={144}
+									alt=""
+								/>
 							</Link>
-						</h2>
-					</>
+							<h1 className={utilStyles.heading2Xl}>{name}</h1>
+						</>
+					) : (
+						<>
+							<Link href="/">
+								<Image
+									priority
+									src="/images/sil-400.jpg"
+									className={utilStyles.borderCircle}
+									height={108}
+									width={108}
+									alt=""
+								/>
+							</Link>
+							<h2 className={utilStyles.headingLg}>
+								<Link href="/" className={utilStyles.colorInherit}>
+									{name}
+								</Link>
+							</h2>
+						</>
+					)}
+				</header>
+				<nav className="d-flex justify-content-end mx-4">
+					<Link href="/posts/create-new" title="Create new post"><i className="bi bi-plus-square fs-2"></i></Link>
+				</nav>
+				<main>{children}</main>
+				{!home && (
+					<div className={styles.backToHome}>
+						<Link href="/">← Back to home</Link>
+					</div>
 				)}
-			</header>
-			<main>{children}</main>
-			{!home && (
-				<div className={styles.backToHome}>
-					<Link href="/">← Back to home</Link>
-				</div>
-			)}
+			</body>
 		</div>
 	);
 }

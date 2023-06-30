@@ -8,6 +8,7 @@ export default function PostPage() {
 	const router = useRouter();
 	const { id } = router.query;
 	const [postData, setPostData] = useState(null);
+	const [ edited, setIsEdited ] = useState(false)
 
 	useEffect(() => {
 		const fetchPostData = async () => {
@@ -24,7 +25,7 @@ export default function PostPage() {
 		if (id) {
 			fetchPostData();
 		}
-	}, [id]);
+	}, [id, edited]);
 
 	if (!postData) {
 		return <div>Loading...</div>;
@@ -32,7 +33,7 @@ export default function PostPage() {
 
 	return (
 		<Layout>
-			<PostArticle postData={postData} fullPost />
+			<PostArticle postData={postData} setIsEdited={setIsEdited} fullPost />
 		</Layout>
 	);
 }

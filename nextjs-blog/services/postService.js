@@ -36,6 +36,17 @@ export default class PostService {
 		}
 	}
 
+	async updatePost(id, data) {
+		console.log(id, data)
+		
+		try{
+			const response = await axios.patch(`${API_URL}${id}`, data)
+			return response.data
+		} catch (error){
+			throw new Error('Error al actualizar el post')
+		}
+	}
+
 	async deletePost(id) {
 		try {
 			const response = await axios.delete(`${API_URL}${id}`);

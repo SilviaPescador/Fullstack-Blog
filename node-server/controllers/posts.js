@@ -20,7 +20,7 @@ class PostController {
 				const postWithImageUrl = post[0].image
 					? {
 							...post[0],
-							image: `${req.protocol}://${req.get("host")}/${post[0].image}`,
+							image: `${req.protocol}://${req.get("host")}${post[0].image}`,
 					  }
 					: {
 							...post[0],
