@@ -94,12 +94,12 @@ export default function PostArticle({
 				</div>
 			)}
 			{/** TITLE + POST_DATE */}
-			<div className="d-flex justify-content-between mx-3 align-items-center p-2">
+			<div className=" mx-3 align-items-center p-2">
 				{isEditing ? (
 					<textarea
 						name="title"
 						{...register("title")}
-						className="form-control"
+						className="form-control col-9"
 						value={title}
 						onChange={(e) => setTitle(e.target.value)}
 						rows="3"
@@ -109,7 +109,7 @@ export default function PostArticle({
 						<h2 className="card-title">{postData.title}</h2>
 					</Link>
 				)}
-				<p>{friendlyDate}</p>
+				<p>{friendlyDate} - {postData.author}</p>
 			</div>
 			{/** POST CONTENT */}
 			<div className="card-body mx-3">
@@ -120,10 +120,10 @@ export default function PostArticle({
 						className="form-control"
 						value={content}
 						onChange={(e) => setContent(e.target.value)}
-						rows="3"
+						rows="10"
 					/>
 				) : (
-					<p>{fullPost ? postData.content : truncatedContent}</p>
+					<pre className="">{fullPost ? postData.content : truncatedContent}</pre>
 				)}
 			</div>
 			{/** FOOTER - BUTTONS */}

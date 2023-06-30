@@ -12,6 +12,7 @@ export default function Home() {
 	if (error) return <div>Failed to load </div>;
 	if (!data) return <div>Loading...</div>;
 	
+	console.log(data)
 
 	const resetPosts = async () =>{
 		mutate("http://localhost:3001/posts")
@@ -23,7 +24,7 @@ export default function Home() {
 				<title>{siteTitle}</title>
 			</Head>
 			<section className={utilStyles.headingMd}>
-				<p className="mx-3">Welcome to my blog</p>
+				<p className="mx-3 text-center">Aquí se plasman sueños, noticias, emociones e ideas de célula y metal.</p>
 			</section>
 			<section>
 				{data.map((post) => (

@@ -10,7 +10,7 @@ export const siteTitle = "My Blog";
 
 export default function Layout({ children, home }) {
 	return (
-		<div className="container card shadow rounded mt-3 p-3">
+		<div className="container card shadow rounded mt-3 p-3 ">
 			<Head>
 				<link rel="icon" href="/favicon.ico" />
 				<meta name="description" content="Personal Blog" />

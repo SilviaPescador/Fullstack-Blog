@@ -15,7 +15,6 @@ export default function PostPage() {
 			try {
 				const postService = new PostService();
 				const response = await postService.getPosts(id);
-				console.log(response)
 				setPostData(response);
 			} catch (error) {
 				console.error(error);

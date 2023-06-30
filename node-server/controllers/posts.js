@@ -6,12 +6,13 @@ class PostController {
 	static async getPosts(req, res) {
 		try {
 			const id = req.params.id;
-			console.log(id)
+			console.log(id);
 
 			if (id) {
-				const [post] = await pool.query("SELECT * FROM posts WHERE id = ?", [
-					id,
-				]);
+				const [post] = await pool.query(
+					"SELECT * FROM posts WHERE id = ?",
+					[id]
+				);
 
 				if (!post.length) {
 					return res.status(404).json({ message: "Post not found" });
@@ -29,8 +30,8 @@ class PostController {
 
 				return res.status(200).json(postWithImageUrl);
 			} else {
-				console.log("por aqui")
-				const [posts] = await pool.query("SELECT * FROM posts");
+				console.log("por aqui");
+				const [posts] = await pool.query("SELECT * FROM posts ORDER BY post_date DESC");
 				const postsWithImageUrl = posts.map((post) =>
 					post.image
 						? {
@@ -43,7 +44,7 @@ class PostController {
 						  }
 				);
 
-				console.log(postsWithImageUrl)
+				console.log(postsWithImageUrl);
 				return res.status(200).json(postsWithImageUrl);
 			}
 		} catch (err) {
