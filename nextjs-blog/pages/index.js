@@ -1,35 +1,22 @@
 import Head from "next/head";
 import Layout, { siteTitle } from "../components/layout";
-// import useSWR from "swr";
+import useSWR, {mutate} from "swr";
 import PostArticle from "../components/postArticle";
 import utilStyles from "../styles/utils.module.css";
-import PostService from "../services/postService"
-import { useEffect, useState } from "react";
 
-// const fetcher = (url) => fetch(url).then((res) => res.json());
+
+const fetcher = (url) => fetch(url).then((res) => res.json());
 
 export default function Home() {
-	const [postsData, setPostsData ] = useState(null)
-	// const { data, error } = useSWR(() => data ? `http://localhost:3001/posts/${data.id}` : null, fetcher);
-	// if (error) return <div>Failed to load </div>;
-	// if (!data) return <div>Loading...</div>;
-	useEffect (() => {
-		const fetchPostData = async () => {
-			try {
-				const postService = new PostService()
-				const response = await postService.getPosts()
-				console.log(response)
-				setPostsData(response)
+	const { data, error } = useSWR("http://localhost:3001/posts", fetcher);
+	if (error) return <div>Failed to load </div>;
+	if (!data) return <div>Loading...</div>;
+	
 
-			} catch (error) {
-				console.error(error)
-			}
-		}
+	const resetPosts = async (postId) =>{
+		mutate("http://localhost:3001/posts")
+	}
 
-		fetchPostData()
-	}, []) 
-
-	if (!postsData) return <div>Loading...</div>;
 	return (
 		<Layout home>
 			<Head>
@@ -39,8 +26,8 @@ export default function Home() {
 				<p className="mx-3">Welcome to my blog</p>
 			</section>
 			<section>
-				{postsData.map((post) => (
-					<PostArticle postData={post} key={post.id} />
+				{data.map((post) => (
+					<PostArticle postData={post} key={post.id} onDelete={resetPosts} fullPost={false}/>
 				))}
 			</section>
 		</Layout>

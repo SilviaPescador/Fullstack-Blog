@@ -32,7 +32,7 @@ export default function PostPage() {
 
 	return (
 		<Layout>
-			<PostArticle postData={postData} home={false} />
+			<PostArticle postData={postData} fullPost />
 		</Layout>
 	);
 }

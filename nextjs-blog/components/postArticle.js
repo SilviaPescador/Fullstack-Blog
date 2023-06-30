@@ -5,10 +5,10 @@ import formatDate from "../common/formatDate";
 import PostService from "../services/postService";
 import Swal from "sweetalert2";
 
-export default function PostArticle({ postData }) {
+export default function PostArticle({ postData, onDelete, fullPost }) {
 	const [truncatedContent, setTruncatedContent] = useState("");
+	const [isEditing, setIsEditing] = useState(false);
 	const friendlyDate = formatDate(postData.post_date);
-	const home = 
 
 	useEffect(() => {
 		if (postData.content.length > 50) {
@@ -35,6 +35,7 @@ export default function PostArticle({ postData }) {
 
 			if (result.isConfirmed) {
 				const response = await postService.deletePost(id);
+				onDelete(postData.id);
 				Swal.fire("Success", response.message, "success");
 			} else {
 				Swal.fire("Cancelled", "The deletion was cancelled", "info");
@@ -47,18 +48,18 @@ export default function PostArticle({ postData }) {
 	return (
 		<article className="card rounded mt-3 mx-3 shadow">
 			{/** IMAGE (if not null) */}
-			{postData.image ? (
+			{postData.image && (
 				<div className="d-flex justify-content-center rounded">
 					<Image
 						priority
 						src={postData.image}
 						className="img-fluid rounded-4 p-1 border border-dark mt-3"
-						height={300}
-						width={300}
+						height={fullPost ? 800 : 200}
+						width={fullPost ? 800 : 200}
 						alt=""
 					/>
 				</div>
-			) : null}
+			)}
 			{/** TITLE + POST_DATE */}
 			<div className="d-flex justify-content-between mx-3 align-items-center p-2">
 				<Link href="/posts/[id]" as={`/posts/${postData.id}`}>
@@ -68,10 +69,28 @@ export default function PostArticle({ postData }) {
 			</div>
 			{/** POST CONTENT */}
 			<div className="card-body mx-3">
-				<p> {home ? (truncatedContent) : (postData.content)} </p>
+				<p> {fullPost ? postData.content : truncatedContent} </p>
 			</div>
 			{/** FOOTER - BUTTONS */}
 			<div className="card-footer d-flex justify-content-end">
+				{isEditing && (
+					<button
+						className="btn"
+						title="Delete this post"
+						onClick={() => handleDelete(postData.id)}
+					>
+						<i className="bi bi-save"></i>
+					</button>
+				)}
+				{fullPost && (
+					<button
+						className="btn"
+						title="Delete this post"
+						onClick={() => handleDelete(postData.id)}
+					>
+						<i className="bi bi-pencil-square"></i>
+					</button>
+				)}
 				<button
 					className="btn"
 					title="Delete this post"
