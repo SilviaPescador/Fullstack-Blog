@@ -8,6 +8,7 @@ import Swal from "sweetalert2";
 export default function PostArticle({ postData }) {
 	const [truncatedContent, setTruncatedContent] = useState("");
 	const friendlyDate = formatDate(postData.post_date);
+	const home = 
 
 	useEffect(() => {
 		if (postData.content.length > 50) {
@@ -60,14 +61,14 @@ export default function PostArticle({ postData }) {
 			) : null}
 			{/** TITLE + POST_DATE */}
 			<div className="d-flex justify-content-between mx-3 align-items-center p-2">
-				<Link href="/">
+				<Link href="/posts/[id]" as={`/posts/${postData.id}`}>
 					<h2 className="card-title">{postData.title}</h2>
 				</Link>
 				<p>{friendlyDate}</p>
 			</div>
 			{/** POST CONTENT */}
 			<div className="card-body mx-3">
-				<p>{truncatedContent}</p>
+				<p> {home ? (truncatedContent) : (postData.content)} </p>
 			</div>
 			{/** FOOTER - BUTTONS */}
 			<div className="card-footer d-flex justify-content-end">

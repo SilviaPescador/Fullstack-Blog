@@ -18,7 +18,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 /* GET posts listing. */
-router.get("/", postController.getAllPosts);
+router.get("/:id?", postController.getPosts);
 /* POST create new post */
 router.post("/", upload.single("image"), postController.createPost);
 /* PATCH update only changed items of post */

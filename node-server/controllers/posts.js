@@ -3,25 +3,52 @@ const path = require("path");
 const fs = require("fs");
 
 class PostController {
-	static async getAllPosts(req, res) {
+	static async getPosts(req, res) {
 		try {
-			const [posts] = await pool.query("SELECT * FROM posts");
-			const postsWithImageUrl = posts.map((post) =>
-				post.image
+			const id = req.params.id;
+			console.log(id)
+
+			if (id) {
+				const [post] = await pool.query("SELECT * FROM posts WHERE id = ?", [
+					id,
+				]);
+
+				if (!post.length) {
+					return res.status(404).json({ message: "Post not found" });
+				}
+
+				const postWithImageUrl = post[0].image
 					? {
-							...post,
-							image: `${req.protocol}://${req.get("host")}/${post.image}`,
+							...post[0],
+							image: `${req.protocol}://${req.get("host")}/${post[0].image}`,
 					  }
 					: {
-							...post,
+							...post[0],
 							image: null,
-					  }
-			);
-			
-			res.status(200).json(postsWithImageUrl);
+					  };
+
+				return res.status(200).json(postWithImageUrl);
+			} else {
+				console.log("por aqui")
+				const [posts] = await pool.query("SELECT * FROM posts");
+				const postsWithImageUrl = posts.map((post) =>
+					post.image
+						? {
+								...post,
+								image: `${req.protocol}://${req.get("host")}/${post.image}`,
+						  }
+						: {
+								...post,
+								image: null,
+						  }
+				);
+
+				console.log(postsWithImageUrl)
+				return res.status(200).json(postsWithImageUrl);
+			}
 		} catch (err) {
-			console.log(err);
-			res.status(500).json(err);
+			console.error(err);
+			return res.status(500).json(err);
 		}
 	}
 
@@ -117,6 +144,16 @@ class PostController {
 			}
 
 			await pool.query("DELETE FROM posts WHERE id = ? ", [id]);
+
+			// Elimino la imagen
+			const imagePath = path.join(__dirname, "../public", result[0].image);
+			console.log(imagePath);
+			fs.unlink(imagePath, (err) => {
+				if (err) {
+					console.error(err);
+				}
+			});
+
 			res
 				.status(200)
 				.json({ message: "El post ha sido eliminado exitosamente" });

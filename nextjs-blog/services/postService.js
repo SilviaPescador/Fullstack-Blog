@@ -3,13 +3,15 @@ import axios from "axios";
 const API_URL = "http://localhost:3001/posts/";
 
 export default class PostService {
-	async getAllPosts() {
+	async getPosts(id = null) {
 		try {
-			const response = await axios.get(API_URL);
+			const url = id ? `${API_URL}${id}` : API_URL;
+			const response = await axios.get(url);
+			console.log(response.data)
 			return response.data;
 		} catch (error) {
 			console.error(error);
-			throw new Error("Error al obtener todos los posts");
+			throw new Error("Error al obtener los posts");
 		}
 	}
 
