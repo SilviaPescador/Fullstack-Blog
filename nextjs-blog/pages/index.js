@@ -12,7 +12,6 @@ export default function Home() {
 	if (error) return <div>Failed to load </div>;
 	if (!data) return <div>Loading...</div>;
 	
-	console.log(data)
 
 	const resetPosts = async () =>{
 		mutate("http://localhost:3001/posts")

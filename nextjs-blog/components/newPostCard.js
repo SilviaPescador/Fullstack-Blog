@@ -25,7 +25,13 @@ export default function NewPostCard() {
 		try {
 			const postService = new PostService();
 			const response = await postService.createPost(data);
-			alert("Yeah!! new post");
+			Swal.fire({
+				position: 'top-end',
+				icon: 'success',
+				title: 'Yeah!! has creado un nuevo post!!',
+				showConfirmButton: false,
+				timer: 1500
+			    })
 			router.push(`/posts/${response.insertId}`)
 		} catch (error) {
 			console.log(error);
@@ -41,7 +47,7 @@ export default function NewPostCard() {
 	return (
 		<>
 			<div className="container">
-				<h1>Create new Post</h1>
+				<h1>Añade una nueva entrada</h1>
 				<form onSubmit={handleSubmit(onSubmit)} className="w-100">
 					<div className="mb-3">
 						<input

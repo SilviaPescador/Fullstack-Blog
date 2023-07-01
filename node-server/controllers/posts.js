@@ -30,7 +30,7 @@ class PostController {
 
 				return res.status(200).json(postWithImageUrl);
 			} else {
-				console.log("por aqui");
+				
 				const [posts] = await pool.query("SELECT * FROM posts ORDER BY post_date DESC");
 				const postsWithImageUrl = posts.map((post) =>
 					post.image
@@ -44,7 +44,6 @@ class PostController {
 						  }
 				);
 
-				console.log(postsWithImageUrl);
 				return res.status(200).json(postsWithImageUrl);
 			}
 		} catch (err) {
