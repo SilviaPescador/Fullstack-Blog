@@ -10,7 +10,7 @@ export const siteTitle = "My Blog";
 
 export default function Layout({ children, home }) {
 	return (
-		<div className="container card shadow rounded mt-3 p-3 ">
+		<>
 			<Head>
 				<link rel="icon" href="/favicon.ico" />
 				<meta name="description" content="Personal Blog" />
@@ -23,7 +23,7 @@ export default function Layout({ children, home }) {
 				<meta name="og:title" content={siteTitle} />
 				<meta name="twitter:card" content="summary_large_image" />
 			</Head>
-			<body>
+			<body className="container card shadow-lg rounded mt-3 p-3 bg-light bg-gradient ">
 				<header className={styles.header}>
 					{home ? (
 						<>
@@ -83,7 +83,10 @@ export default function Layout({ children, home }) {
 						<Link href="/">← Back to home</Link>
 					</div>
 				)}
+				<footer className="container-fluid position-sticky py-3">
+					<h5 className="text-center">hola</h5>
+				</footer>
 			</body>
-		</div>
+		</>
 	);
 }

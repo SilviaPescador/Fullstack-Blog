@@ -36,12 +36,7 @@ export default class PostService {
 	}
 
 	async updatePost(id, data) {
-		console.log(id, data);
-		// const formData = new FormData();
-		// formData.append("title", data.title);
-		// formData.append("content", data.content);
-		// formData.append("image", data.image);
-		// console.log(formData)
+		
 		try {
 			const response = await axios.patch(`${API_URL}${id}`, data , {
 				headers: {
