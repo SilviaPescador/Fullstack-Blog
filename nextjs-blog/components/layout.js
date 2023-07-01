@@ -59,8 +59,23 @@ export default function Layout({ children, home }) {
 						</>
 					)}
 				</header>
-				<nav className="d-flex justify-content-end mx-4">
-					<Link href="/posts/create-new" title="Create new post"><i className="bi bi-plus-square fs-2"></i></Link>
+				<nav className="d-flex justify-content-end mx-4 gap-3">
+					{home && (
+						<Link href="/posts/create-new" title="Añadir nuevo post">
+							<i className="bi bi-plus-square fs-2 "></i>
+						</Link>
+					)}
+					{!home && (
+						<>
+							<Link
+								href="https://www.bing.com/images/create?form=FLPGEN"
+								title="Crea imágenes con Bing"
+								target="_blank"
+							>
+								<i className="bi bi-microsoft fs-2"></i>
+							</Link>
+						</>
+					)}
 				</nav>
 				<main>{children}</main>
 				{!home && (
