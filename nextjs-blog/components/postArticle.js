@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 
-import { useRouter } from "next/router";
 import Image from "next/image";
 import Link from "next/link";
 
+import DeleteButton from "../components/deleteButton";
+import ImageUploader from "./imageUploader";
 import PostService from "../services/postService";
 import formatDate from "../common/formatDate";
-
-import DeleteButton from '../components/deleteButton'
+import Swal from "sweetalert2";
 
 export default function PostArticle({
 	postData,
@@ -17,13 +17,14 @@ export default function PostArticle({
 	setIsEdited,
 	home,
 }) {
-	const [truncatedContent, setTruncatedContent] = useState("");
 	const [isEditing, setIsEditing] = useState(false);
+	const [truncatedContent, setTruncatedContent] = useState("");
 	const [content, setContent] = useState(postData.content || "");
 	const [title, setTitle] = useState(postData.title || "");
+	const [selectedImage, setSelectedImage] = useState(null);
+
 	const friendlyDate = formatDate(postData.post_date);
 	const { register } = useForm();
-	const router = useRouter();
 
 	useEffect(() => {
 		if (postData.content.length > 50) {
@@ -33,17 +34,27 @@ export default function PostArticle({
 		}
 	}, []);
 
-	const onSubmit = async (newContent, newTitle) => {
-		const data = {
+	const handleImageUpload = (image) => {
+		setSelectedImage(image);
+	};
+
+	const handleUpdates = async (newContent, newTitle) => {
+		const updates = {
 			content: newContent,
 			title: newTitle,
+			image: selectedImage,
 		};
-		console.log(data);
+
 		try {
 			const postService = new PostService();
-			const response = await postService.updatePost(postData.id, data);
-			alert(response);
-			alert("Post updated successfully");
+			await postService.updatePost(postData.id, updates);
+			await Swal.fire({
+				position: "top-end",
+				icon: "success",
+				title: "Post Updated!",
+				showConfirmButton: false,
+				timer: 1500,
+			});
 			setIsEditing(false);
 			setIsEdited(true);
 		} catch (error) {
@@ -51,22 +62,24 @@ export default function PostArticle({
 			alert(`Oops... error: ${error}`);
 		}
 	};
-	
-	
+
 	return (
 		<article className="card rounded mt-3 mx-3 shadow">
 			{/** IMAGE (if not null) */}
 			{postData.image && (
-				<div className="d-flex justify-content-center rounded">
-					<Image
-						priority
-						src={postData.image}
-						className="img-fluid rounded-4 p-1 border border-dark mt-3"
-						height={fullPost ? 800 : 200}
-						width={fullPost ? 800 : 200}
-						alt=""
-					/>
-				</div>
+				<>
+					<div className="d-flex justify-content-center rounded">
+						<Image
+							priority
+							src={postData.image}
+							className="img-fluid rounded-4 p-1 border border-dark mt-3"
+							height={fullPost ? 800 : 200}
+							width={fullPost ? 800 : 200}
+							alt=""
+						/>
+					</div>
+					{isEditing && <ImageUploader onImageUpload={handleImageUpload} />}
+				</>
 			)}
 			{/** TITLE + POST_DATE */}
 			<div className=" mx-3 align-items-center p-2">
@@ -77,7 +90,7 @@ export default function PostArticle({
 						className="form-control col-9"
 						value={title}
 						onChange={(e) => setTitle(e.target.value)}
-						rows="3"
+						rows="1"
 					/>
 				) : !fullPost ? (
 					<Link href="/posts/[id]" as={`/posts/${postData.id}`}>
@@ -102,9 +115,7 @@ export default function PostArticle({
 						rows="10"
 					/>
 				) : (
-					<pre className="">
-						{fullPost ? postData.content : truncatedContent}
-					</pre>
+					<pre>{fullPost ? postData.content : truncatedContent}</pre>
 				)}
 			</div>
 			{/** FOOTER - BUTTONS */}
@@ -114,7 +125,7 @@ export default function PostArticle({
 						<button
 							className="btn"
 							title="Save changes"
-							onClick={() => onSubmit(content, title)}
+							onClick={() => handleUpdates(content, title)}
 						>
 							<i className="bi bi-save"></i>
 						</button>
@@ -137,11 +148,7 @@ export default function PostArticle({
 						<i className="bi bi-pencil-square"></i>
 					</button>
 				)}
-				<DeleteButton
-					id={postData.id}
-					home={home}
-					onDelete={onDelete}
-				/>
+				<DeleteButton id={postData.id} home={home} onDelete={onDelete} />
 			</div>
 		</article>
 	);

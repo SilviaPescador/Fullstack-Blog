@@ -22,7 +22,7 @@ router.get("/:id?", postController.getPosts);
 /* POST create new post */
 router.post("/", upload.single("image"), postController.createPost);
 /* PATCH update only changed items of post */
-router.patch("/:id", postController.updatePost);
+router.patch("/:id", upload.single("image"), postController.updatePost);
 /* DELETE delete post */
 router.delete("/:id", postController.deletePost);
 

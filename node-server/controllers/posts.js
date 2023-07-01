@@ -9,10 +9,9 @@ class PostController {
 			console.log(id);
 
 			if (id) {
-				const [post] = await pool.query(
-					"SELECT * FROM posts WHERE id = ?",
-					[id]
-				);
+				const [post] = await pool.query("SELECT * FROM posts WHERE id = ?", [
+					id,
+				]);
 
 				if (!post.length) {
 					return res.status(404).json({ message: "Post not found" });
@@ -30,8 +29,9 @@ class PostController {
 
 				return res.status(200).json(postWithImageUrl);
 			} else {
-				
-				const [posts] = await pool.query("SELECT * FROM posts ORDER BY post_date DESC");
+				const [posts] = await pool.query(
+					"SELECT * FROM posts ORDER BY post_date DESC"
+				);
 				const postsWithImageUrl = posts.map((post) =>
 					post.image
 						? {
@@ -84,6 +84,7 @@ class PostController {
 	static async updatePost(req, res) {
 		const { id } = req.params;
 		const postData = req.body;
+		const image = req.file
 
 		try {
 			const postExists = await pool.query("SELECT * FROM posts WHERE id= ?", [
@@ -102,6 +103,31 @@ class PostController {
 				if (value !== postExists[0][key] && value !== "") {
 					updatedFields[key] = value;
 				}
+			}
+			
+			if (image) {
+				// Elimino imagen existente
+				const imagePath = path.join(
+					__dirname,
+					"../public",
+					postExists[0][0].image
+				);
+				fs.unlink(imagePath, (err) => {
+					if (err) {
+						console.error(err);
+					}
+				});
+
+				// Nueva ruta de la imagen 
+				const newImagePath = path.join(
+					__dirname,
+					"../public/images",
+					image.originalname
+				);
+				await fs.promises.rename(image.path, newImagePath);
+
+				// Actualizar el campo de imagen en la base de datos
+				updatedFields.image = `/images/${req.file.originalname}`;
 			}
 
 			// Si no hay campos actualizados, respondemos con un mensaje
