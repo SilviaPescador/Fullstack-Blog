@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 
-import Swal from "sweetalert2";
 import PostService from "../services/postService";
+import Swal from "sweetalert2";
 
 export default function DeleteButton({ id, home, onDelete }) {
       const router = useRouter() 
@@ -42,7 +42,7 @@ export default function DeleteButton({ id, home, onDelete }) {
 				title="Delete this post"
 				onClick={() => handleDelete(id)}
 			>
-				<i className="bi bi-x-lg"></i>
+				<i className="bi bi-x-lg fs-5"></i>
 			</button>
 		</>
 	);

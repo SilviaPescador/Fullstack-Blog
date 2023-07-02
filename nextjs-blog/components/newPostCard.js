@@ -36,7 +36,7 @@ export default function NewPostCard() {
 			    })
 			router.push(`/posts/${response.insertId}`)
 		} catch (error) {
-			console.log(error);
+			console.error(error);
 			Swal.fire({
 				icon: 'error',
 				title: 'Oops...',
@@ -55,7 +55,7 @@ export default function NewPostCard() {
 						<input
 							name="title"
 							{...register("title")}
-							className="form-control"
+							className="form-control shadow mb-1"
 							placeholder="Title"
 						></input>
 						{errors.title && (
@@ -65,7 +65,7 @@ export default function NewPostCard() {
 						<textarea
 							name="consulta"
 							{...register("content")}
-							className="form-control"
+							className="form-control shadow"
 							placeholder="Share your thoughts..."
 							rows="3"
 						/>
@@ -75,8 +75,8 @@ export default function NewPostCard() {
 					</div>
 					<ImageUploader onImageUpload={handleImageUpload} />
 					<div className="d-flex justify-content-end">
-						<button type="submit" className="btn btn-dark sombra mx-1 mt-1">
-							Post
+						<button type="submit" className="btn mx-1 mt-2" title="post">
+						<i class="bi bi-send fs-3"></i>
 						</button>
 					</div>
 				</form>

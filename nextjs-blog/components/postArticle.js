@@ -58,8 +58,12 @@ export default function PostArticle({
 			setIsEditing(false);
 			setIsEdited(true);
 		} catch (error) {
-			console.log(error);
-			alert(`Oops... error: ${error}`);
+			console.error(error);
+			Swal.fire({
+				icon: 'error',
+				title: 'Oops...',
+				text: `Something went wrong!: ${error}`,
+			    })
 		}
 	};
 
@@ -94,7 +98,7 @@ export default function PostArticle({
 					/>
 				) : !fullPost ? (
 					<Link href="/posts/[id]" as={`/posts/${postData.id}`}>
-						<h2 className="card-title">{postData.title}</h2>
+						<h2 className="card-title" title="Full post">{postData.title}</h2>
 					</Link>
 				) : (
 					<h2 className="card-title">{postData.title}</h2>

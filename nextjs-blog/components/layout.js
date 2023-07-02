@@ -25,14 +25,14 @@ export default function Layout({ children, home }) {
 				<meta name="og:title" content={siteTitle} />
 				<meta name="twitter:card" content="summary_large_image" />
 			</Head>
-			<body className="container card shadow-lg rounded rounded-3 mt-3 p-3  bg-light bg-gradient ">
+			<body className="container card shadow-lg rounded rounded-3 mt-3 p-3 contentBackground">
 				<header className={styles.header}>
 					{home ? (
 						<>
 							<Link href="/posts/create-new">
 								<Image
 									priority
-									src="/images/sil-400.jpg"
+									src="/images/quantum-flower-400.jpg"
 									className={utilStyles.borderCircle}
 									height={144}
 									width={144}
@@ -46,7 +46,7 @@ export default function Layout({ children, home }) {
 							<Link href="/">
 								<Image
 									priority
-									src="/images/sil-400.jpg"
+									src="/images/quantum-flower-400.jpg"
 									className={utilStyles.borderCircle}
 									height={108}
 									width={108}

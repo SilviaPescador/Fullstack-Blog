@@ -48,3 +48,9 @@ pre {
 	white-space: -o-pre-wrap;    /* Opera 7 */
 	word-wrap: break-word;       /* Internet Explorer 5.5+ */
 }
+
+.contentBackground {
+	background-image: url('../public/images/marco-hoja.jpg');
+	background-size: cover;
+	background-position: center center;
+}

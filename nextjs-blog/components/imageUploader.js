@@ -13,7 +13,7 @@ const ImageUploader = ({ onImageUpload }) => {
 	const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
 	return (
-		<div {...getRootProps()} className="border border-dark card shadow p-4">
+		<div {...getRootProps()} className="card shadow p-4">
 			<input {...getInputProps()} />
 			{selectedImage ? (
 				<img src={selectedImage} alt="Selected" />

@@ -6,7 +6,6 @@ class PostController {
 	static async getPosts(req, res) {
 		try {
 			const id = req.params.id;
-			console.log(id);
 
 			if (id) {
 				const [post] = await pool.query("SELECT * FROM posts WHERE id = ?", [
@@ -76,7 +75,7 @@ class PostController {
 
 			res.status(200).json({ insertId: result.insertId });
 		} catch (err) {
-			console.log(err);
+			console.error(err);
 			res.status(500).json(err);
 		}
 	}
@@ -173,7 +172,6 @@ class PostController {
 
 			// Elimino la imagen
 			const imagePath = path.join(__dirname, "../public", result[0].image);
-			console.log(imagePath);
 			fs.unlink(imagePath, (err) => {
 				if (err) {
 					console.error(err);
