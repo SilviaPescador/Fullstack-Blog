@@ -25,7 +25,7 @@ export default function Home() {
 			<section className={utilStyles.headingMd}>
 				<p className="mx-3 text-center">Aquí se plasman sueños, noticias, emociones e ideas de célula y metal.</p>
 			</section>
-			<section>
+			<section className="py-5">
 				{data.map((post) => (
 					<PostArticle postData={post} key={post.id} onDelete={resetPosts} fullPost={false} home/>
 				))}

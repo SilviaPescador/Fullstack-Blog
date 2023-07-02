@@ -25,7 +25,7 @@ export default function Layout({ children, home }) {
 				<meta name="og:title" content={siteTitle} />
 				<meta name="twitter:card" content="summary_large_image" />
 			</Head>
-			<body className="container card shadow-lg rounded mt-3 p-3 bg-light bg-gradient ">
+			<body className="container card shadow-lg rounded rounded-3 mt-3 p-3  bg-light bg-gradient ">
 				<header className={styles.header}>
 					{home ? (
 						<>

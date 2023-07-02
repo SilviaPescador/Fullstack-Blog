@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from 'next/router'
 
+import utilStyles from "../styles/utils.module.css";
+
 import PostService from "../services/postService";
 import ImageUploader from "./imageUploader";
 import Swal from 'sweetalert2'
@@ -28,7 +30,7 @@ export default function NewPostCard() {
 			Swal.fire({
 				position: 'top-end',
 				icon: 'success',
-				title: 'Yeah!! has creado un nuevo post!!',
+				title: 'Congrats, new post created!!',
 				showConfirmButton: false,
 				timer: 1500
 			    })
@@ -47,7 +49,7 @@ export default function NewPostCard() {
 	return (
 		<>
 			<div className="container">
-				<h1>Añade una nueva entrada</h1>
+				<h1 className={utilStyles.headingLg}>Are you inspired today...?</h1>
 				<form onSubmit={handleSubmit(onSubmit)} className="w-100">
 					<div className="mb-3">
 						<input

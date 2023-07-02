@@ -1,9 +1,3 @@
-.container {
-	max-width: 36rem;
-	padding: 0 1rem;
-	margin: 3rem auto 6rem;
-}
-
 .header {
 	display: flex;
 	flex-direction: column;
@@ -11,5 +5,9 @@
 }
 
 .backToHome {
-	margin: 3rem 0 0;
+	margin: 3rem 0 4rem;
+}
+
+.footer {
+	margin: 4rem 0 0;
 }

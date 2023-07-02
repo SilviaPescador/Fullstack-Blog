@@ -64,7 +64,7 @@ export default function PostArticle({
 	};
 
 	return (
-		<article className="card rounded mt-3 mx-3 shadow">
+		<article className="card rounded mt-3  mb-4 shadow ">
 			{/** IMAGE (if not null) */}
 			{postData.image && (
 				<>
