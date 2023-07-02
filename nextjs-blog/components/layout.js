@@ -2,6 +2,8 @@ import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 
+import Footer from "../components/footer";
+
 import styles from "./layout.module.css";
 import utilStyles from "../styles/utils.module.css";
 
@@ -34,7 +36,7 @@ export default function Layout({ children, home }) {
 									className={utilStyles.borderCircle}
 									height={144}
 									width={144}
-									alt=""
+									alt="blog logo"
 								/>
 							</Link>
 							<h1 className={utilStyles.heading2Xl}>{name}</h1>
@@ -48,20 +50,24 @@ export default function Layout({ children, home }) {
 									className={utilStyles.borderCircle}
 									height={108}
 									width={108}
-									alt=""
+									alt="blog logo"
 								/>
 							</Link>
-							<h2 className={utilStyles.headingLg}>
-								<Link href="/" className={utilStyles.colorInherit}>
+							<h3 className={utilStyles.headingX1}>
+								<Link
+									href="/"
+									className={utilStyles.colorInherit}
+									title="Go home"
+								>
 									{name}
 								</Link>
-							</h2>
+							</h3>
 						</>
 					)}
 				</header>
 				<nav className="d-flex justify-content-end mx-4 gap-3">
 					{home && (
-						<Link href="/posts/create-new" title="Añadir nuevo post">
+						<Link href="/posts/create-new" title="Create new post">
 							<i className="bi bi-plus-square fs-2 "></i>
 						</Link>
 					)}
@@ -69,7 +75,7 @@ export default function Layout({ children, home }) {
 						<>
 							<Link
 								href="https://www.bing.com/images/create?form=FLPGEN"
-								title="Crea imágenes con Bing"
+								title="Bing images generator"
 								target="_blank"
 							>
 								<i className="bi bi-microsoft fs-2"></i>
@@ -83,9 +89,7 @@ export default function Layout({ children, home }) {
 						<Link href="/">← Back to home</Link>
 					</div>
 				)}
-				<footer className="container-fluid position-sticky py-3">
-					<h5 className="text-center">hola</h5>
-				</footer>
+				<Footer />
 			</body>
 		</>
 	);
