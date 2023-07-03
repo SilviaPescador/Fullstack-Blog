@@ -145,7 +145,10 @@ El servidor es una API REST creada con Express Generator y utiliza Node.js. La e
 - `lib`: Contiene varios archivos con funcionalidades utilizadas en diferentes partes del servidor, así como los middlewares para la verificación de datos provenientes del cliente y la autenticación.
 - `routes`: Se definen las diferentes rutas del servidor utilizando `express.router()`. Cada ruta representa un apartado de la base de datos, en este caso una única; gestión de publicaciones. En los endpoints se importan controladores.
 - `controllers` : Clase PostController que consta de los métodos CRUD necesarios de uso en los distintos endpoints. 
-  - Los controladores han sido pensados para que, aun a pesar de ser más complejos permitan un mejor rendimiento y experiencia de usuario, estableciendo una sola petición que contemple distintas opciones, como en el caso de updatePost, maneja los casos de recibir todos, ninguno, o solo alguno de los datos que conforman el post, para actualizar solo aquellos deseados.
+  - Los controladores han sido pensados para que, aun a pesar de ser más complejos permitan un mejor rendimiento y experiencia de usuario.Ejemplos destacados:
+    -  estableciendo una sola petición que contemple distintas opciones, como en el caso de updatePost, maneja los casos de recibir todos, ninguno, o solo alguno de los datos que conforman el post, para actualizar solo aquellos deseados.
+    -  Los posts se muestran por fecha de publicación siendo la primera la más reciente.
+    -  Al eliminar un post, se borra su registro en la carpeta /public/images del servidor.
 
 Todas estas rutas se importan en `app.js`, el archivo principal del servidor. También se incluyen manejadores de errores preestablecidos.
 
