@@ -65,10 +65,12 @@ Next.js 13, React, CSS + Bootstrap.
 
 Librerías destacadas: 
 `react-dropzone` -> carga de imágenes en los posts. USO: `components/imageUploader.js`  (uso en creación y en update de los posts)
+
 [Dropzone DOC](https://react-dropzone.js.org/)  
 `bootstrap@5.3.0`, `bootstrap-icons` -> diseño y responsividad de la web.
 `axios` -> establecimiento de comunicación con el servidor independiente creado. (peticiones http) USO: `services/postService.js`
 `swr` -> Biblioteca SWR para la obtención de datos en index.js (home) -> obtención de los posts
+
  [SWR DOC](https://swr.vercel.app/es-ES)
 `react-hook-form` -> manejo de recogida de datos en formularios e inputs. USO: `newPostCard.js` y `postArticle.js`
 
@@ -79,7 +81,9 @@ La creación inicial del servidor se ha realizado con la funcionalidad `express-
 
 Librerías adicionales: 
 `multer` -> middleware para la gestión y guardado de las imágenes obtenidas en el servidor. USO: `routes/posts.js`
+
 [Multer DOC](https://github.com/expressjs/multer)
+
 `fs` y `path`-> librerías integradas para la lectura, ruta y edición de las imágenes de los posts.
 
 ### Base de datos: 
@@ -125,11 +129,16 @@ Proporciona una estructura básica para una aplicación de Next.js, con un encab
 _componentes_
 
 Se han separado componentes con funcionalidad muy marcada para aligerar el código y dividir las funcionalidades. Aún cabe refactorización pero se pueden encontrar ya en el proyecto los siguientes:
+
 `deleteButton` -> de uso en todos los postArticles.
+
 `footer` -> incluido en el layout
+
 `imageUploader` -> contenedor específico con la lógica de react-dropzone para la carga de imágenes. Usado en modo edición de postArticle y en newPostCard.
+
 `newPostCard `-> formulario para la carga de un nuevo post
-`postArticle` -> Componente reutilizado con renderización condicional en función de diferentes estados o rutas donde se encuentre, por ejemplo en la home.  Además, contiene la lógica de el modo edición de la entrada, que solo se acti
+
+`postArticle` -> Componente reutilizado con renderización condicional en función de diferentes estados o rutas donde se encuentre, por ejemplo en la home.  Además, contiene la lógica de el modo edición de la entrada, que solo se activa al hacer clic en el botón editar. A través de ella podemos editar los campos que queramos (título, contenido, o imagen).
 
 
 ### Backend 
@@ -140,6 +149,7 @@ El servidor es una API REST creada con Express Generator y utiliza Node.js. La e
 - `lib`: Contiene varios archivos con funcionalidades utilizadas en diferentes partes del servidor, así como los middlewares para la verificación de datos provenientes del cliente y la autenticación.
 - `routes`: Se definen las diferentes rutas del servidor utilizando `express.router()`. Cada ruta representa un apartado de la base de datos, en este caso una única; gestión de publicaciones. En los endpoints se importan controladores.
 - `controllers` : Clase PostController que consta de los métodos CRUD necesarios de uso en los distintos endpoints. 
+  - Los controladores han sido pensados para que, aun a pesar de ser más complejos permitan un mejor rendimiento y experiencia de usuario, estableciendo una sola petición que contemple distintas opciones, como en el caso de updatePost, maneja los casos de recibir todos, ninguno, o solo alguno de los datos que conforman el post, para actualizar solo aquellos deseados.
 
 Todas estas rutas se importan en `app.js`, el archivo principal del servidor. También se incluyen manejadores de errores preestablecidos.
 
