@@ -3,7 +3,8 @@
 ## PUESTA EN MARCHA DE SPELKIT BLOG
 
 ### MySQL 
-La base de datos se encuentra en /backend/db/next-blog-db.sql
+La base de datos se encuentra en `/backend/db/next-blog-db.sql`
+
 Impórtala en phpMyAdmin o el entorno de ejecución de SQL que prefieras.
 
 ### BACKEND (express) : Inicialización
