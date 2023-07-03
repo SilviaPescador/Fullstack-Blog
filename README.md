@@ -130,15 +130,11 @@ _componentes_
 
 Se han separado componentes con funcionalidad muy marcada para aligerar el código y dividir las funcionalidades. Aún cabe refactorización pero se pueden encontrar ya en el proyecto los siguientes:
 
-`deleteButton` -> de uso en todos los postArticles.
-
-`footer` -> incluido en el layout
-
-`imageUploader` -> contenedor específico con la lógica de react-dropzone para la carga de imágenes. Usado en modo edición de postArticle y en newPostCard.
-
-`newPostCard `-> formulario para la carga de un nuevo post
-
-`postArticle` -> Componente reutilizado con renderización condicional en función de diferentes estados o rutas donde se encuentre, por ejemplo en la home.  Además, contiene la lógica de el modo edición de la entrada, que solo se activa al hacer clic en el botón editar. A través de ella podemos editar los campos que queramos (título, contenido, o imagen).
+- `deleteButton` -> de uso en todos los postArticles.
+- `footer` -> incluido en el layout
+- `imageUploader` -> contenedor específico con la lógica de react-dropzone para la carga de imágenes. Usado en modo edición de postArticle y en newPostCard.
+- `newPostCard `-> formulario para la carga de un nuevo post
+- `postArticle` -> Componente reutilizado con renderización condicional en función de diferentes estados o rutas donde se encuentre, por ejemplo en la home.  Además, contiene la lógica de el modo edición de la entrada, que solo se activa al hacer clic en el botón editar. A través de ella podemos editar los campos que queramos (título, contenido, o imagen).
 
 
 ### Backend 
@@ -156,10 +152,10 @@ Todas estas rutas se importan en `app.js`, el archivo principal del servidor. Ta
 
 ## FUNCIONALIDADES CLAVE
 
-Sistema CRUD: Creación, Lectura, Actualización y Borrado de entradas.
-Envío de imágenes al servidor mediante react-dropzone y almacenamiento en carpeta pública.
-Edición de entradas con renderización condicional de campos en modo edición.
-Protección contra borrado accidental mediante popup de confirmación.
+- Sistema CRUD: Creación, Lectura, Actualización y Borrado de entradas.
+- Envío de imágenes al servidor mediante react-dropzone y almacenamiento en carpeta pública.
+- Edición de entradas con renderización condicional de campos en modo edición.
+- Protección contra borrado accidental mediante popup de confirmación.
 
 
 ## DESAFÍOS TÉCNICOS
@@ -179,10 +175,10 @@ Utilicé la función getStaticProps para obtener los datos iniciales del servido
 
 ## Mejoras futuras: 
 
-Implementar autenticación de usuarios para proteger el contenido y permitir que los autores editen solo sus propias entradas.
-Mejorar el manejo de imágenes en el servidor para optimizar el rendimiento y la seguridad.
-Explorar la posibilidad de implementar un enfoque más sofisticado para el enrutamiento utilizando App router de Next.js.
-Incluir el servidor en la misma aplicación de Next.js
+- Implementar autenticación de usuarios para proteger el contenido y permitir que los autores editen solo sus propias entradas.
+- Mejorar el manejo de imágenes en el servidor para optimizar el rendimiento y la seguridad.
+- Explorar la posibilidad de implementar un enfoque más sofisticado para el enrutamiento utilizando App router de Next.js.
+- Incluir el servidor en la misma aplicación de Next.js
 
 
 
