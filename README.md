@@ -2,24 +2,35 @@
 
 ## PUESTA EN MARCHA DE SPELKIT BLOG
 
+### MySQL 
+La base de datos se encuentra en /backend/db/next-blog-db.sql
+Impórtala en phpMyAdmin o el entorno de ejecución de SQL que prefieras.
+
 ### BACKEND (express) : Inicialización
 
-Para inicializar el servidor (backend), sigue los siguientes pasos:
+_Para inicializar el servidor (backend), sigue los siguientes pasos_
+
+coloca el .env en la raiz de /backend con estas variables de entorno:
+PORT=3000
+DB_HOST=127.0.0.1
+DB_USER=root
+DB_NAME=blog_bd
 
 ```bash
+cd backend
 npm install
 npm run dev
 ```
 
 ### FRONTEND (next.js): Inicialización
 
-Para inicializar el cliente (frontend), sigue los siguientes pasos:
+_Para inicializar el cliente (frontend), sigue los siguientes pasos_
 
 ```bash
+cd frontend
 npm install
 npm run dev
 ```
-
 
 ## OBJETIVOS DEL PROYECTO 
 
