@@ -134,7 +134,7 @@ Se han separado componentes con funcionalidad muy marcada para aligerar el códi
 - `footer` -> incluido en el layout
 - `imageUploader` -> contenedor específico con la lógica de react-dropzone para la carga de imágenes. Usado en modo edición de postArticle y en newPostCard.
 - `newPostCard `-> formulario para la carga de un nuevo post
-- `postArticle` -> Componente reutilizado con renderización condicional en función de diferentes estados o rutas donde se encuentre, por ejemplo en la home.  Además, contiene la lógica de el modo edición de la entrada, que solo se activa al hacer clic en el botón editar. A través de ella podemos editar los campos que queramos (título, contenido, o imagen).
+- `postArticle` -> Componente reutilizado con renderización condicional en función de diferentes estados o rutas donde se encuentre, por ejemplo en la home.  Además, contiene la lógica de el `modo edición` de la entrada, que solo se activa al hacer clic en el botón editar. A través de ella podemos editar los campos que queramos (título, contenido, o imagen). Se le ha añadido al modo edición, un botón para cancelar la edición en caso de no querer continuar. 
 
 
 ### Backend 
