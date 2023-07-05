@@ -9,13 +9,15 @@ Impórtala en phpMyAdmin o el entorno de ejecución de SQL que prefieras.
 
 ### BACKEND (express) : Inicialización
 
-_Para inicializar el servidor (backend), sigue los siguientes pasos_
+_Para inicializar el servidor, sigue los siguientes pasos_
 
-coloca el .env en la raiz de /backend con estas variables de entorno:
+coloca el .env en la raiz de /backend:
+```
 PORT=3000
 DB_HOST=127.0.0.1
 DB_USER=root
 DB_NAME=blog_bd
+```
 
 ```bash
 cd backend
@@ -25,7 +27,7 @@ npm run dev
 
 ### FRONTEND (next.js): Inicialización
 
-_Para inicializar el cliente (frontend), sigue los siguientes pasos_
+_Para inicializar el cliente, sigue los siguientes pasos_
 
 ```bash
 cd frontend
@@ -35,30 +37,32 @@ npm run dev
 
 ## OBJETIVOS DEL PROYECTO 
 
-Demostrar habilidades y conocimientos técnicos en el desarrollo web.
-Familiarizarse con el framework Next.js, incluyendo el uso de sus capacidades de servidor.
-Implementar un sistema CRUD (Create, Read, Update, Delete) para las entradas del blog.
-Crear una interfaz de usuario atractiva y responsiva utilizando CSS (bootstrap).
-Integrar la funcionalidad de subida y manejo de imágenes en el servidor.
+	Demostrar habilidades y conocimientos técnicos en el desarrollo web.
+	Familiarizarse con el framework Next.js, incluyendo el uso de sus capacidades de servidor.
+	Implementar un sistema CRUD (Create, Read, Update, Delete) para las entradas del blog.
+	Crear una interfaz de usuario atractiva y responsiva utilizando CSS (bootstrap).
+	Integrar la funcionalidad de subida y manejo de imágenes en el servidor.
 
 ### Motivaciones
 
-He querido proporcionar un grado de complejidad al proyecto adentrándome en un framework nuevo como es Next.js, de cara a la escalabilidad posterior y a mi aprendizaje personal. 
-Nextjs es una forma de usar REACT, que ofrece la posibilidad de facilidad de enrutamiento, proporciona una estructura inicial, y da la posibilidad de incluir cliente y servidor en un mismo proyecto. 
+En este proyecto, he tomado mi primer contacto con Next.js, de cara a la escalabilidad posterior y a mi aprendizaje personal. 
 
-Su uso ha facilitado tareas ya que tiene incluidos componentes como Link, Image, Head, y diferentes hooks como next/router. Ha simplificado enormemente la creación de nuevas rutas con el sistema de carpetas en /Pages.
+ 		Componentes: Link, Image, Head
+		Hooks: next/router
+		Routing; /Pages router
 
-En este caso, he creado el servidor de forma independiente, aunque posteriormente lo incluiré en la misma app, mejorando así el rendimiento y funcionalidades. 
+Por el momento se ha creado el servidor de forma independiente, aunque posteriormente lo incluiré en la misma app, mejorando así el rendimiento y funcionalidades. 
 
 Cabe destacar que no he usado todas las posibilidades que ofrece Next.js:
 ROUTING: las rutas están (por el momento) establecidas a través del PAGES ROUTING  de nextjs. 
-En la última versión , Next.js 13, se recomienda migrar a App Router[App Router DOC](https://nextjs.org/docs/pages), y se implementará en un futuro
+En la última versión , Next.js 13, se recomienda migrar a App Router[App Router DOC](https://nextjs.org/docs/pages), y se implementará en un futuro.
 [Next.js DOC](https://nextjs.org/docs/pages/building-your-application)
 
 ## DISEÑO VISUAL Y RESPONSIVIDAD: 
 
 ### Diseño
-Quise crear un espacio online personal donde plasmar ideas, noticias e intereses varios, con clara tendencia marcada hacia las tecnologías y la inteligencia artificial. 
+Se creó un espacio online personal donde plasmar ideas, noticias e intereses varios, con clara tendencia hacia las tecnologías y la inteligencia artificial. 
+
 Todas las imágenes que aparecen en el blog son creadas por el Creador de Imágenes de Bing, al cual existe un enlace en la página para crear una nueva entrada. 
 
 He optado por conservar un diseño sencillo y claro, que no esté recargado, de cara a posteriores peticiones del cliente, y aminorar la complejidad de la responsividad de cara a futuras refactorizaciones o añadidos. 
