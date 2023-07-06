@@ -20,6 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Base de datos: `next-blog-db`
 --
+CREATE DATABASE IF NOT EXISTS `next-blog-db` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+USE `next-blog-db`;
 
 -- --------------------------------------------------------
 
