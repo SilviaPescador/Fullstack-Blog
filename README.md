@@ -13,10 +13,10 @@ _Para inicializar el servidor, sigue los siguientes pasos_
 
 coloca el .env en la raiz de /backend:
 ```
-PORT=3000
+PORT=3001
 DB_HOST=127.0.0.1
 DB_USER=root
-DB_NAME=blog_bd
+DB_NAME=next-blog-db
 ```
 
 ```bash
