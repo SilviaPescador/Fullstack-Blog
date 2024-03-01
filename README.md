@@ -20,7 +20,7 @@ DB_NAME=next-blog-db
 ```
 
 ```bash
-cd backend
+cd node-server
 npm install
 npm run dev
 ```
@@ -30,7 +30,7 @@ npm run dev
 _Para inicializar el cliente, sigue los siguientes pasos_
 
 ```bash
-cd frontend
+cd nextjs-blog
 npm install
 npm run dev
 ```
