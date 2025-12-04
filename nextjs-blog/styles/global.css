@@ -9,11 +9,10 @@ body {
 		Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 	line-height: 1.6;
 	font-size: 18px;
-	background-image: url('../public/images/muro.jpg');
+	background-image: url('/images/muro.jpg');
 	background-size: contain;
 	background-position: center center;
 	min-block-size: 200vh;
-	
 }
 
 * {
@@ -40,17 +39,16 @@ img {
 	display: block;
 }
 
-
 pre {
-	white-space: pre-wrap;       /* Since CSS 2.1 */
-	white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
-	white-space: -pre-wrap;      /* Opera 4-6 */
-	white-space: -o-pre-wrap;    /* Opera 7 */
-	word-wrap: break-word;       /* Internet Explorer 5.5+ */
+	white-space: pre-wrap; /* Since CSS 2.1 */
+	white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
+	white-space: -pre-wrap; /* Opera 4-6 */
+	white-space: -o-pre-wrap; /* Opera 7 */
+	word-wrap: break-word; /* Internet Explorer 5.5+ */
 }
 
 .contentBackground {
-	background-image: url('../public/images/marco-hoja.jpg');
+	background-image: url('/images/marco-hoja.jpg');
 	background-size: cover;
 	background-position: center center;
 }

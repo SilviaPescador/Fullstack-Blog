@@ -1,5 +1,7 @@
-import { useState } from "react";
-import { useDropzone } from "react-dropzone";
+'use client';
+
+import { useState } from 'react';
+import { useDropzone } from 'react-dropzone';
 
 const ImageUploader = ({ onImageUpload }) => {
 	const [selectedImage, setSelectedImage] = useState(null);

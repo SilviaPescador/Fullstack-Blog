@@ -1,3 +1,5 @@
+'use client';
+
 export default function Footer() {
 	return (
 		<footer className="container-fluid position-absolute fixed-bottom py-3 ">
@@ -9,4 +11,3 @@ export default function Footer() {
 		</footer>
 	);
 }
- 

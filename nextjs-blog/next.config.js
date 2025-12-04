@@ -1,5 +1,15 @@
-module.exports = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
 	images: {
-		domains: ["localhost"],
+		// Permitir imágenes de cualquier fuente local
+		unoptimized: false,
+		remotePatterns: [
+			{
+				protocol: 'http',
+				hostname: 'localhost',
+			},
+		],
 	},
 };
+
+module.exports = nextConfig;

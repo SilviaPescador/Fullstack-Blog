@@ -1,14 +1,15 @@
-import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
+'use client';
 
-import Image from "next/image";
-import Link from "next/link";
+import { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
 
-import DeleteButton from "../components/deleteButton";
-import ImageUploader from "./imageUploader";
-import PostService from "../services/postService";
-import formatDate from "../common/formatDate";
-import Swal from "sweetalert2";
+import Link from 'next/link';
+
+import DeleteButton from '@/components/deleteButton';
+import ImageUploader from './imageUploader';
+import PostService from '@/services/postService';
+import formatDate from '@/common/formatDate';
+import Swal from 'sweetalert2';
 
 export default function PostArticle({
 	postData,
@@ -18,9 +19,9 @@ export default function PostArticle({
 	home,
 }) {
 	const [isEditing, setIsEditing] = useState(false);
-	const [truncatedContent, setTruncatedContent] = useState("");
-	const [content, setContent] = useState(postData.content || "");
-	const [title, setTitle] = useState(postData.title || "");
+	const [truncatedContent, setTruncatedContent] = useState('');
+	const [content, setContent] = useState(postData.content || '');
+	const [title, setTitle] = useState(postData.title || '');
 	const [selectedImage, setSelectedImage] = useState(null);
 
 	const friendlyDate = formatDate(postData.post_date);
@@ -28,11 +29,11 @@ export default function PostArticle({
 
 	useEffect(() => {
 		if (postData.content.length > 50) {
-			setTruncatedContent(postData.content.substring(0, 50) + "...");
+			setTruncatedContent(postData.content.substring(0, 50) + '...');
 		} else {
 			setTruncatedContent(postData.content);
 		}
-	}, []);
+	}, [postData.content]);
 
 	const handleImageUpload = (image) => {
 		setSelectedImage(image);
@@ -49,9 +50,9 @@ export default function PostArticle({
 			const postService = new PostService();
 			await postService.updatePost(postData.id, updates);
 			await Swal.fire({
-				position: "top-end",
-				icon: "success",
-				title: "Post Updated!",
+				position: 'top-end',
+				icon: 'success',
+				title: 'Post Updated!',
 				showConfirmButton: false,
 				timer: 1500,
 			});
@@ -63,7 +64,7 @@ export default function PostArticle({
 				icon: 'error',
 				title: 'Oops...',
 				text: `Something went wrong!: ${error}`,
-			    })
+			});
 		}
 	};
 
@@ -73,13 +74,16 @@ export default function PostArticle({
 			{postData.image && (
 				<>
 					<div className="d-flex justify-content-center rounded">
-						<Image
-							priority
+						{/* eslint-disable-next-line @next/next/no-img-element */}
+						<img
 							src={postData.image}
 							className="img-fluid rounded-4 p-1 border border-dark mt-3"
-							height={fullPost ? 800 : 200}
-							width={fullPost ? 800 : 200}
-							alt=""
+							style={{
+								maxHeight: fullPost ? '800px' : '200px',
+								maxWidth: fullPost ? '800px' : '200px',
+								objectFit: 'cover',
+							}}
+							alt={postData.title || 'Post image'}
 						/>
 					</div>
 					{isEditing && <ImageUploader onImageUpload={handleImageUpload} />}
@@ -90,15 +94,17 @@ export default function PostArticle({
 				{isEditing ? (
 					<textarea
 						name="title"
-						{...register("title")}
+						{...register('title')}
 						className="form-control col-9"
 						value={title}
 						onChange={(e) => setTitle(e.target.value)}
 						rows="1"
 					/>
 				) : !fullPost ? (
-					<Link href="/posts/[id]" as={`/posts/${postData.id}`}>
-						<h2 className="card-title" title="Full post">{postData.title}</h2>
+					<Link href={`/posts/${postData.id}`}>
+						<h2 className="card-title" title="Full post">
+							{postData.title}
+						</h2>
 					</Link>
 				) : (
 					<h2 className="card-title">{postData.title}</h2>
@@ -112,7 +118,7 @@ export default function PostArticle({
 				{isEditing ? (
 					<textarea
 						name="content"
-						{...register("content")}
+						{...register('content')}
 						className="form-control"
 						value={content}
 						onChange={(e) => setContent(e.target.value)}

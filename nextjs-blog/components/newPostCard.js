@@ -1,12 +1,14 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { useRouter } from 'next/router'
+'use client';
 
-import utilStyles from "../styles/utils.module.css";
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useRouter } from 'next/navigation';
 
-import PostService from "../services/postService";
-import ImageUploader from "./imageUploader";
-import Swal from 'sweetalert2'
+import utilStyles from '@/styles/utils.module.css';
+
+import PostService from '@/services/postService';
+import ImageUploader from './imageUploader';
+import Swal from 'sweetalert2';
 
 export default function NewPostCard() {
 	const [selectedImage, setSelectedImage] = useState(null);
@@ -16,7 +18,7 @@ export default function NewPostCard() {
 		reset,
 		formState: { errors },
 	} = useForm();
-	const router = useRouter()
+	const router = useRouter();
 
 	const handleImageUpload = (image) => {
 		setSelectedImage(image);
@@ -32,16 +34,16 @@ export default function NewPostCard() {
 				icon: 'success',
 				title: 'Congrats, new post created!!',
 				showConfirmButton: false,
-				timer: 1500
-			    })
-			router.push(`/posts/${response.insertId}`)
+				timer: 1500,
+			});
+			router.push(`/posts/${response.insertId}`);
 		} catch (error) {
 			console.error(error);
 			Swal.fire({
 				icon: 'error',
 				title: 'Oops...',
 				text: `Something went wrong!: ${error}`,
-			    })
+			});
 			reset();
 		}
 	};
@@ -54,7 +56,7 @@ export default function NewPostCard() {
 					<div className="mb-3">
 						<input
 							name="title"
-							{...register("title")}
+							{...register('title')}
 							className="form-control shadow mb-1"
 							placeholder="Title"
 						></input>
@@ -64,7 +66,7 @@ export default function NewPostCard() {
 
 						<textarea
 							name="consulta"
-							{...register("content")}
+							{...register('content')}
 							className="form-control shadow"
 							placeholder="Share your thoughts..."
 							rows="3"
@@ -76,7 +78,7 @@ export default function NewPostCard() {
 					<ImageUploader onImageUpload={handleImageUpload} />
 					<div className="d-flex justify-content-end">
 						<button type="submit" className="btn mx-1 mt-2" title="post">
-						<i class="bi bi-send fs-3"></i>
+							<i className="bi bi-send fs-3"></i>
 						</button>
 					</div>
 				</form>
