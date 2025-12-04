@@ -9,6 +9,7 @@ import DeleteButton from '@/components/deleteButton';
 import ImageUploader from './imageUploader';
 import PostService from '@/services/postService';
 import formatDate from '@/common/formatDate';
+import { useAuth } from '@/hooks/useAuth';
 import Swal from 'sweetalert2';
 
 export default function PostArticle({
@@ -24,8 +25,14 @@ export default function PostArticle({
 	const [title, setTitle] = useState(postData.title || '');
 	const [selectedImage, setSelectedImage] = useState(null);
 
+	const { canEditPost, canDeletePost, loading: authLoading } = useAuth();
+
 	const friendlyDate = formatDate(postData.post_date);
 	const { register } = useForm();
+
+	// Verificar permisos para este post específico
+	const canEdit = canEditPost(postData.author_id);
+	const canDelete = canDeletePost(postData.author_id);
 
 	useEffect(() => {
 		if (postData.content.length > 50) {
@@ -197,7 +204,8 @@ export default function PostArticle({
 					</>
 				)}
 
-				{fullPost && !isEditing && (
+				{/* Solo mostrar botón de editar si tiene permisos */}
+				{fullPost && !isEditing && canEdit && !authLoading && (
 					<button
 						className="btn"
 						title="Edit this post"
@@ -206,7 +214,11 @@ export default function PostArticle({
 						<i className="bi bi-pencil-square"></i>
 					</button>
 				)}
-				<DeleteButton id={postData.id} home={home} onDelete={onDelete} />
+
+				{/* Solo mostrar botón de eliminar si tiene permisos */}
+				{canDelete && !authLoading && (
+					<DeleteButton id={postData.id} home={home} onDelete={onDelete} />
+				)}
 			</div>
 		</article>
 	);
