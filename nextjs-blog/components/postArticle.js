@@ -68,20 +68,49 @@ export default function PostArticle({
 		}
 	};
 
+	// Estilos para truncar texto en grid
+	const titleStyle = !fullPost
+		? {
+				display: '-webkit-box',
+				WebkitLineClamp: 2,
+				WebkitBoxOrient: 'vertical',
+				overflow: 'hidden',
+				textOverflow: 'ellipsis',
+				minHeight: '3rem',
+		  }
+		: {};
+
+	const contentStyle = !fullPost
+		? {
+				display: '-webkit-box',
+				WebkitLineClamp: 2,
+				WebkitBoxOrient: 'vertical',
+				overflow: 'hidden',
+				textOverflow: 'ellipsis',
+		  }
+		: {};
+
 	return (
-		<article className="card rounded mt-3  mb-4 shadow ">
-			{/** IMAGE (if not null) */}
+		<article
+			className={`card rounded shadow w-100 ${fullPost ? 'mt-3 mb-4' : 'h-100 d-flex flex-column'}`}
+		>
+			{/** IMAGE */}
 			{postData.image && (
 				<>
-					<div className="d-flex justify-content-center rounded">
+					<div
+						className="d-flex justify-content-center rounded overflow-hidden"
+						style={!fullPost ? { height: '150px' } : {}}
+					>
 						{/* eslint-disable-next-line @next/next/no-img-element */}
 						<img
 							src={postData.image}
-							className="img-fluid rounded-4 p-1 border border-dark mt-3"
+							className={`img-fluid ${fullPost ? 'rounded-4 p-1 border border-dark mt-3' : 'card-img-top'}`}
 							style={{
-								maxHeight: fullPost ? '800px' : '200px',
-								maxWidth: fullPost ? '800px' : '200px',
+								height: fullPost ? 'auto' : '150px',
+								width: '100%',
 								objectFit: 'cover',
+								maxHeight: fullPost ? '800px' : '150px',
+								maxWidth: fullPost ? '800px' : '100%',
 							}}
 							alt={postData.title || 'Post image'}
 						/>
@@ -89,8 +118,9 @@ export default function PostArticle({
 					{isEditing && <ImageUploader onImageUpload={handleImageUpload} />}
 				</>
 			)}
+
 			{/** TITLE + POST_DATE */}
-			<div className=" mx-3 align-items-center p-2">
+			<div className="card-header bg-transparent border-0 px-3 pt-3 pb-0">
 				{isEditing ? (
 					<textarea
 						name="title"
@@ -102,19 +132,20 @@ export default function PostArticle({
 					/>
 				) : !fullPost ? (
 					<Link href={`/posts/${postData.id}`}>
-						<h2 className="card-title" title="Full post">
+						<h6 className="card-title fw-bold mb-1" style={titleStyle} title={postData.title}>
 							{postData.title}
-						</h2>
+						</h6>
 					</Link>
 				) : (
 					<h2 className="card-title">{postData.title}</h2>
 				)}
-				<p>
+				<small className="text-muted">
 					{friendlyDate} - {postData.author}
-				</p>
+				</small>
 			</div>
+
 			{/** POST CONTENT */}
-			<div className="card-body mx-3">
+			<div className={`card-body px-3 py-2 ${!fullPost ? 'flex-grow-1' : ''}`}>
 				{isEditing ? (
 					<textarea
 						name="content"
@@ -125,11 +156,14 @@ export default function PostArticle({
 						rows="10"
 					/>
 				) : (
-					<pre>{fullPost ? postData.content : truncatedContent}</pre>
+					<pre className="mb-0 small" style={contentStyle}>
+						{fullPost ? postData.content : truncatedContent}
+					</pre>
 				)}
 			</div>
+
 			{/** FOOTER - BUTTONS */}
-			<div className="card-footer d-flex justify-content-end">
+			<div className="card-footer bg-gray-100 border-0 d-flex justify-content-end py-2 mt-auto">
 				{isEditing && (
 					<>
 						<button

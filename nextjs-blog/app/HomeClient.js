@@ -27,16 +27,20 @@ export default function HomeClient({ initialPosts }) {
 					Aquí se plasman sueños, noticias, emociones e ideas de célula y metal.
 				</p>
 			</section>
+			{/* Grid de 3 columnas */}
 			<section className="pb-5">
-				{data.map((post) => (
-					<PostArticle
-						postData={post}
-						key={post.id}
-						onDelete={resetPosts}
-						fullPost={false}
-						home
-					/>
-				))}
+				<div className="row g-3">
+					{data.map((post) => (
+						<div className="col-12 col-md-6 col-lg-4" key={post.id}>
+							<PostArticle
+								postData={post}
+								onDelete={resetPosts}
+								fullPost={false}
+								home
+							/>
+						</div>
+					))}
+				</div>
 			</section>
 		</Layout>
 	);
