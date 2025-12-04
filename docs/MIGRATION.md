@@ -1,10 +1,12 @@
 # 📋 Historial de Migración
 
-Este documento detalla la migración del proyecto desde una arquitectura separada (Express + Next.js Pages Router) a una arquitectura fullstack integrada con Next.js App Router.
+Este documento detalla las migraciones del proyecto desde su arquitectura inicial hasta la actual.
 
 ---
 
-## 🔄 Resumen de la Migración
+## 🔄 Resumen de Migraciones
+
+### Migración 1: Express → Next.js App Router (Diciembre 2024)
 
 | Aspecto | Antes | Después |
 |---------|-------|---------|
@@ -14,13 +16,22 @@ Este documento detalla la migración del proyecto desde una arquitectura separad
 | **Routing** | `pages/` directory | `app/` directory |
 | **Peticiones HTTP** | Axios | Fetch API nativo |
 | **Servidores** | 2 (frontend + backend) | 1 (fullstack) |
-| **CORS** | Configuración necesaria | No necesario |
+
+### Migración 2: MySQL → Supabase (Diciembre 2024)
+
+| Aspecto | Antes | Después |
+|---------|-------|---------|
+| **Base de datos** | MySQL local | Supabase (PostgreSQL cloud) |
+| **Autenticación** | Ninguna | Supabase Auth (Email, GitHub) |
+| **Almacenamiento** | `/public/images/` local | Supabase Storage (cloud) |
+| **Hosting** | Local | Vercel |
+| **Seguridad** | Ninguna | RLS (Row Level Security) |
 
 ---
 
-## 📂 Cambios en la Estructura
+## 📂 Evolución de la Estructura
 
-### Estructura Anterior (Express + Pages Router)
+### Fase 1: Express + Pages Router (Original)
 
 ```
 proyecto/
@@ -34,141 +45,195 @@ proyecto/
         ├── _app.js
         ├── index.js
         └── posts/
-            ├── [id].js
-            └── create-new.js
 ```
 
-### Estructura Actual (Next.js Fullstack)
+### Fase 2: Next.js Fullstack + MySQL (Intermedia)
 
 ```
 nextjs-blog/
-├── app/                      # ✅ NUEVO - App Router
-│   ├── api/posts/            # API Routes (reemplaza Express)
-│   │   ├── route.js          # GET all, POST
-│   │   └── [id]/route.js     # GET one, PATCH, DELETE
-│   ├── layout.js             # Layout raíz
-│   ├── page.js               # Home (Server Component)
-│   ├── HomeClient.js         # Home (Client Component)
+├── app/                      # App Router
+│   ├── api/posts/            # API Routes
 │   └── posts/
-│       ├── [id]/
-│       │   ├── page.js
-│       │   └── PostPageClient.js
-│       └── create-new/page.js
 ├── lib/
-│   └── db.js                 # ✅ NUEVO - Conexión MySQL
-├── db/
-│   └── next-blog-db.sql      # Esquema de base de datos
-└── public/images/            # Imágenes (movidas desde node-server)
+│   └── db.js                 # Conexión MySQL
+└── public/images/            # Imágenes locales
+```
+
+### Fase 3: Next.js + Supabase + Vercel (Actual)
+
+```
+nextjs-blog/
+├── app/
+│   ├── api/posts/            # API Routes con Supabase
+│   ├── (auth)/               # ✅ NUEVO - Páginas de auth
+│   │   ├── login/
+│   │   ├── register/
+│   │   └── banned/
+│   ├── auth/callback/        # ✅ NUEVO - OAuth callback
+│   ├── admin/users/          # ✅ NUEVO - Panel admin
+│   └── posts/
+├── hooks/
+│   └── useAuth.js            # ✅ NUEVO - Hook de autenticación
+├── lib/supabase/             # ✅ NUEVO - Clientes Supabase
+│   ├── client.js             # Cliente para browser
+│   ├── server.js             # Cliente para server
+│   └── middleware.js         # Middleware de sesión
+├── middleware.js             # ✅ NUEVO - Protección de rutas
+└── db/
+    ├── schema.sql            # Esquema PostgreSQL
+    ├── rls-policies.sql      # Políticas de seguridad
+    └── seed-posts.sql        # Datos iniciales
 ```
 
 ---
 
 ## 🔧 Cambios Técnicos Principales
 
-### 1. API Routes (Reemplazo de Express)
+### 1. Base de Datos: MySQL → PostgreSQL (Supabase)
 
-**Antes** - Express con controladores:
-```javascript
-// node-server/routes/posts.js
-router.get("/:id?", postController.getPosts);
-router.post("/", upload.single("image"), postController.createPost);
-```
-
-**Después** - Route Handlers de Next.js:
-```javascript
-// app/api/posts/route.js
-export async function GET() { ... }
-export async function POST(request) { ... }
-```
-
-### 2. Conexión a Base de Datos
-
-**Antes** - En servidor Express separado:
-```javascript
-// node-server/db/connection.js
-const pool = mysql.createPool({ ... });
-```
-
-**Después** - Integrado en Next.js:
+**Antes** - MySQL local:
 ```javascript
 // lib/db.js
 import mysql from 'mysql2/promise';
-const pool = mysql.createPool({ ... });
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+});
 ```
 
-### 3. Componentes Client/Server
-
-**Antes** - Todo renderizado del lado del cliente:
+**Después** - Supabase:
 ```javascript
-// pages/index.js
-export default function Home({ initialData }) {
-  const { data } = useSWR("http://localhost:3001/posts", fetcher);
+// lib/supabase/server.js
+import { createServerClient } from '@supabase/ssr';
+export async function createClient() {
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    { cookies: { ... } }
+  );
 }
 ```
 
-**Después** - Server Components + Client Components:
+### 2. Autenticación
+
+**Antes** - Sin autenticación:
 ```javascript
-// app/page.js (Server Component)
-export default async function Home() {
-  const posts = await getPosts(); // Directo a DB
-  return <HomeClient initialPosts={posts} />;
+// Cualquiera podía crear/editar/eliminar posts
+```
+
+**Después** - Supabase Auth:
+```javascript
+// API Route protegida
+const { data: { user } } = await supabase.auth.getUser();
+if (!user) {
+  return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
 }
+```
 
-// app/HomeClient.js (Client Component)
-'use client';
-export default function HomeClient({ initialPosts }) {
-  const { data } = useSWR('/api/posts', fetcher);
+### 3. Almacenamiento de Imágenes
+
+**Antes** - Sistema de archivos local:
+```javascript
+import { writeFile } from 'fs/promises';
+const imagePath = path.join(process.cwd(), 'public/images', fileName);
+await writeFile(imagePath, buffer);
+```
+
+**Después** - Supabase Storage:
+```javascript
+const { data } = await supabase.storage
+  .from('post-images')
+  .upload(fileName, image);
+const { data: { publicUrl } } = supabase.storage
+  .from('post-images')
+  .getPublicUrl(data.path);
+```
+
+### 4. Sistema de Roles y Permisos
+
+**Nuevo** - Row Level Security (RLS):
+```sql
+-- Solo el autor o admin puede editar
+CREATE POLICY "Users can update own posts"
+ON posts FOR UPDATE
+USING (auth.uid() = author_id);
+
+CREATE POLICY "Admins can update any post"
+ON posts FOR UPDATE
+USING (
+  EXISTS (
+    SELECT 1 FROM profiles
+    WHERE id = auth.uid() AND role = 'admin'
+  )
+);
+```
+
+### 5. Middleware de Protección
+
+**Nuevo** - Middleware para rutas protegidas:
+```javascript
+// middleware.js
+export async function middleware(request) {
+  const { user } = await supabase.auth.getUser();
+  
+  if (isProtectedRoute && !user) {
+    return NextResponse.redirect('/login');
+  }
+  
+  if (user?.role === 'banned') {
+    return NextResponse.redirect('/banned');
+  }
 }
-```
-
-### 4. Navegación
-
-**Antes**:
-```javascript
-import { useRouter } from 'next/router';
-```
-
-**Después**:
-```javascript
-import { useRouter } from 'next/navigation';
-```
-
-### 5. Servicio de Posts
-
-**Antes** - Llamadas a servidor externo con Axios:
-```javascript
-const API_URL = "http://localhost:3001/posts/";
-const response = await axios.get(url);
-```
-
-**Después** - Llamadas internas con Fetch:
-```javascript
-const API_URL = '/api/posts';
-const response = await fetch(url);
 ```
 
 ---
 
-## ✅ Beneficios de la Migración
+## ✅ Beneficios de las Migraciones
 
-1. **Despliegue simplificado**: Un solo servidor en lugar de dos
-2. **Sin configuración CORS**: Las API Routes son internas
-3. **Mejor rendimiento**: Server Components para carga inicial
-4. **Código más limpio**: Sin duplicación de lógica
-5. **Variables de entorno centralizadas**: Un solo `.env.local`
-6. **Mejor DX**: Hot reload más rápido, debugging integrado
+### Migración 1 (Express → Next.js)
+- ✅ Despliegue simplificado: Un solo servidor
+- ✅ Sin configuración CORS
+- ✅ Mejor rendimiento con Server Components
+- ✅ Hot reload más rápido
+
+### Migración 2 (MySQL → Supabase)
+- ✅ Base de datos en la nube (sin configuración local)
+- ✅ Autenticación lista para usar (Email, OAuth)
+- ✅ Almacenamiento de archivos en la nube
+- ✅ Seguridad con RLS a nivel de base de datos
+- ✅ Despliegue automático con Vercel
+- ✅ Escalabilidad automática
 
 ---
 
-## 📅 Fecha de Migración
+## 🌐 URLs del Proyecto
 
-**Diciembre 2024**
+| Entorno | URL |
+|---------|-----|
+| **Producción** | https://fullstack-blog-beta.vercel.app |
+| **Supabase** | https://app.supabase.com/project/lvjjpispbeghnhctyasr |
+| **Vercel** | https://vercel.com/dashboard |
+| **GitHub** | https://github.com/SilviaPescador/Fullstack-Blog |
+
+---
+
+## 📅 Cronología
+
+| Fecha | Evento |
+|-------|--------|
+| Junio 2023 | Versión inicial (Express + Next.js Pages Router) |
+| Diciembre 2024 | Migración a Next.js 16 App Router |
+| Diciembre 2024 | Migración a Supabase + Vercel |
 
 ---
 
 ## 🔗 Referencias
 
 - [Next.js App Router](https://nextjs.org/docs/app)
-- [Route Handlers](https://nextjs.org/docs/app/building-your-application/routing/route-handlers)
-- [Server Components](https://nextjs.org/docs/app/building-your-application/rendering/server-components)
-
+- [Supabase Documentation](https://supabase.com/docs)
+- [Supabase Auth](https://supabase.com/docs/guides/auth)
+- [Supabase Storage](https://supabase.com/docs/guides/storage)
+- [Row Level Security](https://supabase.com/docs/guides/auth/row-level-security)
+- [Vercel Deployment](https://vercel.com/docs)
