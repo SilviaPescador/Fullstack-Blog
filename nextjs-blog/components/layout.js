@@ -4,20 +4,35 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import Footer from '@/components/footer';
+import UserMenu from '@/components/UserMenu';
 
 import styles from './layout.module.css';
 import utilStyles from '@/styles/utils.module.css';
 
 const name = 'Spelkit Blog';
-export const siteTitle = 'My Blog';
+export const siteTitle = 'Spelkit Blog';
 
 export default function Layout({ children, home }) {
 	return (
 		<div className="container card shadow-lg rounded rounded-3 mt-3 p-3 contentBackground">
+			{/* Navbar superior */}
+			<nav className="d-flex justify-content-between align-items-center mb-3 px-2">
+				<Link href="/" className="text-decoration-none">
+					<span className="fw-bold text-dark">{name}</span>
+				</Link>
+				<div className="d-flex align-items-center gap-3">
+					<Link href="/posts/create-new" title="Crear nuevo post" className="btn btn-sm btn-outline-success">
+						<i className="bi bi-plus-lg me-1"></i>
+						<span className="d-none d-sm-inline">Nuevo Post</span>
+					</Link>
+					<UserMenu />
+				</div>
+			</nav>
+
 			<header className={styles.header}>
 				{home ? (
 					<>
-						<Link href="/posts/create-new">
+						<Link href="/">
 							<Image
 								priority
 								src="/images/quantum-flower-400.jpg"
@@ -53,28 +68,15 @@ export default function Layout({ children, home }) {
 					</>
 				)}
 			</header>
-			<nav className="d-flex justify-content-end mx-4 gap-3">
-				{home && (
-					<Link href="/posts/create-new" title="Create new post">
-						<i className="bi bi-plus-square fs-2 "></i>
-					</Link>
-				)}
-				{!home && (
-					<Link
-						href="https://www.bing.com/images/create?form=FLPGEN"
-						title="Bing images generator"
-						target="_blank"
-					>
-						<i className="bi bi-microsoft fs-2"></i>
-					</Link>
-				)}
-			</nav>
+
 			<main>{children}</main>
+
 			{!home && (
 				<div className={styles.backToHome}>
-					<Link href="/">← Back to home</Link>
+					<Link href="/">← Volver al inicio</Link>
 				</div>
 			)}
+
 			<Footer />
 		</div>
 	);

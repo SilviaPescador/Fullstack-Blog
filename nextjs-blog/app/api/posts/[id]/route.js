@@ -1,34 +1,47 @@
 import { NextResponse } from 'next/server';
-import { writeFile, unlink, mkdir } from 'fs/promises';
-import path from 'path';
-import pool from '@/lib/db';
+import { createClient } from '@/lib/supabase/server';
 
 // GET - Obtener un post por ID
 export async function GET(request, { params }) {
 	try {
 		const { id } = await params;
+		const supabase = await createClient();
 
-		const [posts] = await pool.query('SELECT * FROM posts WHERE id = ?', [id]);
+		const { data: post, error } = await supabase
+			.from('posts')
+			.select(`
+				*,
+				profiles:author_id (
+					id,
+					full_name,
+					email,
+					avatar_url
+				)
+			`)
+			.eq('id', id)
+			.single();
 
-		if (posts.length === 0) {
+		if (error || !post) {
 			return NextResponse.json(
 				{ error: 'Post no encontrado' },
 				{ status: 404 }
 			);
 		}
 
-		const post = posts[0];
-		const postWithImageUrl = post.image
-			? {
-					...post,
-					image: post.image,
-			  }
-			: {
-					...post,
-					image: null,
-			  };
+		// Formatear el post para mantener compatibilidad
+		const formattedPost = {
+			id: post.id,
+			title: post.title,
+			content: post.content,
+			image: post.image_url,
+			author: post.profiles?.full_name || post.profiles?.email || 'Anónimo',
+			author_id: post.author_id,
+			post_date: post.created_at,
+			created_at: post.created_at,
+			updated_at: post.updated_at,
+		};
 
-		return NextResponse.json(postWithImageUrl);
+		return NextResponse.json(formattedPost);
 	} catch (error) {
 		console.error('Error fetching post:', error);
 		return NextResponse.json(
@@ -42,27 +55,65 @@ export async function GET(request, { params }) {
 export async function PATCH(request, { params }) {
 	try {
 		const { id } = await params;
-		const formData = await request.formData();
+		const supabase = await createClient();
 
-		// Verificar que el post existe
-		const [existingPosts] = await pool.query(
-			'SELECT * FROM posts WHERE id = ?',
-			[id]
-		);
+		// Verificar autenticación
+		const {
+			data: { user },
+			error: authError,
+		} = await supabase.auth.getUser();
 
-		if (existingPosts.length === 0) {
+		if (authError || !user) {
 			return NextResponse.json(
-				{ error: 'El post no está en la base de datos' },
+				{ error: 'Debes iniciar sesión para editar un post' },
+				{ status: 401 }
+			);
+		}
+
+		// Obtener el post existente
+		const { data: existingPost, error: fetchError } = await supabase
+			.from('posts')
+			.select('*, profiles:author_id(role)')
+			.eq('id', id)
+			.single();
+
+		if (fetchError || !existingPost) {
+			return NextResponse.json(
+				{ error: 'El post no existe' },
 				{ status: 404 }
 			);
 		}
 
-		const existingPost = existingPosts[0];
-		const updatedFields = {};
+		// Verificar permisos: autor del post o admin
+		const { data: userProfile } = await supabase
+			.from('profiles')
+			.select('role')
+			.eq('id', user.id)
+			.single();
 
-		// Procesar campos de texto
+		const isAuthor = existingPost.author_id === user.id;
+		const isAdmin = userProfile?.role === 'admin';
+
+		if (!isAuthor && !isAdmin) {
+			return NextResponse.json(
+				{ error: 'No tienes permiso para editar este post' },
+				{ status: 403 }
+			);
+		}
+
+		if (userProfile?.role === 'banned') {
+			return NextResponse.json(
+				{ error: 'Tu cuenta ha sido suspendida' },
+				{ status: 403 }
+			);
+		}
+
+		const formData = await request.formData();
 		const title = formData.get('title');
 		const content = formData.get('content');
+		const image = formData.get('image');
+
+		const updatedFields = {};
 
 		if (title && title !== existingPost.title) {
 			updatedFields.title = title;
@@ -73,37 +124,39 @@ export async function PATCH(request, { params }) {
 		}
 
 		// Procesar imagen
-		const image = formData.get('image');
-
 		if (image && image.size > 0) {
-			// Eliminar imagen anterior si existe
-			if (existingPost.image) {
-				const oldImagePath = path.join(
-					process.cwd(),
-					'public',
-					existingPost.image
-				);
-				try {
-					await unlink(oldImagePath);
-				} catch (err) {
-					console.error('Error deleting old image:', err);
+			// Eliminar imagen anterior de Storage si existe
+			if (existingPost.image_url && existingPost.image_url.includes('supabase')) {
+				const oldPath = existingPost.image_url.split('/post-images/')[1];
+				if (oldPath) {
+					await supabase.storage.from('post-images').remove([oldPath]);
 				}
 			}
 
-			// Asegurar que el directorio existe
-			const uploadDir = path.join(process.cwd(), 'public/images');
-			try {
-				await mkdir(uploadDir, { recursive: true });
-			} catch (err) {
-				// El directorio ya existe
+			// Subir nueva imagen
+			const fileExt = image.name.split('.').pop();
+			const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+
+			const { data: uploadData, error: uploadError } = await supabase.storage
+				.from('post-images')
+				.upload(fileName, image, {
+					cacheControl: '3600',
+					upsert: false,
+				});
+
+			if (uploadError) {
+				console.error('Error uploading image:', uploadError);
+				return NextResponse.json(
+					{ error: 'Error al subir la imagen' },
+					{ status: 500 }
+				);
 			}
 
-			// Guardar nueva imagen
-			const bytes = await image.arrayBuffer();
-			const buffer = Buffer.from(bytes);
-			const newImagePath = path.join(uploadDir, image.name);
-			await writeFile(newImagePath, buffer);
-			updatedFields.image = `/images/${image.name}`;
+			const { data: publicUrl } = supabase.storage
+				.from('post-images')
+				.getPublicUrl(uploadData.path);
+
+			updatedFields.image_url = publicUrl.publicUrl;
 		}
 
 		// Si no hay campos actualizados
@@ -114,18 +167,25 @@ export async function PATCH(request, { params }) {
 			});
 		}
 
-		// Actualizar en la base de datos
-		await pool.query('UPDATE posts SET ? WHERE id = ?', [updatedFields, id]);
+		// Actualizar en Supabase
+		const { data: updatedPost, error: updateError } = await supabase
+			.from('posts')
+			.update(updatedFields)
+			.eq('id', id)
+			.select()
+			.single();
 
-		// Obtener el post actualizado
-		const [updatedPosts] = await pool.query(
-			'SELECT * FROM posts WHERE id = ?',
-			[id]
-		);
+		if (updateError) {
+			console.error('Error updating post:', updateError);
+			return NextResponse.json(
+				{ error: 'Error al actualizar el post' },
+				{ status: 500 }
+			);
+		}
 
 		return NextResponse.json({
 			message: 'Post actualizado con éxito',
-			updatedPost: updatedPosts[0],
+			updatedPost,
 		});
 	} catch (error) {
 		console.error('Error updating post:', error);
@@ -140,29 +200,78 @@ export async function PATCH(request, { params }) {
 export async function DELETE(request, { params }) {
 	try {
 		const { id } = await params;
+		const supabase = await createClient();
 
-		// Verificar que el post existe
-		const [posts] = await pool.query('SELECT * FROM posts WHERE id = ?', [id]);
+		// Verificar autenticación
+		const {
+			data: { user },
+			error: authError,
+		} = await supabase.auth.getUser();
 
-		if (posts.length === 0) {
+		if (authError || !user) {
 			return NextResponse.json(
-				{ error: 'El post no existe o no tienes permiso para eliminarlo' },
+				{ error: 'Debes iniciar sesión para eliminar un post' },
+				{ status: 401 }
+			);
+		}
+
+		// Obtener el post
+		const { data: post, error: fetchError } = await supabase
+			.from('posts')
+			.select('*')
+			.eq('id', id)
+			.single();
+
+		if (fetchError || !post) {
+			return NextResponse.json(
+				{ error: 'El post no existe' },
 				{ status: 404 }
 			);
 		}
 
-		const post = posts[0];
+		// Verificar permisos: autor del post o admin
+		const { data: userProfile } = await supabase
+			.from('profiles')
+			.select('role')
+			.eq('id', user.id)
+			.single();
 
-		// Eliminar el post de la base de datos
-		await pool.query('DELETE FROM posts WHERE id = ?', [id]);
+		const isAuthor = post.author_id === user.id;
+		const isAdmin = userProfile?.role === 'admin';
 
-		// Eliminar la imagen si existe
-		if (post.image) {
-			const imagePath = path.join(process.cwd(), 'public', post.image);
-			try {
-				await unlink(imagePath);
-			} catch (err) {
-				console.error('Error deleting image:', err);
+		if (!isAuthor && !isAdmin) {
+			return NextResponse.json(
+				{ error: 'No tienes permiso para eliminar este post' },
+				{ status: 403 }
+			);
+		}
+
+		if (userProfile?.role === 'banned') {
+			return NextResponse.json(
+				{ error: 'Tu cuenta ha sido suspendida' },
+				{ status: 403 }
+			);
+		}
+
+		// Eliminar el post
+		const { error: deleteError } = await supabase
+			.from('posts')
+			.delete()
+			.eq('id', id);
+
+		if (deleteError) {
+			console.error('Error deleting post:', deleteError);
+			return NextResponse.json(
+				{ error: 'Error al eliminar el post' },
+				{ status: 500 }
+			);
+		}
+
+		// Eliminar la imagen de Storage si existe
+		if (post.image_url && post.image_url.includes('supabase')) {
+			const imagePath = post.image_url.split('/post-images/')[1];
+			if (imagePath) {
+				await supabase.storage.from('post-images').remove([imagePath]);
 			}
 		}
 
@@ -177,4 +286,3 @@ export async function DELETE(request, { params }) {
 		);
 	}
 }
-
