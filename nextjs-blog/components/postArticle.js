@@ -95,28 +95,42 @@ export default function PostArticle({
 			className={`card rounded shadow w-100 ${fullPost ? 'mt-3 mb-4' : 'h-100 d-flex flex-column'}`}
 		>
 			{/** IMAGE */}
-			{postData.image && (
-				<>
-					<div
-						className="d-flex justify-content-center rounded overflow-hidden"
-						style={!fullPost ? { height: '150px' } : {}}
-					>
-						{/* eslint-disable-next-line @next/next/no-img-element */}
-						<img
-							src={postData.image}
-							className={`img-fluid ${fullPost ? 'rounded-4 p-1 border border-dark mt-3' : 'card-img-top'}`}
-							style={{
-								height: fullPost ? 'auto' : '150px',
-								width: '100%',
-								objectFit: 'cover',
-								maxHeight: fullPost ? '800px' : '150px',
-								maxWidth: fullPost ? '800px' : '100%',
-							}}
-							alt={postData.title || 'Post image'}
-						/>
-					</div>
-					{isEditing && <ImageUploader onImageUpload={handleImageUpload} />}
-				</>
+			{postData.image && !isEditing && (
+				<div
+					className="d-flex justify-content-center rounded overflow-hidden"
+					style={!fullPost ? { height: '150px' } : {}}
+				>
+					{/* eslint-disable-next-line @next/next/no-img-element */}
+					<img
+						src={postData.image}
+						className={`img-fluid ${fullPost ? 'rounded-4 p-1 border border-dark mt-3' : 'card-img-top'}`}
+						style={{
+							height: fullPost ? 'auto' : '150px',
+							width: '100%',
+							objectFit: 'cover',
+							maxHeight: fullPost ? '800px' : '150px',
+							maxWidth: fullPost ? '800px' : '100%',
+						}}
+						alt={postData.title || 'Post image'}
+					/>
+				</div>
+			)}
+			{isEditing && fullPost && (
+				<div className="p-3">
+					<label className="form-label fw-bold">Imagen del post:</label>
+					{postData.image && (
+						<div className="mb-2">
+							<small className="text-muted">Imagen actual: {postData.image.split('/').pop()}</small>
+						</div>
+					)}
+					<ImageUploader onImageUpload={handleImageUpload} />
+					{selectedImage && (
+						<small className="text-success mt-1 d-block">
+							<i className="bi bi-check-circle me-1"></i>
+							Nueva imagen seleccionada: {selectedImage.name}
+						</small>
+					)}
+				</div>
 			)}
 
 			{/** TITLE + POST_DATE */}
