@@ -49,5 +49,18 @@ pre {
 .contentBackground {
 	background-image: url('/images/marco-hoja.jpg');
 	background-size: cover;
-	background-position: center center;
+}
+
+/* Pantallas medianas y grandes: no repetir la imagen */
+@media (min-width: 768px) {
+	.contentBackground {
+		background-position: center center no-repeat;
+	}
+}
+
+/* Pantallas pequeñas: repite la imagen */
+@media (max-width: 767px) {
+	.contentBackground {
+		background-position: center center;
+	}
 }
