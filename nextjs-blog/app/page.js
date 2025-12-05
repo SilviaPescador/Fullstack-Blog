@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 
 async function getPosts() {
 	try {
+		// throw new Error ('500 error de prueba');
 		const supabase = await createClient();
 
 		const { data: posts, error } = await supabase
@@ -22,11 +23,17 @@ async function getPosts() {
 
 		if (error) {
 			console.error('Error fetching posts:', error);
-			return [];
+			return { 
+				posts: [], 
+				error: { 
+					message: error.message || 'Error al conectar con la base de datos',
+					code: error.code 
+				} 
+			};
 		}
 
 		// Formatear los posts para mantener compatibilidad
-		return posts.map((post) => ({
+		const formattedPosts = posts.map((post) => ({
 			id: post.id,
 			title: post.title,
 			content: post.content,
@@ -37,14 +44,22 @@ async function getPosts() {
 			created_at: post.created_at,
 			updated_at: post.updated_at,
 		}));
+
+		return { posts: formattedPosts, error: null };
 	} catch (error) {
 		console.error('Error fetching posts:', error);
-		return [];
+		return { 
+			posts: [], 
+			error: { 
+				message: error.message || 'Error inesperado del servidor',
+				code: 'UNKNOWN_ERROR' 
+			} 
+		};
 	}
 }
 
 export default async function Home() {
-	const initialPosts = await getPosts();
+	const { posts, error } = await getPosts();
 
-	return <HomeClient initialPosts={initialPosts} />;
+	return <HomeClient initialPosts={posts} initialError={error} />;
 }

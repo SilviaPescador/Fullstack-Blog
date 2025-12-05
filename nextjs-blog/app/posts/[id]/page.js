@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { notFound } from 'next/navigation';
 import PostPageClient from './PostPageClient';
 
 export const dynamic = 'force-dynamic';
@@ -21,12 +22,20 @@ async function getPost(id) {
 			.eq('id', id)
 			.single();
 
-		if (error || !post) {
-			return null;
+		if (error) {
+			// Si es error de "no encontrado", devolver null
+			if (error.code === 'PGRST116') {
+				return { post: null, error: null };
+			}
+			// Otros errores
+			return { 
+				post: null, 
+				error: { message: error.message, code: error.code } 
+			};
 		}
 
 		// Formatear el post
-		return {
+		const formattedPost = {
 			id: post.id,
 			title: post.title,
 			content: post.content,
@@ -37,19 +46,25 @@ async function getPost(id) {
 			created_at: post.created_at,
 			updated_at: post.updated_at,
 		};
+
+		return { post: formattedPost, error: null };
 	} catch (error) {
 		console.error('Error fetching post:', error);
-		return null;
+		return { 
+			post: null, 
+			error: { message: error.message || 'Error del servidor', code: 'UNKNOWN' } 
+		};
 	}
 }
 
 export default async function PostPage({ params }) {
 	const { id } = await params;
-	const initialPost = await getPost(id);
+	const { post, error } = await getPost(id);
 
-	if (!initialPost) {
-		return <div>Post no encontrado</div>;
+	// Si no existe el post, mostrar 404
+	if (!post && !error) {
+		notFound();
 	}
 
-	return <PostPageClient initialPost={initialPost} postId={id} />;
+	return <PostPageClient initialPost={post} postId={id} initialError={error} />;
 }
