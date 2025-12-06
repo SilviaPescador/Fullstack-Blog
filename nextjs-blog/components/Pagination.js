@@ -14,10 +14,12 @@ export default function Pagination({
 	onPageChange,
 	scrollToTop = true,
 }) {
-	if (totalPages <= 1) return null;
+	// Siempre mostrar el componente, con botones disabled si solo hay 1 página
+	const effectiveTotalPages = Math.max(totalPages, 1);
+	const isSinglePage = effectiveTotalPages <= 1;
 
 	const handlePrevious = () => {
-		if (currentPage > 1) {
+		if (currentPage > 1 && !isSinglePage) {
 			onPageChange(currentPage - 1);
 			if (scrollToTop) {
 				window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -26,7 +28,7 @@ export default function Pagination({
 	};
 
 	const handleNext = () => {
-		if (currentPage < totalPages) {
+		if (currentPage < effectiveTotalPages && !isSinglePage) {
 			onPageChange(currentPage + 1);
 			if (scrollToTop) {
 				window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -34,8 +36,8 @@ export default function Pagination({
 		}
 	};
 
-	const isFirstPage = currentPage === 1;
-	const isLastPage = currentPage === totalPages;
+	const isFirstPage = currentPage === 1 || isSinglePage;
+	const isLastPage = currentPage === effectiveTotalPages || isSinglePage;
 
 	return (
 		<nav aria-label="Navegación de páginas" className="my-5">
@@ -54,7 +56,7 @@ export default function Pagination({
 				</button>
 
 				<span className="text-muted user-select-none">
-					Página <strong>{currentPage}</strong> de <strong>{totalPages}</strong>
+					Página <strong>{currentPage}</strong> de <strong>{effectiveTotalPages}</strong>
 				</span>
 
 				<button

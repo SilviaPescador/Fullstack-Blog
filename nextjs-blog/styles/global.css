@@ -5,13 +5,34 @@ html,
 body {
 	padding: 0;
 	margin: 0;
-	font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-		Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-	line-height: 1.6;
-	font-size: 18px;
+	font-family: var(--font-nunito), -apple-system, BlinkMacSystemFont, sans-serif;
+	line-height: 1.7;
+	font-size: 17px;
 	background-size: contain;
 	background-position: center center;
 	min-block-size: 200vh;
+	font-weight: 400;
+	color: #2d3748;
+}
+
+/* Tipografía para títulos */
+h1, h2, h3, h4, h5, h6 {
+	font-family: var(--font-nunito), sans-serif;
+	font-weight: 700;
+	color: #1a202c;
+	letter-spacing: -0.01em;
+}
+
+h1 { font-size: 2.5rem; }
+h2 { font-size: 2rem; }
+h3 { font-size: 1.5rem; }
+h4 { font-size: 1.25rem; }
+
+/* Estilo para el nombre del blog en el header */
+.blog-title {
+	font-family: var(--font-nunito), sans-serif;
+	font-weight: 800;
+	letter-spacing: -0.02em;
 }
 
 * {
@@ -44,11 +65,40 @@ pre {
 	white-space: -pre-wrap; /* Opera 4-6 */
 	white-space: -o-pre-wrap; /* Opera 7 */
 	word-wrap: break-word; /* Internet Explorer 5.5+ */
+	font-family: var(--font-nunito), sans-serif;
+}
+
+/* Estilos para las tarjetas de posts */
+.card {
+	border: none;
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12) !important;
+}
+
+.card-title {
+	font-family: var(--font-nunito), sans-serif;
+	font-weight: 700;
+	color: #1a202c;
+}
+
+.card-title a {
+	color: inherit;
+	text-decoration: none;
+}
+
+.card-title a:hover {
+	color: #4a5568;
+	text-decoration: none;
 }
 
 .contentBackground {
 	background-image: url('/images/marco-hoja.jpg');
 	background-size: cover;
+	min-height: calc(100vh - 2rem);
 }
 
 /* Pantallas medianas y grandes: no repetir la imagen */

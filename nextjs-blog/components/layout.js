@@ -9,7 +9,7 @@ import UserMenu from '@/components/UserMenu';
 import styles from './layout.module.css';
 import utilStyles from '@/styles/utils.module.css';
 
-const name = 'Spelkit Blog';
+const name = 'Spelkit';
 export const siteTitle = 'Spelkit Blog';
 
 export default function Layout({ children, home }) {
@@ -18,7 +18,7 @@ export default function Layout({ children, home }) {
 			{/* Navbar superior */}
 			<nav className="d-flex justify-content-between align-items-center mb-3 px-2">
 				<Link href="/" className="text-decoration-none">
-					<span className="fw-bold text-dark">{name}</span>
+					<span className="blog-title fs-4 text-dark">{name}</span>
 				</Link>
 				<div className="d-flex align-items-center gap-3">
 					<Link href="/posts/create-new" title="Crear nuevo post" className="btn btn-sm btn-outline-success">
@@ -42,7 +42,7 @@ export default function Layout({ children, home }) {
 								alt="blog logo"
 							/>
 						</Link>
-						<h1 className={utilStyles.heading2Xl}>{name}</h1>
+						<h1 className={utilStyles.heading2Xl}>{siteTitle}</h1>
 					</>
 				) : (
 					<>

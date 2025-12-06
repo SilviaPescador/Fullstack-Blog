@@ -1,6 +1,6 @@
 import { updateSession } from '@/lib/supabase/middleware';
 
-export async function middleware(request) {
+export async function proxy(request) {
 	return await updateSession(request);
 }
 
@@ -13,7 +13,7 @@ export const config = {
 		 * - favicon.ico (favicon file)
 		 * - public folder
 		 */
-		'/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+		String.raw`/((?!_next/static|_next/image|favicon.ico|.*\.(?:svg|png|jpg|jpeg|gif|webp)$).*)`,
 	],
 };
 
