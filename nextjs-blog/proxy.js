@@ -13,7 +13,8 @@ export const config = {
 		 * - favicon.ico (favicon file)
 		 * - public folder
 		 */
-		String.raw`/((?!_next/static|_next/image|favicon.ico|.*\.(?:svg|png|jpg|jpeg|gif|webp)$).*)`,
+		// eslint-disable-next-line no-useless-escape
+		'/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
 	],
 };
 
