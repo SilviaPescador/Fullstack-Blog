@@ -1,10 +1,27 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { 
+	isValidUUID,
+	validateImage, 
+	sanitizeText, 
+	getSafeExtension,
+	MAX_TITLE_LENGTH, 
+	MAX_CONTENT_LENGTH 
+} from '@/lib/validation';
 
 // GET - Obtener un post por ID
 export async function GET(request, { params }) {
 	try {
 		const { id } = await params;
+
+		// Validar formato del ID
+		if (!isValidUUID(id)) {
+			return NextResponse.json(
+				{ error: 'ID de post inválido' },
+				{ status: 400 }
+			);
+		}
+
 		const supabase = await createClient();
 
 		const { data: post, error } = await supabase
@@ -55,6 +72,15 @@ export async function GET(request, { params }) {
 export async function PATCH(request, { params }) {
 	try {
 		const { id } = await params;
+
+		// Validar formato del ID
+		if (!isValidUUID(id)) {
+			return NextResponse.json(
+				{ error: 'ID de post inválido' },
+				{ status: 400 }
+			);
+		}
+
 		const supabase = await createClient();
 
 		// Verificar autenticación
@@ -109,22 +135,51 @@ export async function PATCH(request, { params }) {
 		}
 
 		const formData = await request.formData();
-		const title = formData.get('title');
-		const content = formData.get('content');
+		const rawTitle = formData.get('title');
+		const rawContent = formData.get('content');
 		const image = formData.get('image');
 
 		const updatedFields = {};
 
-		if (title && title !== existingPost.title) {
-			updatedFields.title = title;
+		// ============================================
+		// VALIDACIÓN DE ENTRADA
+		// ============================================
+
+		// Validar título si se proporciona y es diferente
+		if (rawTitle && rawTitle !== existingPost.title) {
+			const titleValidation = sanitizeText(rawTitle, MAX_TITLE_LENGTH, 'título');
+			if (!titleValidation.valid) {
+				return NextResponse.json(
+					{ error: titleValidation.error },
+					{ status: 400 }
+				);
+			}
+			updatedFields.title = titleValidation.value;
 		}
 
-		if (content && content !== existingPost.content) {
-			updatedFields.content = content;
+		// Validar contenido si se proporciona y es diferente
+		if (rawContent && rawContent !== existingPost.content) {
+			const contentValidation = sanitizeText(rawContent, MAX_CONTENT_LENGTH, 'contenido');
+			if (!contentValidation.valid) {
+				return NextResponse.json(
+					{ error: contentValidation.error },
+					{ status: 400 }
+				);
+			}
+			updatedFields.content = contentValidation.value;
 		}
 
 		// Procesar imagen
 		if (image && image.size > 0) {
+			// Validar imagen (tipo, extensión, tamaño)
+			const imageValidation = validateImage(image);
+			if (!imageValidation.valid) {
+				return NextResponse.json(
+					{ error: imageValidation.error },
+					{ status: 400 }
+				);
+			}
+
 			// Eliminar imagen anterior de Storage si existe
 			if (existingPost.image_url && existingPost.image_url.includes('supabase')) {
 				const oldPath = existingPost.image_url.split('/post-images/')[1];
@@ -134,7 +189,7 @@ export async function PATCH(request, { params }) {
 			}
 
 			// Subir nueva imagen
-			const fileExt = image.name.split('.').pop();
+			const fileExt = getSafeExtension(image.name);
 			const fileName = `${user.id}/${Date.now()}.${fileExt}`;
 
 			const { data: uploadData, error: uploadError } = await supabase.storage
@@ -142,6 +197,7 @@ export async function PATCH(request, { params }) {
 				.upload(fileName, image, {
 					cacheControl: '3600',
 					upsert: false,
+					contentType: image.type, // Forzar content-type validado
 				});
 
 			if (uploadError) {
@@ -200,6 +256,15 @@ export async function PATCH(request, { params }) {
 export async function DELETE(request, { params }) {
 	try {
 		const { id } = await params;
+
+		// Validar formato del ID
+		if (!isValidUUID(id)) {
+			return NextResponse.json(
+				{ error: 'ID de post inválido' },
+				{ status: 400 }
+			);
+		}
+
 		const supabase = await createClient();
 
 		// Verificar autenticación

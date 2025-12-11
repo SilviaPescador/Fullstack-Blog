@@ -74,10 +74,16 @@ USING (
   )
 );
 
--- Usuarios pueden eliminar sus propios posts
+-- Usuarios pueden eliminar sus propios posts (si no están baneados)
 CREATE POLICY "Users can delete own posts"
 ON posts FOR DELETE
-USING (auth.uid() = author_id);
+USING (
+  auth.uid() = author_id
+  AND NOT EXISTS (
+    SELECT 1 FROM profiles
+    WHERE id = auth.uid() AND role = 'banned'
+  )
+);
 
 -- Admins pueden eliminar cualquier post
 CREATE POLICY "Admins can delete any post"

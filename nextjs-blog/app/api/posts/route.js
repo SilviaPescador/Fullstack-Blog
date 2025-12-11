@@ -1,5 +1,12 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { 
+	validateImage, 
+	sanitizeText, 
+	getSafeExtension,
+	MAX_TITLE_LENGTH, 
+	MAX_CONTENT_LENGTH 
+} from '@/lib/validation';
 
 // GET - Obtener todos los posts
 export async function GET() {
@@ -83,15 +90,49 @@ export async function POST(request) {
 		}
 
 		const formData = await request.formData();
-		const title = formData.get('title');
-		const content = formData.get('content');
+		const rawTitle = formData.get('title');
+		const rawContent = formData.get('content');
 		const image = formData.get('image');
+
+		// ============================================
+		// VALIDACIÓN DE ENTRADA
+		// ============================================
+		
+		// Validar título
+		const titleValidation = sanitizeText(rawTitle, MAX_TITLE_LENGTH, 'título');
+		if (!titleValidation.valid) {
+			return NextResponse.json(
+				{ error: titleValidation.error },
+				{ status: 400 }
+			);
+		}
+
+		// Validar contenido
+		const contentValidation = sanitizeText(rawContent, MAX_CONTENT_LENGTH, 'contenido');
+		if (!contentValidation.valid) {
+			return NextResponse.json(
+				{ error: contentValidation.error },
+				{ status: 400 }
+			);
+		}
+
+		const title = titleValidation.value;
+		const content = contentValidation.value;
 
 		let imageUrl = null;
 
 		// Subir imagen a Supabase Storage
 		if (image && image.size > 0) {
-			const fileExt = image.name.split('.').pop();
+			// Validar imagen (tipo, extensión, tamaño)
+			const imageValidation = validateImage(image);
+			if (!imageValidation.valid) {
+				return NextResponse.json(
+					{ error: imageValidation.error },
+					{ status: 400 }
+				);
+			}
+
+			const fileExt = getSafeExtension(image.name);
 			const fileName = `${user.id}/${Date.now()}.${fileExt}`;
 
 			const { data: uploadData, error: uploadError } = await supabase.storage
@@ -99,6 +140,7 @@ export async function POST(request) {
 				.upload(fileName, image, {
 					cacheControl: '3600',
 					upsert: false,
+					contentType: image.type, // Forzar content-type validado
 				});
 
 			if (uploadError) {
