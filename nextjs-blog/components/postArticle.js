@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslations } from 'next-intl';
 
 import Link from 'next/link';
 
@@ -26,6 +27,7 @@ export default function PostArticle({
 	const [selectedImage, setSelectedImage] = useState(null);
 
 	const { canEditPost, canDeletePost, loading: authLoading } = useAuth();
+	const t = useTranslations();
 
 	const friendlyDate = formatDate(postData.post_date);
 	const { register } = useForm();
@@ -59,7 +61,7 @@ export default function PostArticle({
 			await Swal.fire({
 				position: 'top-end',
 				icon: 'success',
-				title: 'Post Updated!',
+				title: t('posts.edit.success'),
 				showConfirmButton: false,
 				timer: 1500,
 			});
@@ -69,8 +71,8 @@ export default function PostArticle({
 			console.error(error);
 			Swal.fire({
 				icon: 'error',
-				title: 'Oops...',
-				text: `Something went wrong!: ${error}`,
+				title: '¡Vaya!',
+				text: `${t('posts.edit.error')}: ${error}`,
 			});
 		}
 	};
@@ -118,23 +120,23 @@ export default function PostArticle({
 							maxHeight: fullPost ? '800px' : '150px',
 							maxWidth: fullPost ? '800px' : '100%',
 						}}
-						alt={postData.title || 'Post image'}
+						alt={postData.title || t('posts.view.postImage')}
 					/>
 				</div>
 			)}
 			{isEditing && fullPost && (
 				<div className="p-3">
-					<label className="form-label fw-bold">Imagen del post:</label>
+					<label className="form-label fw-bold">{t('imageUploader.postImage')}:</label>
 					{postData.image && (
 						<div className="mb-2">
-							<small className="text-muted">Imagen actual: {postData.image.split('/').pop()}</small>
+							<small className="text-muted">{t('imageUploader.currentImage')}: {postData.image.split('/').pop()}</small>
 						</div>
 					)}
 					<ImageUploader onImageUpload={handleImageUpload} />
 					{selectedImage && (
 						<small className="text-success mt-1 d-block">
 							<i className="bi bi-check-circle me-1"></i>
-							Nueva imagen seleccionada: {selectedImage.name}
+							{t('imageUploader.newImageSelected')}: {selectedImage.name}
 						</small>
 					)}
 				</div>
@@ -189,14 +191,14 @@ export default function PostArticle({
 					<>
 						<button
 							className="btn"
-							title="Save changes"
+							title={t('posts.edit.save')}
 							onClick={() => handleUpdates(content, title)}
 						>
 							<i className="bi bi-save"></i>
 						</button>
 						<button
 							className="btn"
-							title="Cancel editing"
+							title={t('posts.edit.cancel')}
 							onClick={() => setIsEditing(false)}
 						>
 							<i className="bi bi-x-circle-fill"></i>
@@ -208,7 +210,7 @@ export default function PostArticle({
 				{fullPost && !isEditing && canEdit && !authLoading && (
 					<button
 						className="btn"
-						title="Edit this post"
+						title={t('posts.edit.editPost')}
 						onClick={() => setIsEditing(true)}
 					>
 						<i className="bi bi-pencil-square"></i>

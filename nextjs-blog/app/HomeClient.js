@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import useSWR, { mutate } from 'swr';
+import { useTranslations } from 'next-intl';
 import Layout, { siteTitle } from '@/components/layout';
 import PostArticle from '@/components/postArticle';
 import Pagination from '@/components/Pagination';
@@ -27,6 +28,7 @@ const POSTS_PER_PAGE = 6;
 
 export default function HomeClient({ initialPosts, initialError }) {
 	const [currentPage, setCurrentPage] = useState(1);
+	const t = useTranslations();
 
 	const { data, error, isLoading } = useSWR('/api/posts', fetcher, {
 		fallbackData: initialPosts,
@@ -50,11 +52,11 @@ export default function HomeClient({ initialPosts, initialError }) {
 				<title>{siteTitle}</title>
 				<ErrorMessage
 					type={isServerError ? 'server' : 'error'}
-					title={isServerError ? 'Error del servidor' : 'No se pudieron cargar los posts'}
+					title={isServerError ? t('posts.list.serverError') : t('posts.list.loadError')}
 					message={
 						isServerError
-							? 'El servicio no está disponible temporalmente. Por favor, intenta más tarde.'
-							: 'Hubo un problema al obtener los posts del blog.'
+							? t('posts.list.serverErrorMessage')
+							: t('posts.list.loadErrorMessage')
 					}
 					details={errorMessage}
 					onRetry={handleRetry}
@@ -71,9 +73,9 @@ export default function HomeClient({ initialPosts, initialError }) {
 				<div className="d-flex justify-content-center align-items-center py-5">
 					<div className="text-center">
 						<div className="spinner-border text-primary mb-3" role="status">
-							<span className="visually-hidden">Cargando...</span>
+							<span className="visually-hidden">{t('common.loading')}</span>
 						</div>
-						<p className="text-muted">Cargando posts...</p>
+						<p className="text-muted">{t('posts.list.loading')}</p>
 					</div>
 				</div>
 			</Layout>
@@ -87,8 +89,8 @@ export default function HomeClient({ initialPosts, initialError }) {
 				<title>{siteTitle}</title>
 				<ErrorMessage
 					type="empty"
-					title="No hay posts todavía"
-					message="Sé el primero en crear contenido para este blog."
+					title={t('posts.list.empty')}
+					message={t('posts.list.emptyMessage')}
 				/>
 			</Layout>
 		);
@@ -110,7 +112,7 @@ export default function HomeClient({ initialPosts, initialError }) {
 			<title>{siteTitle}</title>
 			<section className={utilStyles.headingMd}>
 				<p className="mx-3 text-center fw-bold">
-					Aquí se plasman sueños, noticias, emociones e ideas de célula y metal.
+					{t('home.description')}
 				</p>
 			</section>
 

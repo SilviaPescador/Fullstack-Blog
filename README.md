@@ -24,6 +24,7 @@ Blog personal fullstack desarrollado con **Next.js 16**, **Supabase** y desplega
 | ⚡ **Server Components** | Carga inicial rápida con SSR |
 | 🔄 **SWR** | Revalidación automática de datos |
 | 📄 **Paginación** | Navegación entre páginas de posts |
+| 🌐 **Multiidioma** | Soporte para Español e Inglés (next-intl) |
 
 ---
 
@@ -50,8 +51,13 @@ cd Fullstack-Blog/nextjs-blog
 ### 2. Instalar dependencias
 
 ```bash
-npm install
+pnpm install
 ```
+
+> ⚠️ Este proyecto usa **pnpm** como gestor de paquetes. Si no lo tienes instalado:
+> ```bash
+> npm install -g pnpm
+> ```
 
 ### 3. Configurar Variables de Entorno
 
@@ -67,7 +73,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=tu-anon-key
 ### 4. Ejecutar en desarrollo
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 Abre [http://localhost:3000](http://localhost:3000) 🎉
@@ -86,6 +92,12 @@ nextjs-blog/
 │   └── page.js             # Home
 ├── components/             # Componentes React
 ├── hooks/                  # Custom hooks (useAuth)
+├── i18n/                   # Configuración de internacionalización
+│   ├── config.js           # Idiomas soportados (es, en)
+│   └── request.js          # Configuración de next-intl
+├── messages/               # Archivos de traducciones
+│   ├── es.json             # Español (idioma por defecto)
+│   └── en.json             # Inglés
 ├── lib/supabase/           # Clientes de Supabase
 ├── db/                     # Scripts SQL
 ├── services/               # Servicios API
@@ -105,7 +117,9 @@ nextjs-blog/
 | **Autenticación** | Supabase Auth (Email, GitHub) |
 | **Almacenamiento** | Supabase Storage |
 | **Hosting** | Vercel |
+| **Internacionalización** | next-intl (ES/EN) |
 | **Librerías** | SWR, react-hook-form, react-dropzone, sweetalert2 |
+| **Gestor de paquetes** | pnpm |
 
 ---
 
@@ -132,6 +146,38 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=tu-anon-key
 
 ---
 
+## 🌐 Sistema de Traducciones (i18n)
+
+El blog soporta múltiples idiomas usando **next-intl**:
+
+| Idioma | Código | Estado |
+|--------|--------|--------|
+| 🇪🇸 Español | `es` | Por defecto |
+| 🇬🇧 Inglés | `en` | Disponible |
+
+### Cambiar idioma
+
+El selector de idioma está en la barra de navegación (icono 🌐).
+
+### Añadir un nuevo idioma
+
+1. Crea el archivo `messages/XX.json` (copia de `es.json`)
+2. Traduce todos los textos
+3. Añade el código en `i18n/config.js`:
+
+```javascript
+export const locales = ['es', 'en', 'XX'];
+export const localeNames = {
+  es: 'Español',
+  en: 'English',
+  XX: 'Nuevo Idioma',
+};
+```
+
+4. ¡Listo! El nuevo idioma aparecerá en el selector
+
+---
+
 ## 🗺️ Roadmap
 
 - [x] Migración a Supabase
@@ -139,7 +185,9 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=tu-anon-key
 - [x] Sistema de roles y permisos
 - [x] Imágenes en la nube
 - [x] Despliegue en Vercel
-- [ ] Autenticación con Google
+- [x] Autenticación con Google
+- [x] Autenticación con Github
+- [x] Sistema de internacionalización (ES/EN)
 - [ ] Comentarios en posts
 - [ ] Búsqueda de posts
 - [ ] Editor de texto enriquecido
@@ -153,5 +201,5 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=tu-anon-key
 ---
 
 <p align="center">
-  <sub>Desarrollado con 💜 usando Next.js + Supabase</sub>
+  <sub>Desarrollado con 💜 usando Claude Opus 4.5 + Next.js + Supabase + Vercel</sub>
 </p>

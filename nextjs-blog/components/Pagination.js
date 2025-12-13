@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 /**
  * Componente de paginación reutilizable
  * 
@@ -14,6 +16,8 @@ export default function Pagination({
 	onPageChange,
 	scrollToTop = true,
 }) {
+	const t = useTranslations('pagination');
+	
 	// Siempre mostrar el componente, con botones disabled si solo hay 1 página
 	const effectiveTotalPages = Math.max(totalPages, 1);
 	const isSinglePage = effectiveTotalPages <= 1;
@@ -40,7 +44,7 @@ export default function Pagination({
 	const isLastPage = currentPage === effectiveTotalPages || isSinglePage;
 
 	return (
-		<nav aria-label="Navegación de páginas" className="my-5">
+		<nav aria-label={t('previous')} className="my-5">
 			<div className="d-flex justify-content-between align-items-center px-2 py-3">
 				<button
 					type="button"
@@ -49,14 +53,14 @@ export default function Pagination({
 					}`}
 					onClick={handlePrevious}
 					disabled={isFirstPage}
-					aria-label="Página anterior"
+					aria-label={t('previous')}
 				>
 					<i className="bi bi-chevron-left"></i>
-					<span>Anterior</span>
+					<span>{t('previous')}</span>
 				</button>
 
 				<span className="text-muted user-select-none">
-					Página <strong>{currentPage}</strong> de <strong>{effectiveTotalPages}</strong>
+					{t('page')} <strong>{currentPage}</strong> {t('of')} <strong>{effectiveTotalPages}</strong>
 				</span>
 
 				<button
@@ -66,13 +70,12 @@ export default function Pagination({
 					}`}
 					onClick={handleNext}
 					disabled={isLastPage}
-					aria-label="Página siguiente"
+					aria-label={t('next')}
 				>
-					<span>Siguiente</span>
+					<span>{t('next')}</span>
 					<i className="bi bi-chevron-right"></i>
 				</button>
 			</div>
 		</nav>
 	);
 }
-

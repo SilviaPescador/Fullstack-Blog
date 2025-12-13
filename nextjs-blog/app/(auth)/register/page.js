@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { createClient } from '@/lib/supabase/client';
 
 export default function RegisterPage() {
@@ -14,6 +15,7 @@ export default function RegisterPage() {
 	const [success, setSuccess] = useState('');
 	const [loading, setLoading] = useState(false);
 	const router = useRouter();
+	const t = useTranslations('auth.register');
 
 	const supabase = createClient();
 
@@ -23,12 +25,12 @@ export default function RegisterPage() {
 		setSuccess('');
 
 		if (password !== confirmPassword) {
-			setError('Las contraseñas no coinciden');
+			setError(t('passwordMismatch'));
 			return;
 		}
 
 		if (password.length < 6) {
-			setError('La contraseña debe tener al menos 6 caracteres');
+			setError(t('passwordTooShort'));
 			return;
 		}
 
@@ -49,9 +51,7 @@ export default function RegisterPage() {
 			setError(error.message);
 			setLoading(false);
 		} else {
-			setSuccess(
-				'¡Registro exitoso! Revisa tu email para confirmar tu cuenta.'
-			);
+			setSuccess(t('success'));
 			setLoading(false);
 		}
 	};
@@ -78,8 +78,8 @@ export default function RegisterPage() {
 			<div className="card shadow-lg" style={{ maxWidth: '420px', width: '100%' }}>
 				<div className="card-body p-5">
 					<div className="text-center mb-4">
-						<h2 className="fw-bold">Crear Cuenta</h2>
-						<p className="text-muted">Únete a Spelkit Blog</p>
+						<h2 className="fw-bold">{t('title')}</h2>
+						<p className="text-muted">{t('subtitle')}</p>
 					</div>
 
 					{error && (
@@ -97,7 +97,7 @@ export default function RegisterPage() {
 					<form onSubmit={handleRegister}>
 						<div className="mb-3">
 							<label htmlFor="fullName" className="form-label">
-								Nombre completo
+								{t('fullName')}
 							</label>
 							<input
 								type="text"
@@ -112,7 +112,7 @@ export default function RegisterPage() {
 
 						<div className="mb-3">
 							<label htmlFor="email" className="form-label">
-								Email
+								{t('email')}
 							</label>
 							<input
 								type="email"
@@ -127,7 +127,7 @@ export default function RegisterPage() {
 
 						<div className="mb-3">
 							<label htmlFor="password" className="form-label">
-								Contraseña
+								{t('password')}
 							</label>
 							<input
 								type="password"
@@ -143,7 +143,7 @@ export default function RegisterPage() {
 
 						<div className="mb-3">
 							<label htmlFor="confirmPassword" className="form-label">
-								Confirmar contraseña
+								{t('confirmPassword')}
 							</label>
 							<input
 								type="password"
@@ -164,16 +164,16 @@ export default function RegisterPage() {
 							{loading ? (
 								<>
 									<span className="spinner-border spinner-border-sm me-2"></span>
-									Registrando...
+									{t('loading')}
 								</>
 							) : (
-								'Crear Cuenta'
+								t('submit')
 							)}
 						</button>
 					</form>
 
 					<div className="text-center my-3">
-						<span className="text-muted">o regístrate con</span>
+						<span className="text-muted">{t('orRegisterWith')}</span>
 					</div>
 
 					<div className="d-grid gap-2">
@@ -200,9 +200,9 @@ export default function RegisterPage() {
 					<hr className="my-4" />
 
 					<p className="text-center mb-0">
-						¿Ya tienes cuenta?{' '}
+						{t('hasAccount')}{' '}
 						<Link href="/login" className="text-primary">
-							Inicia sesión
+							{t('login')}
 						</Link>
 					</p>
 				</div>
@@ -210,4 +210,3 @@ export default function RegisterPage() {
 		</div>
 	);
 }
-

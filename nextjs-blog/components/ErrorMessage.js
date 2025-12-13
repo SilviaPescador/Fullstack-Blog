@@ -1,5 +1,7 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 /**
  * Componente reutilizable para mostrar mensajes de error
  * 
@@ -18,46 +20,39 @@ export default function ErrorMessage({
 	onRetry,
 	showHomeLink = false,
 }) {
+	const t = useTranslations('errors.types');
+	const tCommon = useTranslations('common');
+
 	const config = {
 		error: {
 			icon: 'bi-exclamation-triangle',
 			iconColor: 'text-danger',
-			defaultTitle: 'Error al cargar',
-			defaultMessage: 'No se pudo completar la operación.',
 		},
 		warning: {
 			icon: 'bi-exclamation-circle',
 			iconColor: 'text-warning',
-			defaultTitle: 'Advertencia',
-			defaultMessage: 'Algo no funcionó como se esperaba.',
 		},
 		info: {
 			icon: 'bi-info-circle',
 			iconColor: 'text-info',
-			defaultTitle: 'Información',
-			defaultMessage: 'Información importante.',
 		},
 		empty: {
 			icon: 'bi-inbox',
 			iconColor: 'text-muted',
-			defaultTitle: 'Sin contenido',
-			defaultMessage: 'No hay elementos para mostrar.',
 		},
 		offline: {
 			icon: 'bi-wifi-off',
 			iconColor: 'text-secondary',
-			defaultTitle: 'Sin conexión',
-			defaultMessage: 'Parece que no tienes conexión a internet.',
 		},
 		server: {
 			icon: 'bi-server',
 			iconColor: 'text-danger',
-			defaultTitle: 'Error del servidor',
-			defaultMessage: 'El servidor no está disponible en este momento.',
 		},
 	};
 
-	const { icon, iconColor, defaultTitle, defaultMessage } = config[type] || config.error;
+	const { icon, iconColor } = config[type] || config.error;
+	const defaultTitle = t(`${type}.title`);
+	const defaultMessage = t(`${type}.message`);
 
 	return (
 		<div className="d-flex flex-column align-items-center justify-content-center py-5">
@@ -87,13 +82,13 @@ export default function ErrorMessage({
 					{onRetry && (
 						<button onClick={onRetry} className="btn btn-primary btn-sm px-3">
 							<i className="bi bi-arrow-clockwise me-1"></i>
-							Reintentar
+							{tCommon('retry')}
 						</button>
 					)}
 					{showHomeLink && (
 						<a href="/" className="btn btn-outline-secondary btn-sm px-3">
 							<i className="bi bi-house-door me-1"></i>
-							Ir al inicio
+							{tCommon('goHome')}
 						</a>
 					)}
 				</div>
@@ -101,4 +96,3 @@ export default function ErrorMessage({
 		</div>
 	);
 }
-

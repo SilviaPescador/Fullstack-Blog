@@ -1,11 +1,14 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { createClient } from '@/lib/supabase/client';
 
 export default function BannedPage() {
 	const router = useRouter();
 	const supabase = createClient();
+	const t = useTranslations('auth.banned');
+	const tNav = useTranslations('nav');
 
 	const handleLogout = async () => {
 		await supabase.auth.signOut();
@@ -20,20 +23,18 @@ export default function BannedPage() {
 					<div className="mb-4">
 						<i className="bi bi-exclamation-octagon text-danger" style={{ fontSize: '4rem' }}></i>
 					</div>
-					<h2 className="fw-bold text-danger mb-3">Cuenta Suspendida</h2>
+					<h2 className="fw-bold text-danger mb-3">{t('title')}</h2>
 					<p className="text-muted mb-4">
-						Tu cuenta ha sido suspendida por violar las normas de la comunidad.
-						Si crees que esto es un error, contacta con el administrador.
+						{t('message')}
 					</p>
 					<button
 						onClick={handleLogout}
 						className="btn btn-outline-secondary"
 					>
-						Cerrar Sesión
+						{tNav('logout')}
 					</button>
 				</div>
 			</div>
 		</div>
 	);
 }
-

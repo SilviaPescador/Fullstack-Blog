@@ -1,0 +1,196 @@
+{
+	"common": {
+		"loading": "Loading...",
+		"error": "Error",
+		"success": "Success!",
+		"cancel": "Cancel",
+		"save": "Save",
+		"delete": "Delete",
+		"edit": "Edit",
+		"retry": "Retry",
+		"goHome": "Go home",
+		"backToHome": "← Back to home"
+	},
+	"nav": {
+		"newPost": "New Post",
+		"createNewPost": "Create new post",
+		"login": "Log In",
+		"logout": "Log Out",
+		"myProfile": "My Profile",
+		"myPosts": "My Posts",
+		"manageUsers": "Manage Users"
+	},
+	"auth": {
+		"login": {
+			"title": "Log In",
+			"welcome": "Welcome back to Spelkit Blog",
+			"email": "Email",
+			"password": "Password",
+			"submit": "Log In",
+			"loading": "Logging in...",
+			"orContinueWith": "or continue with",
+			"noAccount": "Don't have an account?",
+			"register": "Sign up"
+		},
+		"register": {
+			"title": "Create Account",
+			"subtitle": "Join Spelkit Blog",
+			"fullName": "Full name",
+			"email": "Email",
+			"password": "Password",
+			"confirmPassword": "Confirm password",
+			"submit": "Create Account",
+			"loading": "Registering...",
+			"orRegisterWith": "or register with",
+			"hasAccount": "Already have an account?",
+			"login": "Log in",
+			"success": "Registration successful! Check your email to confirm your account.",
+			"passwordMismatch": "Passwords do not match",
+			"passwordTooShort": "Password must be at least 6 characters"
+		},
+		"banned": {
+			"title": "Account Suspended",
+			"message": "Your account has been suspended for violating community guidelines. If you believe this is a mistake, contact the administrator."
+		}
+	},
+	"posts": {
+		"create": {
+			"pageTitle": "New Post - Spelkit Blog",
+			"inspiration": "Are you inspired today...?",
+			"titlePlaceholder": "Title",
+			"contentPlaceholder": "Share your thoughts...",
+			"publish": "Publish",
+			"success": "Congrats, new post created!",
+			"error": "Something went wrong!"
+		},
+		"edit": {
+			"save": "Save changes",
+			"cancel": "Cancel editing",
+			"editPost": "Edit this post",
+			"success": "Post Updated!",
+			"error": "Something went wrong!"
+		},
+		"delete": {
+			"title": "Confirm Deletion",
+			"message": "Are you sure you want to delete this post?",
+			"confirm": "Delete",
+			"cancel": "Cancel",
+			"success": "Success!",
+			"cancelled": "Cancelled",
+			"cancelledMessage": "The deletion was cancelled",
+			"button": "Delete this post"
+		},
+		"view": {
+			"imageAlt": "Post image",
+			"postImage": "Post image",
+			"notAvailable": "Post not available",
+			"notAvailableMessage": "The post you're looking for doesn't exist or has been deleted.",
+			"loadError": "Error loading post",
+			"loadErrorMessage": "Could not get post information. Please try again later.",
+			"loadingPost": "Loading post..."
+		},
+		"list": {
+			"empty": "No posts yet",
+			"emptyMessage": "Be the first to create content for this blog.",
+			"loadError": "Could not load posts",
+			"loadErrorMessage": "There was a problem getting the blog posts.",
+			"serverError": "Server error",
+			"serverErrorMessage": "The service is temporarily unavailable. Please try again later.",
+			"loading": "Loading posts..."
+		}
+	},
+	"home": {
+		"description": "Here dreams, news, emotions and ideas of cell and metal are captured."
+	},
+	"pagination": {
+		"previous": "Previous",
+		"next": "Next",
+		"page": "Page",
+		"of": "of"
+	},
+	"errors": {
+		"notFound": {
+			"code": "404",
+			"title": "Page not found",
+			"message": "Sorry, the page you're looking for doesn't exist or has been moved.",
+			"goHome": "Go back home"
+		},
+		"generic": {
+			"title": "Oops! Something went wrong",
+			"message": "An unexpected error occurred in the application.",
+			"retry": "Try again",
+			"goHome": "Go home"
+		},
+		"types": {
+			"error": {
+				"title": "Loading error",
+				"message": "Could not complete the operation."
+			},
+			"warning": {
+				"title": "Warning",
+				"message": "Something didn't work as expected."
+			},
+			"info": {
+				"title": "Information",
+				"message": "Important information."
+			},
+			"empty": {
+				"title": "No content",
+				"message": "There are no items to display."
+			},
+			"offline": {
+				"title": "Offline",
+				"message": "You appear to be offline."
+			},
+			"server": {
+				"title": "Server error",
+				"message": "The server is not available at this time."
+			}
+		}
+	},
+	"imageUploader": {
+		"dropzone": "Drag an image or click to select",
+		"dropHere": "Drop the image here...",
+		"formats": "JPG, PNG, GIF, WEBP • Max 5MB",
+		"preview": "Preview",
+		"remove": "Remove image",
+		"currentImage": "Current image",
+		"newImageSelected": "New image selected",
+		"postImage": "Post image",
+		"errors": {
+			"tooLarge": "File is too large. Maximum 5MB",
+			"invalidType": "File type not allowed. Only JPG, PNG, GIF, WEBP",
+			"invalid": "Invalid file"
+		}
+	},
+	"admin": {
+		"users": {
+			"title": "User Management",
+			"count": "users",
+			"loadError": "Error loading users",
+			"roleUpdated": "Role updated successfully",
+			"roleError": "Error updating role",
+			"cantChangeSelf": "You cannot change your own role",
+			"noName": "No name",
+			"you": "You",
+			"changeRole": "Change role",
+			"columns": {
+				"user": "User",
+				"email": "Email",
+				"role": "Role",
+				"registered": "Registered",
+				"actions": "Actions"
+			},
+			"roles": {
+				"user": "User",
+				"admin": "Admin",
+				"ban": "Ban"
+			}
+		}
+	},
+	"metadata": {
+		"blogLogo": "blog logo",
+		"goHome": "Go home",
+		"avatar": "Avatar"
+	}
+}

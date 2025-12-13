@@ -1,4 +1,6 @@
- import { Nunito } from 'next/font/google';
+import { Nunito } from 'next/font/google';
+import { NextIntlClientProvider } from 'next-intl';
+import { getLocale, getMessages } from 'next-intl/server';
 import '../styles/global.css';
 
 const nunito = Nunito({
@@ -27,7 +29,7 @@ export const metadata = {
 				url: `${siteUrl}/images/quantum-flower-400.jpg`,
 				width: 400,
 				height: 400,
-				alt: 'Spelkit Blog Logo',
+				alt: 'Logo de Spelkit Blog',
 			},
 		],
 		locale: 'es_ES',
@@ -41,11 +43,17 @@ export const metadata = {
 	},
 };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+	const locale = await getLocale();
+	const messages = await getMessages();
+
 	return (
-		<html lang="es" className={nunito.variable}>
-			<body>{children}</body>
+		<html lang={locale} className={nunito.variable}>
+			<body>
+				<NextIntlClientProvider messages={messages}>
+					{children}
+				</NextIntlClientProvider>
+			</body>
 		</html>
 	);
 }
-

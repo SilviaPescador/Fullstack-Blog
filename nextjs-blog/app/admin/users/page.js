@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { createClient } from '@/lib/supabase/client';
 
 export default function AdminUsersPage() {
@@ -12,6 +13,8 @@ export default function AdminUsersPage() {
 	const [success, setSuccess] = useState('');
 	const router = useRouter();
 	const supabase = createClient();
+	const t = useTranslations('admin.users');
+	const tCommon = useTranslations('common');
 
 	useEffect(() => {
 		const checkAdminAndLoadUsers = async () => {
@@ -46,7 +49,7 @@ export default function AdminUsersPage() {
 				.order('created_at', { ascending: false });
 
 			if (error) {
-				setError('Error al cargar usuarios');
+				setError(t('loadError'));
 				console.error(error);
 			} else {
 				setUsers(allProfiles || []);
@@ -56,11 +59,11 @@ export default function AdminUsersPage() {
 		};
 
 		checkAdminAndLoadUsers();
-	}, [supabase, router]);
+	}, [supabase, router, t]);
 
 	const updateUserRole = async (userId, newRole) => {
 		if (userId === currentUser?.id) {
-			setError('No puedes cambiar tu propio rol');
+			setError(t('cantChangeSelf'));
 			return;
 		}
 
@@ -73,10 +76,10 @@ export default function AdminUsersPage() {
 			.eq('id', userId);
 
 		if (error) {
-			setError('Error al actualizar el rol');
+			setError(t('roleError'));
 			console.error(error);
 		} else {
-			setSuccess('Rol actualizado correctamente');
+			setSuccess(t('roleUpdated'));
 			// Actualizar lista local
 			setUsers(
 				users.map((u) => (u.id === userId ? { ...u, role: newRole } : u))
@@ -99,7 +102,7 @@ export default function AdminUsersPage() {
 		return (
 			<div className="d-flex justify-content-center align-items-center min-vh-100">
 				<div className="spinner-border text-primary" role="status">
-					<span className="visually-hidden">Cargando...</span>
+					<span className="visually-hidden">{tCommon('loading')}</span>
 				</div>
 			</div>
 		);
@@ -110,9 +113,9 @@ export default function AdminUsersPage() {
 			<div className="d-flex justify-content-between align-items-center mb-4">
 				<h1 className="h3 mb-0">
 					<i className="bi bi-people me-2"></i>
-					Gestión de Usuarios
+					{t('title')}
 				</h1>
-				<span className="badge bg-secondary">{users.length} usuarios</span>
+				<span className="badge bg-secondary">{users.length} {t('count')}</span>
 			</div>
 
 			{error && (
@@ -142,11 +145,11 @@ export default function AdminUsersPage() {
 					<table className="table table-hover mb-0">
 						<thead className="table-light">
 							<tr>
-								<th>Usuario</th>
-								<th>Email</th>
-								<th>Rol</th>
-								<th>Registro</th>
-								<th>Acciones</th>
+								<th>{t('columns.user')}</th>
+								<th>{t('columns.email')}</th>
+								<th>{t('columns.role')}</th>
+								<th>{t('columns.registered')}</th>
+								<th>{t('columns.actions')}</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -170,7 +173,7 @@ export default function AdminUsersPage() {
 													{(user.full_name || user.email)?.[0]?.toUpperCase() || 'U'}
 												</div>
 											)}
-											<span>{user.full_name || 'Sin nombre'}</span>
+											<span>{user.full_name || t('noName')}</span>
 										</div>
 									</td>
 									<td className="text-muted">{user.email}</td>
@@ -184,7 +187,7 @@ export default function AdminUsersPage() {
 									</td>
 									<td>
 										{user.id === currentUser?.id ? (
-											<span className="text-muted small">Tú</span>
+											<span className="text-muted small">{t('you')}</span>
 										) : (
 											<div className="dropdown">
 												<button
@@ -193,7 +196,7 @@ export default function AdminUsersPage() {
 													data-bs-toggle="dropdown"
 													aria-expanded="false"
 												>
-													Cambiar rol
+													{t('changeRole')}
 												</button>
 												<ul className="dropdown-menu">
 													<li>
@@ -203,7 +206,7 @@ export default function AdminUsersPage() {
 															disabled={user.role === 'user'}
 														>
 															<i className="bi bi-person me-2"></i>
-															Usuario
+															{t('roles.user')}
 														</button>
 													</li>
 													<li>
@@ -213,7 +216,7 @@ export default function AdminUsersPage() {
 															disabled={user.role === 'admin'}
 														>
 															<i className="bi bi-shield me-2"></i>
-															Admin
+															{t('roles.admin')}
 														</button>
 													</li>
 													<li>
@@ -226,7 +229,7 @@ export default function AdminUsersPage() {
 															disabled={user.role === 'banned'}
 														>
 															<i className="bi bi-slash-circle me-2"></i>
-															Banear
+															{t('roles.ban')}
 														</button>
 													</li>
 												</ul>
@@ -242,4 +245,3 @@ export default function AdminUsersPage() {
 		</div>
 	);
 }
-

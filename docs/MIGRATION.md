@@ -27,6 +27,16 @@ Este documento detalla las migraciones del proyecto desde su arquitectura inicia
 | **Hosting** | Local | Vercel |
 | **Seguridad** | Ninguna | RLS (Row Level Security) |
 
+### Migración 3: Internacionalización + pnpm (Diciembre 2024)
+
+| Aspecto | Antes | Después |
+|---------|-------|---------|
+| **Gestor de paquetes** | npm | pnpm |
+| **Idiomas** | Solo español (hardcoded) | ES/EN con next-intl |
+| **Textos** | Strings en componentes | Archivos JSON centralizados |
+| **Selector de idioma** | No existía | LocaleSwitcher en navbar |
+| **Persistencia** | N/A | Cookie `NEXT_LOCALE` |
+
 ---
 
 ## 📂 Evolución de la Estructura
@@ -59,7 +69,7 @@ nextjs-blog/
 └── public/images/            # Imágenes locales
 ```
 
-### Fase 3: Next.js + Supabase + Vercel (Actual)
+### Fase 3: Next.js + Supabase + Vercel
 
 ```
 nextjs-blog/
@@ -83,6 +93,26 @@ nextjs-blog/
     ├── schema.sql            # Esquema PostgreSQL
     ├── rls-policies.sql      # Políticas de seguridad
     └── seed-posts.sql        # Datos iniciales
+```
+
+### Fase 4: Internacionalización con next-intl (Actual)
+
+```
+nextjs-blog/
+├── app/
+│   └── layout.js             # 🔄 MODIFICADO - NextIntlClientProvider
+├── components/
+│   ├── layout.js             # 🔄 MODIFICADO - useTranslations + LocaleSwitcher
+│   ├── LocaleSwitcher.js     # ✅ NUEVO - Selector de idioma
+│   └── ...                   # 🔄 MODIFICADOS - Todos usan useTranslations
+├── i18n/                     # ✅ NUEVO - Configuración i18n
+│   ├── config.js             # Idiomas soportados
+│   └── request.js            # Configuración de next-intl
+├── messages/                 # ✅ NUEVO - Archivos de traducciones
+│   ├── es.json               # Español (por defecto)
+│   └── en.json               # Inglés
+├── next.config.js            # 🔄 MODIFICADO - withNextIntl plugin
+└── pnpm-lock.yaml            # 🔄 NUEVO - Reemplaza package-lock.json
 ```
 
 ---
@@ -188,6 +218,55 @@ export async function middleware(request) {
 }
 ```
 
+### 6. Sistema de Internacionalización (next-intl)
+
+**Configuración** - `i18n/config.js`:
+```javascript
+export const locales = ['es', 'en'];
+export const defaultLocale = 'es';
+
+export const localeNames = {
+  es: 'Español',
+  en: 'English',
+};
+```
+
+**Uso en componentes**:
+```javascript
+'use client';
+import { useTranslations } from 'next-intl';
+
+export default function MyComponent() {
+  const t = useTranslations('namespace');
+  
+  return <h1>{t('title')}</h1>;
+}
+```
+
+**Estructura de traducciones** - `messages/es.json`:
+```json
+{
+  "namespace": {
+    "title": "Mi Título"
+  }
+}
+```
+
+### 7. Migración de npm a pnpm
+
+**Motivo**: pnpm es más rápido y eficiente en uso de disco.
+
+**Comandos actualizados**:
+```bash
+# Antes (npm)
+npm install
+npm run dev
+
+# Ahora (pnpm)
+pnpm install
+pnpm dev
+```
+
 ---
 
 ## ✅ Beneficios de las Migraciones
@@ -205,6 +284,15 @@ export async function middleware(request) {
 - ✅ Seguridad con RLS a nivel de base de datos
 - ✅ Despliegue automático con Vercel
 - ✅ Escalabilidad automática
+
+### Migración 3 (Internacionalización + pnpm)
+- ✅ Soporte multiidioma (Español/Inglés)
+- ✅ Textos centralizados en archivos JSON
+- ✅ Fácil añadir nuevos idiomas
+- ✅ Selector de idioma en la interfaz
+- ✅ Persistencia de preferencia de idioma
+- ✅ Instalación de dependencias más rápida con pnpm
+- ✅ Menor uso de espacio en disco
 
 ---
 
@@ -226,6 +314,7 @@ export async function middleware(request) {
 | Junio 2023 | Versión inicial (Express + Next.js Pages Router) |
 | Diciembre 2024 | Migración a Next.js 16 App Router |
 | Diciembre 2024 | Migración a Supabase + Vercel |
+| Diciembre 2024 | Internacionalización (next-intl) + pnpm |
 
 ---
 
@@ -237,3 +326,5 @@ export async function middleware(request) {
 - [Supabase Storage](https://supabase.com/docs/guides/storage)
 - [Row Level Security](https://supabase.com/docs/guides/auth/row-level-security)
 - [Vercel Deployment](https://vercel.com/docs)
+- [next-intl Documentation](https://next-intl-docs.vercel.app/)
+- [pnpm Documentation](https://pnpm.io/)

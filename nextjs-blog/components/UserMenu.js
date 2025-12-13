@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { createClient } from '@/lib/supabase/client';
 
 export default function UserMenu() {
@@ -12,6 +13,7 @@ export default function UserMenu() {
 	const [showDropdown, setShowDropdown] = useState(false);
 	const router = useRouter();
 	const supabase = createClient();
+	const t = useTranslations();
 
 	useEffect(() => {
 		const getUser = async () => {
@@ -64,7 +66,7 @@ export default function UserMenu() {
 	if (loading) {
 		return (
 			<div className="spinner-border spinner-border-sm text-secondary" role="status">
-				<span className="visually-hidden">Cargando...</span>
+				<span className="visually-hidden">{t('common.loading')}</span>
 			</div>
 		);
 	}
@@ -73,7 +75,7 @@ export default function UserMenu() {
 		return (
 			<Link href="/login" className="btn btn-outline-primary btn-sm">
 				<i className="bi bi-person me-1"></i>
-				Iniciar Sesión
+				{t('nav.login')}
 			</Link>
 		);
 	}
@@ -90,7 +92,7 @@ export default function UserMenu() {
 					// eslint-disable-next-line @next/next/no-img-element
 					<img
 						src={profile.avatar_url}
-						alt="Avatar"
+						alt={t('metadata.avatar')}
 						className="rounded-circle"
 						style={{ width: '32px', height: '32px', objectFit: 'cover' }}
 					/>
@@ -139,7 +141,7 @@ export default function UserMenu() {
 								onClick={() => setShowDropdown(false)}
 							>
 								<i className="bi bi-person me-2"></i>
-								Mi Perfil
+								{t('nav.myProfile')}
 							</Link>
 						</li>
 						<li>
@@ -149,7 +151,7 @@ export default function UserMenu() {
 								onClick={() => setShowDropdown(false)}
 							>
 								<i className="bi bi-file-text me-2"></i>
-								Mis Posts
+								{t('nav.myPosts')}
 							</Link>
 						</li>
 						{profile?.role === 'admin' && (
@@ -164,7 +166,7 @@ export default function UserMenu() {
 										onClick={() => setShowDropdown(false)}
 									>
 										<i className="bi bi-people me-2"></i>
-										Gestionar Usuarios
+										{t('nav.manageUsers')}
 									</Link>
 								</li>
 							</>
@@ -175,7 +177,7 @@ export default function UserMenu() {
 						<li>
 							<button className="dropdown-item text-danger" onClick={handleLogout}>
 								<i className="bi bi-box-arrow-right me-2"></i>
-								Cerrar Sesión
+								{t('nav.logout')}
 							</button>
 						</li>
 					</ul>
@@ -184,4 +186,3 @@ export default function UserMenu() {
 		</div>
 	);
 }
-

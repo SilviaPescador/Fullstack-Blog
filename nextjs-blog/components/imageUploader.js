@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
+import { useTranslations } from 'next-intl';
 
 // Constantes de validación (deben coincidir con el backend)
 const ALLOWED_IMAGE_TYPES = {
@@ -15,6 +16,7 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ImageUploader = ({ onImageUpload }) => {
 	const [selectedImage, setSelectedImage] = useState(null);
 	const [error, setError] = useState(null);
+	const t = useTranslations('imageUploader');
 
 	const onDrop = useCallback((acceptedFiles, rejectedFiles) => {
 		setError(null);
@@ -25,11 +27,11 @@ const ImageUploader = ({ onImageUpload }) => {
 			const errorCode = rejection.errors[0]?.code;
 			
 			if (errorCode === 'file-too-large') {
-				setError('El archivo es demasiado grande. Máximo 5MB');
+				setError(t('errors.tooLarge'));
 			} else if (errorCode === 'file-invalid-type') {
-				setError('Tipo de archivo no permitido. Solo JPG, PNG, GIF, WEBP');
+				setError(t('errors.invalidType'));
 			} else {
-				setError('Archivo no válido');
+				setError(t('errors.invalid'));
 			}
 			return;
 		}
@@ -40,7 +42,7 @@ const ImageUploader = ({ onImageUpload }) => {
 			setSelectedImage(URL.createObjectURL(file));
 			onImageUpload(file);
 		}
-	}, [onImageUpload]);
+	}, [onImageUpload, t]);
 
 	const { getRootProps, getInputProps, isDragActive } = useDropzone({ 
 		onDrop,
@@ -71,7 +73,7 @@ const ImageUploader = ({ onImageUpload }) => {
 						{/* eslint-disable-next-line @next/next/no-img-element */}
 						<img 
 							src={selectedImage} 
-							alt="Vista previa" 
+							alt={t('preview')} 
 							className="img-fluid rounded"
 							style={{ maxHeight: '200px', objectFit: 'contain' }}
 						/>
@@ -79,7 +81,7 @@ const ImageUploader = ({ onImageUpload }) => {
 							type="button"
 							className="btn btn-sm btn-danger position-absolute top-0 end-0 m-1"
 							onClick={clearImage}
-							title="Eliminar imagen"
+							title={t('remove')}
 						>
 							<i className="bi bi-x"></i>
 						</button>
@@ -88,12 +90,12 @@ const ImageUploader = ({ onImageUpload }) => {
 					<div className="text-muted py-3">
 						<i className="bi bi-cloud-upload fs-2 mb-2 d-block"></i>
 						{isDragActive ? (
-							<p className="mb-0">Suelta la imagen aquí...</p>
+							<p className="mb-0">{t('dropHere')}</p>
 						) : (
 							<>
-								<p className="mb-1">Arrastra una imagen o haz clic para seleccionar</p>
+								<p className="mb-1">{t('dropzone')}</p>
 								<small className="text-secondary">
-									JPG, PNG, GIF, WEBP • Máximo 5MB
+									{t('formats')}
 								</small>
 							</>
 						)}

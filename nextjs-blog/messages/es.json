@@ -1,0 +1,196 @@
+{
+	"common": {
+		"loading": "Cargando...",
+		"error": "Error",
+		"success": "¡Éxito!",
+		"cancel": "Cancelar",
+		"save": "Guardar",
+		"delete": "Eliminar",
+		"edit": "Editar",
+		"retry": "Reintentar",
+		"goHome": "Ir al inicio",
+		"backToHome": "← Volver al inicio"
+	},
+	"nav": {
+		"newPost": "Nuevo Post",
+		"createNewPost": "Crear nuevo post",
+		"login": "Iniciar Sesión",
+		"logout": "Cerrar Sesión",
+		"myProfile": "Mi Perfil",
+		"myPosts": "Mis Posts",
+		"manageUsers": "Gestionar Usuarios"
+	},
+	"auth": {
+		"login": {
+			"title": "Iniciar Sesión",
+			"welcome": "Bienvenido de vuelta a Spelkit Blog",
+			"email": "Email",
+			"password": "Contraseña",
+			"submit": "Iniciar Sesión",
+			"loading": "Iniciando...",
+			"orContinueWith": "o continúa con",
+			"noAccount": "¿No tienes cuenta?",
+			"register": "Regístrate"
+		},
+		"register": {
+			"title": "Crear Cuenta",
+			"subtitle": "Únete a Spelkit Blog",
+			"fullName": "Nombre completo",
+			"email": "Email",
+			"password": "Contraseña",
+			"confirmPassword": "Confirmar contraseña",
+			"submit": "Crear Cuenta",
+			"loading": "Registrando...",
+			"orRegisterWith": "o regístrate con",
+			"hasAccount": "¿Ya tienes cuenta?",
+			"login": "Inicia sesión",
+			"success": "¡Registro exitoso! Revisa tu email para confirmar tu cuenta.",
+			"passwordMismatch": "Las contraseñas no coinciden",
+			"passwordTooShort": "La contraseña debe tener al menos 6 caracteres"
+		},
+		"banned": {
+			"title": "Cuenta Suspendida",
+			"message": "Tu cuenta ha sido suspendida por violar las normas de la comunidad. Si crees que esto es un error, contacta con el administrador."
+		}
+	},
+	"posts": {
+		"create": {
+			"pageTitle": "Nuevo Post - Spelkit Blog",
+			"inspiration": "¿Te sientes inspirado hoy...?",
+			"titlePlaceholder": "Título",
+			"contentPlaceholder": "Comparte tus pensamientos...",
+			"publish": "Publicar",
+			"success": "¡Enhorabuena, nuevo post creado!",
+			"error": "¡Algo ha salido mal!"
+		},
+		"edit": {
+			"save": "Guardar cambios",
+			"cancel": "Cancelar edición",
+			"editPost": "Editar este post",
+			"success": "¡Post actualizado!",
+			"error": "¡Algo ha salido mal!"
+		},
+		"delete": {
+			"title": "Confirmar eliminación",
+			"message": "¿Estás seguro de que quieres eliminar este post?",
+			"confirm": "Eliminar",
+			"cancel": "Cancelar",
+			"success": "¡Éxito!",
+			"cancelled": "Cancelado",
+			"cancelledMessage": "La eliminación ha sido cancelada",
+			"button": "Eliminar este post"
+		},
+		"view": {
+			"imageAlt": "Imagen del post",
+			"postImage": "Imagen del post",
+			"notAvailable": "Post no disponible",
+			"notAvailableMessage": "El post que buscas no existe o ha sido eliminado.",
+			"loadError": "Error al cargar el post",
+			"loadErrorMessage": "No se pudo obtener la información del post. Por favor, intenta más tarde.",
+			"loadingPost": "Cargando post..."
+		},
+		"list": {
+			"empty": "No hay posts todavía",
+			"emptyMessage": "Sé el primero en crear contenido para este blog.",
+			"loadError": "No se pudieron cargar los posts",
+			"loadErrorMessage": "Hubo un problema al obtener los posts del blog.",
+			"serverError": "Error del servidor",
+			"serverErrorMessage": "El servicio no está disponible temporalmente. Por favor, intenta más tarde.",
+			"loading": "Cargando posts..."
+		}
+	},
+	"home": {
+		"description": "Aquí se plasman sueños, noticias, emociones e ideas de célula y metal."
+	},
+	"pagination": {
+		"previous": "Anterior",
+		"next": "Siguiente",
+		"page": "Página",
+		"of": "de"
+	},
+	"errors": {
+		"notFound": {
+			"code": "404",
+			"title": "Página no encontrada",
+			"message": "Lo sentimos, la página que buscas no existe o ha sido movida.",
+			"goHome": "Volver al inicio"
+		},
+		"generic": {
+			"title": "¡Oops! Algo salió mal",
+			"message": "Ha ocurrido un error inesperado en la aplicación.",
+			"retry": "Intentar de nuevo",
+			"goHome": "Ir al inicio"
+		},
+		"types": {
+			"error": {
+				"title": "Error al cargar",
+				"message": "No se pudo completar la operación."
+			},
+			"warning": {
+				"title": "Advertencia",
+				"message": "Algo no funcionó como se esperaba."
+			},
+			"info": {
+				"title": "Información",
+				"message": "Información importante."
+			},
+			"empty": {
+				"title": "Sin contenido",
+				"message": "No hay elementos para mostrar."
+			},
+			"offline": {
+				"title": "Sin conexión",
+				"message": "Parece que no tienes conexión a internet."
+			},
+			"server": {
+				"title": "Error del servidor",
+				"message": "El servidor no está disponible en este momento."
+			}
+		}
+	},
+	"imageUploader": {
+		"dropzone": "Arrastra una imagen o haz clic para seleccionar",
+		"dropHere": "Suelta la imagen aquí...",
+		"formats": "JPG, PNG, GIF, WEBP • Máximo 5MB",
+		"preview": "Vista previa",
+		"remove": "Eliminar imagen",
+		"currentImage": "Imagen actual",
+		"newImageSelected": "Nueva imagen seleccionada",
+		"postImage": "Imagen del post",
+		"errors": {
+			"tooLarge": "El archivo es demasiado grande. Máximo 5MB",
+			"invalidType": "Tipo de archivo no permitido. Solo JPG, PNG, GIF, WEBP",
+			"invalid": "Archivo no válido"
+		}
+	},
+	"admin": {
+		"users": {
+			"title": "Gestión de Usuarios",
+			"count": "usuarios",
+			"loadError": "Error al cargar usuarios",
+			"roleUpdated": "Rol actualizado correctamente",
+			"roleError": "Error al actualizar el rol",
+			"cantChangeSelf": "No puedes cambiar tu propio rol",
+			"noName": "Sin nombre",
+			"you": "Tú",
+			"changeRole": "Cambiar rol",
+			"columns": {
+				"user": "Usuario",
+				"email": "Email",
+				"role": "Rol",
+				"registered": "Registro",
+				"actions": "Acciones"
+			},
+			"roles": {
+				"user": "Usuario",
+				"admin": "Admin",
+				"ban": "Banear"
+			}
+		}
+	},
+	"metadata": {
+		"blogLogo": "logo del blog",
+		"goHome": "Ir al inicio",
+		"avatar": "Avatar"
+	}
+}

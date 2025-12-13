@@ -1,9 +1,12 @@
 'use client';
 
 import { useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import Layout from '@/components/layout';
 
 export default function Error({ error, reset }) {
+	const t = useTranslations('errors.generic');
+
 	useEffect(() => {
 		// Log del error para debugging
 		console.error('Error de aplicación:', error);
@@ -17,11 +20,11 @@ export default function Error({ error, reset }) {
 					<i className="bi bi-exclamation-triangle text-danger" style={{ fontSize: '6rem' }}></i>
 					
 					{/* Título */}
-					<h1 className="h2 text-dark mt-4 mb-3">¡Oops! Algo salió mal</h1>
+					<h1 className="h2 text-dark mt-4 mb-3">{t('title')}</h1>
 					
 					{/* Descripción */}
 					<p className="text-muted mb-2">
-						Ha ocurrido un error inesperado en la aplicación.
+						{t('message')}
 					</p>
 					
 					{/* Detalle del error (solo en desarrollo) */}
@@ -38,11 +41,11 @@ export default function Error({ error, reset }) {
 							className="btn btn-primary px-4"
 						>
 							<i className="bi bi-arrow-clockwise me-2"></i>
-							Intentar de nuevo
+							{t('retry')}
 						</button>
 						<a href="/" className="btn btn-outline-secondary px-4">
 							<i className="bi bi-house-door me-2"></i>
-							Ir al inicio
+							{t('goHome')}
 						</a>
 					</div>
 				</div>
@@ -50,4 +53,3 @@ export default function Error({ error, reset }) {
 		</Layout>
 	);
 }
-

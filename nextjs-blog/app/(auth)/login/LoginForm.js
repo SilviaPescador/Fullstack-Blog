@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { createClient } from '@/lib/supabase/client';
 
 export default function LoginForm() {
@@ -13,6 +14,7 @@ export default function LoginForm() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const redirectTo = searchParams.get('redirectTo') || '/';
+	const t = useTranslations('auth.login');
 
 	const supabase = createClient();
 
@@ -57,8 +59,8 @@ export default function LoginForm() {
 			<div className="card shadow-lg" style={{ maxWidth: '420px', width: '100%' }}>
 				<div className="card-body p-5">
 					<div className="text-center mb-4">
-						<h2 className="fw-bold">Iniciar Sesión</h2>
-						<p className="text-muted">Bienvenido de vuelta a Spelkit Blog</p>
+						<h2 className="fw-bold">{t('title')}</h2>
+						<p className="text-muted">{t('welcome')}</p>
 					</div>
 
 					{error && (
@@ -70,7 +72,7 @@ export default function LoginForm() {
 					<form onSubmit={handleEmailLogin}>
 						<div className="mb-3">
 							<label htmlFor="email" className="form-label">
-								Email
+								{t('email')}
 							</label>
 							<input
 								type="email"
@@ -85,7 +87,7 @@ export default function LoginForm() {
 
 						<div className="mb-3">
 							<label htmlFor="password" className="form-label">
-								Contraseña
+								{t('password')}
 							</label>
 							<input
 								type="password"
@@ -106,16 +108,16 @@ export default function LoginForm() {
 							{loading ? (
 								<>
 									<span className="spinner-border spinner-border-sm me-2"></span>
-									Iniciando...
+									{t('loading')}
 								</>
 							) : (
-								'Iniciar Sesión'
+								t('submit')
 							)}
 						</button>
 					</form>
 
 					<div className="text-center my-3">
-						<span className="text-muted">o continúa con</span>
+						<span className="text-muted">{t('orContinueWith')}</span>
 					</div>
 
 					<div className="d-grid gap-2">
@@ -142,9 +144,9 @@ export default function LoginForm() {
 					<hr className="my-4" />
 
 					<p className="text-center mb-0">
-						¿No tienes cuenta?{' '}
+						{t('noAccount')}{' '}
 						<Link href="/register" className="text-primary">
-							Regístrate
+							{t('register')}
 						</Link>
 					</p>
 				</div>
@@ -152,4 +154,3 @@ export default function LoginForm() {
 		</div>
 	);
 }
-
