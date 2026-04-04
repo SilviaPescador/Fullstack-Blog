@@ -114,3 +114,13 @@ export function getSafeExtension(filename) {
 	return 'jpg'; // Fallback seguro
 }
 
+/**
+ * Valida que el ID sea un identificador de post válido
+ * Acepta tanto UUID v4 como entero positivo (int8)
+ * @param {string|number} id - ID a validar
+ * @returns {boolean}
+ */
+export function isValidPostId(id) {
+	if (id === null || id === undefined) return false;
+	return isValidUUID(String(id)) || /^\d+$/.test(String(id));
+  }

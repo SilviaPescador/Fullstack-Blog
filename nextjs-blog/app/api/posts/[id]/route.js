@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { 
-	isValidUUID,
+	isValidPostId,
 	validateImage, 
 	sanitizeText, 
 	getSafeExtension,
@@ -15,7 +15,7 @@ export async function GET(request, { params }) {
 		const { id } = await params;
 
 		// Validar formato del ID
-		if (!isValidUUID(id)) {
+		if (!isValidPostId(id)) {
 			return NextResponse.json(
 				{ error: 'ID de post inválido' },
 				{ status: 400 }
@@ -74,7 +74,7 @@ export async function PATCH(request, { params }) {
 		const { id } = await params;
 
 		// Validar formato del ID
-		if (!isValidUUID(id)) {
+		if (!isValidPostId(id)) {
 			return NextResponse.json(
 				{ error: 'ID de post inválido' },
 				{ status: 400 }
@@ -258,7 +258,7 @@ export async function DELETE(request, { params }) {
 		const { id } = await params;
 
 		// Validar formato del ID
-		if (!isValidUUID(id)) {
+		if (!isValidPostId(id)) {
 			return NextResponse.json(
 				{ error: 'ID de post inválido' },
 				{ status: 400 }
