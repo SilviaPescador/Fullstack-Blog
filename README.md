@@ -2,6 +2,8 @@
 
 Plataforma de escritura colectiva con moderacion asistida por IA. Cada post aprobado genera una planta unica en un jardin interactivo SVG, basada en el analisis semantico del contenido.
 
+Mi objetivo al escalar este proyecto es crear un espacio vivo para la comunidad de programadores y personas creativas que puedan dar a conocer sus ideas y proyectos. Cuanto más crece la comunidad, más crece el jardín, como en la vida misma.
+
 **Stack**: Next.js 16 - Supabase - Claude API - GSAP - Resend - Vercel
 
 **Demo**: [https://fullstack-blog-beta.vercel.app](https://fullstack-blog-beta.vercel.app)
