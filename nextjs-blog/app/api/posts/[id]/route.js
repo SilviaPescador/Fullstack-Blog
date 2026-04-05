@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import DOMPurify from 'isomorphic-dompurify';
+import sanitizeHtmlLib from 'sanitize-html';
 import { 
 	isValidPostId,
 	validateImage, 
@@ -10,14 +10,13 @@ import {
 	MAX_CONTENT_LENGTH 
 } from '@/lib/validation';
 
-const ALLOWED_CONTENT_TAGS = ['p', 'br', 'strong', 'em', 'a', 'h2', 'h3', 'ul', 'ol', 'li', 'code', 'pre', 'blockquote'];
-const ALLOWED_CONTENT_ATTR = ['href', 'target', 'rel', 'class'];
-
 function sanitizeHtml(raw) {
-	return DOMPurify.sanitize(raw || '', {
-		ALLOWED_TAGS: ALLOWED_CONTENT_TAGS,
-		ALLOWED_ATTR: ALLOWED_CONTENT_ATTR,
-		FORCE_BODY: true,
+	return sanitizeHtmlLib(raw || '', {
+		allowedTags: ['p', 'br', 'strong', 'em', 'a', 'h2', 'h3', 'ul', 'ol', 'li', 'code', 'pre', 'blockquote'],
+		allowedAttributes: { a: ['href', 'target', 'rel', 'class'] },
+		transformTags: {
+			a: sanitizeHtmlLib.simpleTransform('a', { rel: 'noopener noreferrer', target: '_blank' }),
+		},
 	});
 }
 

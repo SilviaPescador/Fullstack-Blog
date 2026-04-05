@@ -14,7 +14,7 @@ import formatDate from '@/common/formatDate';
 import { useAuth } from '@/hooks/useAuth';
 import Icon from '@/components/Icons';
 import { useToast } from '@/components/ToastProvider';
-import DOMPurify from 'isomorphic-dompurify';
+import sanitizeHtml from 'sanitize-html';
 
 function plainTextToHtml(text) {
 	if (!text) return '';
@@ -23,10 +23,12 @@ function plainTextToHtml(text) {
 }
 
 function sanitize(html) {
-	return DOMPurify.sanitize(html, {
-		ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'a', 'h2', 'h3', 'ul', 'ol', 'li', 'code', 'pre', 'blockquote'],
-		ALLOWED_ATTR: ['href', 'target', 'rel', 'class'],
-		FORCE_BODY: true,
+	return sanitizeHtml(html, {
+		allowedTags: ['p', 'br', 'strong', 'em', 'a', 'h2', 'h3', 'ul', 'ol', 'li', 'code', 'pre', 'blockquote'],
+		allowedAttributes: { a: ['href', 'target', 'rel', 'class'] },
+		transformTags: {
+			a: sanitizeHtml.simpleTransform('a', { rel: 'noopener noreferrer', target: '_blank' }),
+		},
 	});
 }
 

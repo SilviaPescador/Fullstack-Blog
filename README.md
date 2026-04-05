@@ -28,16 +28,19 @@ Los usuarios pueden "regar" posts que les gusten, haciendo crecer sus plantas.
 | Jardin SVG interactivo | Canvas procedural en la home con GSAP animations |
 | Moderacion IA | Claude analiza, resume, clasifica y genera el ADN visual |
 | Realtime | El jardin se actualiza en vivo al aprobar posts (Supabase Realtime) |
-| Sistema de riego | Reacciones unicas que hacen crecer las plantas |
-| Particulas flotantes | Fondo animado con particulas tipo firefly (portado del portfolio) |
-| Cursor glow | Resplandor que sigue al raton con gradiente radial |
+| Sistema de riego | Reacciones unicas que hacen crecer las plantas visualmente (escala + brillo) |
+| Editor rich text | TipTap con toolbar (bold, italic, links, headings, listas, codigo, citas) |
+| Particulas flotantes | Fondo animado adaptativo al tema dark/light |
+| Cursor glow | Resplandor que sigue al raton, visible en ambos temas |
 | Dark/Light mode | Design system unificado con portfolio (CSS custom properties) |
+| Navbar global | Navegacion visible en todas las paginas (home, posts, admin, auth) |
+| Toast + confirmaciones | Sistema de notificaciones propio (sin dependencias externas de UI) |
 | Auth completa | Email, Google, GitHub OAuth con Supabase Auth |
 | Roles | Admin, Usuario, Baneado con RLS en PostgreSQL |
 | i18n | Espanol e Ingles (next-intl) |
 | Panel admin | Cola de moderacion con preview de plantas y aprobacion en un click |
 | Notificaciones | Email al autor cuando su post es aprobado (Resend) |
-| Seguridad | Input sanitization, CSP headers, rate limit prep, open redirect protection |
+| Seguridad | HTML sanitization, CSP headers, open redirect protection, Content-Type validation |
 
 ---
 
@@ -61,6 +64,7 @@ Admin aprueba
 
 ## Seguridad
 
+- HTML sanitization server-side y client-side con sanitize-html (whitelist de tags y atributos)
 - Input sanitization (titulo, contenido, imagenes) con limites de longitud y tipo
 - Validacion de IDs en todas las API routes (UUID y bigint)
 - RLS en PostgreSQL: posts pendientes solo visibles para admin/autor
@@ -68,6 +72,7 @@ Admin aprueba
 - Content Security Policy (CSP) headers
 - Proteccion contra usuarios baneados en middleware y API routes
 - Content-Type validation en endpoints JSON
+- Forzado de `rel="noopener noreferrer"` en enlaces de usuario
 - Prompt truncation para Claude API (max 3000 chars)
 
 ---
@@ -140,9 +145,12 @@ nextjs-blog/
     CursorGlow.js               Resplandor que sigue al cursor
     Icons.js                    Sistema de iconos SVG
     ThemeToggle.js              Dark/light mode
-    WaterButton.js              Boton de riego
-    layout.js                   Shell del sitio (nav con logo SVG)
-    postArticle.js              Tarjeta de post
+    WaterButton.js              Boton de riego con persistencia de estado
+    Navbar.js                   Navegacion global (logo SVG, acciones)
+    ToastProvider.js            Toast + ConfirmDialog (reemplaza SweetAlert2)
+    RichEditor.js               Editor WYSIWYG con TipTap
+    layout.js                   Shell del sitio (header, footer)
+    postArticle.js              Tarjeta de post con renderizado HTML
     ...
   lib/
     claude.js                   Cliente Claude API
@@ -164,7 +172,7 @@ nextjs-blog/
 | Categoria | Tecnologia |
 |-----------|------------|
 | Framework | Next.js 16 (App Router) |
-| Frontend | React 19, CSS Custom Properties, GSAP |
+| Frontend | React 19, CSS Custom Properties, GSAP, TipTap |
 | Backend | API Routes de Next.js |
 | Base de datos | Supabase (PostgreSQL + Realtime) |
 | Auth | Supabase Auth (Email, Google, GitHub) |
