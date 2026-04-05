@@ -1,35 +1,44 @@
 'use client';
 
-import { useTransition } from 'react';
+import { useState, useRef, useEffect, useTransition } from 'react';
 import { useLocale } from 'next-intl';
 import { locales, localeNames } from '@/i18n/config';
 
 export default function LocaleSwitcher() {
 	const locale = useLocale();
 	const [isPending, startTransition] = useTransition();
+	const [open, setOpen] = useState(false);
+	const ref = useRef(null);
+
+	useEffect(() => {
+		function handleClickOutside(e) {
+			if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+		}
+		document.addEventListener('mousedown', handleClickOutside);
+		return () => document.removeEventListener('mousedown', handleClickOutside);
+	}, []);
 
 	const handleChange = (newLocale) => {
+		setOpen(false);
 		startTransition(() => {
-			// Guardar el idioma en una cookie
 			document.cookie = `NEXT_LOCALE=${newLocale};path=/;max-age=31536000`;
-			// Recargar la página para aplicar el cambio
 			window.location.reload();
 		});
 	};
 
 	return (
-		<div className="dropdown">
+		<div className="dropdown" ref={ref}>
 			<button
 				className="btn btn-sm btn-outline-secondary dropdown-toggle d-flex align-items-center gap-1"
 				type="button"
-				data-bs-toggle="dropdown"
-				aria-expanded="false"
+				aria-expanded={open}
 				disabled={isPending}
+				onClick={() => setOpen((v) => !v)}
 			>
 				<i className="bi bi-globe2"></i>
 				<span className="d-none d-sm-inline">{localeNames[locale]}</span>
 			</button>
-			<ul className="dropdown-menu dropdown-menu-end">
+			<ul className={`dropdown-menu dropdown-menu-end${open ? ' show' : ''}`}>
 				{locales.map((loc) => (
 					<li key={loc}>
 						<button
