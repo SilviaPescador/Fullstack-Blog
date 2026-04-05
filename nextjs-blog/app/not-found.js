@@ -3,34 +3,23 @@
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import Layout from '@/components/layout';
+import Icon from '@/components/Icons';
 
 export default function NotFound() {
 	const t = useTranslations('errors.notFound');
 
 	return (
 		<Layout>
-			<div className="d-flex flex-column align-items-center justify-content-center py-5">
-				<div className="text-center">
-					{/* Icono grande */}
-					<i className="bi bi-question-circle text-warning" style={{ fontSize: '6rem' }}></i>
-					
-					{/* Código de error */}
-					<h1 className="display-1 fw-bold text-muted mt-3">{t('code')}</h1>
-					
-					{/* Mensaje principal */}
-					<h2 className="h4 text-dark mb-3">{t('title')}</h2>
-					
-					{/* Descripción */}
-					<p className="text-muted mb-4 px-3">
-						{t('message')}
-					</p>
-					
-					{/* Botón de regreso */}
-					<Link href="/" className="btn btn-primary px-4 py-2">
-						<i className="bi bi-house-door me-2"></i>
-						{t('goHome')}
-					</Link>
-				</div>
+			<div className="flex-center flex-col py-8 text-center">
+				<Icon name="helpCircle" size={64} style={{ color: 'var(--color-warning)', marginBottom: 'var(--space-md)' }} />
+				<h1 style={{ fontSize: 'var(--text-3xl)', color: 'var(--color-text-muted)', marginBottom: 'var(--space-xs)' }}>
+					{t('code')}
+				</h1>
+				<h2 style={{ marginBottom: 'var(--space-sm)' }}>{t('title')}</h2>
+				<p className="text-muted mb-6">{t('message')}</p>
+				<Link href="/" className="btn btn--primary">
+					<Icon name="home" size={16} /> {t('goHome')}
+				</Link>
 			</div>
 		</Layout>
 	);

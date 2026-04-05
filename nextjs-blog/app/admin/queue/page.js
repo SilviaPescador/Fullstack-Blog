@@ -1,0 +1,207 @@
+'use client';
+
+import { useState, useEffect, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
+import { generatePlant } from '@/components/garden/PlantGenerator';
+import { defaultVisualDna } from '@/components/garden/gardenUtils';
+import Icon from '@/components/Icons';
+
+function PlantPreview({ dna }) {
+	const { elements, totalHeight } = useMemo(() => generatePlant(dna), [dna]);
+	const svgH = totalHeight + 20;
+
+	const renderEl = (el, i) => {
+		const common = { key: i, opacity: el.opacity };
+		switch (el.type) {
+			case 'path': return <path {...common} d={el.d} stroke={el.stroke} strokeWidth={el.strokeWidth} fill={el.fill || 'none'} />;
+			case 'line': return <line {...common} x1={el.x1} y1={el.y1} x2={el.x2} y2={el.y2} stroke={el.stroke} strokeWidth={el.strokeWidth} />;
+			case 'polyline': return <polyline {...common} points={el.points} stroke={el.stroke} strokeWidth={el.strokeWidth} fill={el.fill || 'none'} />;
+			case 'circle': return <circle {...common} cx={el.cx} cy={el.cy} r={el.r} fill={el.fill} />;
+			case 'ellipse': return <ellipse {...common} cx={el.cx} cy={el.cy} rx={el.rx} ry={el.ry} fill={el.fill} transform={el.transform} />;
+			case 'rect': return <rect {...common} x={el.x} y={el.y} width={el.width} height={el.height} fill={el.fill} transform={el.transform} />;
+			case 'polygon': return <polygon {...common} points={el.points} fill={el.fill} transform={el.transform} />;
+			default: return null;
+		}
+	};
+
+	return (
+		<svg width="80" height={Math.min(svgH, 140)} viewBox={`-30 ${-svgH} 60 ${svgH + 5}`} style={{ display: 'block', margin: '0 auto' }}>
+			{elements.map(renderEl)}
+		</svg>
+	);
+}
+
+export default function ModerationQueuePage() {
+	const [posts, setPosts] = useState([]);
+	const [loading, setLoading] = useState(true);
+	const [actionLoading, setActionLoading] = useState(null);
+	const [tab, setTab] = useState('reviewed_by_ai');
+	const router = useRouter();
+	const supabase = createClient();
+
+	useEffect(() => {
+		const init = async () => {
+			const { data: { user } } = await supabase.auth.getUser();
+			if (!user) { router.push('/login'); return; }
+			const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+			if (profile?.role !== 'admin') { router.push('/'); return; }
+			await loadPosts();
+		};
+		init();
+	}, [tab]);
+
+	const loadPosts = async () => {
+		setLoading(true);
+		const statuses = tab === 'reviewed_by_ai' ? ['pending', 'reviewed_by_ai'] : [tab];
+		const { data, error } = await supabase
+			.from('posts')
+			.select('*, profiles:author_id(full_name, email)')
+			.in('status', statuses)
+			.order('created_at', { ascending: false });
+
+		if (!error) setPosts(data || []);
+		setLoading(false);
+	};
+
+	const handleAction = async (postId, newStatus, reason = null) => {
+		setActionLoading(postId);
+		try {
+			await fetch('/api/posts/approve', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					post_id: postId,
+					action: newStatus === 'approved' ? 'approve' : 'reject',
+					reason,
+				}),
+			});
+			setPosts(posts.filter(p => p.id !== postId));
+		} catch (e) {
+			console.error('Action error:', e);
+		}
+		setActionLoading(null);
+	};
+
+	const scoreColor = (score) => {
+		if (score > 0.7) return 'var(--color-danger)';
+		if (score > 0.3) return 'var(--color-warning)';
+		return 'var(--color-success)';
+	};
+
+	return (
+		<div className="container py-4">
+			<div className="flex-between mb-6">
+				<h1 className="flex items-center gap-3">
+					<Icon name="inbox" size={24} /> Cola de Moderacion
+				</h1>
+				<span className="badge badge--muted">{posts.length} pendientes</span>
+			</div>
+
+			{/* Tabs */}
+			<div className="flex gap-2 mb-6">
+				{[
+					{ key: 'reviewed_by_ai', label: 'Pendientes' },
+					{ key: 'approved', label: 'Aprobados' },
+					{ key: 'rejected', label: 'Rechazados' },
+				].map(t => (
+					<button
+						key={t.key}
+						className={`btn btn--sm ${tab === t.key ? 'btn--primary' : 'btn--outline'}`}
+						onClick={() => setTab(t.key)}
+					>
+						{t.label}
+					</button>
+				))}
+			</div>
+
+			{loading ? (
+				<div className="flex-center py-8"><span className="spinner spinner--lg" /></div>
+			) : posts.length === 0 ? (
+				<div className="text-center py-8 text-muted">
+					<Icon name="check" size={48} style={{ margin: '0 auto var(--space-md)' }} />
+					<p>No hay posts en esta cola.</p>
+				</div>
+			) : (
+				<div className="flex-col gap-4">
+					{posts.map(post => {
+						const dna = post.visual_dna || defaultVisualDna(post.id, post.title, post.content);
+						const author = post.profiles?.full_name || post.profiles?.email || 'Anonimo';
+						const spamScore = post.visual_dna ? 0 : null;
+						const isReviewed = post.status === 'reviewed_by_ai';
+
+						return (
+							<div key={post.id} className="card" style={{ padding: 'var(--space-md)' }}>
+								<div className="flex gap-4" style={{ flexWrap: 'wrap' }}>
+									{/* Plant preview */}
+									<div style={{ width: '80px', flexShrink: 0 }}>
+										<PlantPreview dna={dna} />
+										<p className="text-xs text-muted text-center mt-2">{dna.type}</p>
+									</div>
+
+									{/* Post info */}
+									<div className="flex-1" style={{ minWidth: '200px' }}>
+										<h3 style={{ fontSize: 'var(--text-base)', marginBottom: 'var(--space-xs)' }}>
+											{post.title}
+										</h3>
+										<p className="text-sm text-muted mb-2">por {author} - {new Date(post.created_at).toLocaleDateString('es-ES')}</p>
+
+										{post.ai_summary && (
+											<div style={{ background: 'var(--color-bg-alt)', padding: 'var(--space-sm)', borderRadius: 'var(--radius-sm)', marginBottom: 'var(--space-sm)' }}>
+												<p className="text-xs text-muted mb-1" style={{ fontWeight: 600 }}>Resumen IA:</p>
+												<p className="text-sm">{post.ai_summary}</p>
+											</div>
+										)}
+
+										{post.ai_tags?.length > 0 && (
+											<div className="flex gap-2 flex-wrap mb-2">
+												{post.ai_tags.map(tag => (
+													<span key={tag} className="badge badge--muted">{tag}</span>
+												))}
+											</div>
+										)}
+
+										<p className="text-sm text-muted" style={{
+											display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+										}}>
+											{post.content}
+										</p>
+									</div>
+
+									{/* Actions */}
+									<div className="flex-col gap-2" style={{ minWidth: '120px', alignItems: 'flex-end' }}>
+										<span className={`badge ${post.status === 'approved' ? 'badge--success' : post.status === 'rejected' ? 'badge--danger' : 'badge--muted'}`}>
+											{post.status}
+										</span>
+
+										{(isReviewed || post.status === 'pending') && (
+											<>
+												<button
+													className="btn btn--primary btn--sm btn--full"
+													onClick={() => handleAction(post.id, 'approved')}
+													disabled={actionLoading === post.id}
+												>
+													{actionLoading === post.id ? <span className="spinner spinner--sm" /> : <><Icon name="check" size={14} /> Aprobar</>}
+												</button>
+												<button
+													className="btn btn--outline-danger btn--sm btn--full"
+													onClick={() => {
+														const reason = prompt('Razon del rechazo (opcional):');
+														handleAction(post.id, 'rejected', reason);
+													}}
+													disabled={actionLoading === post.id}
+												>
+													<Icon name="x" size={14} /> Rechazar
+												</button>
+											</>
+										)}
+									</div>
+								</div>
+							</div>
+						);
+					})}
+				</div>
+			)}
+		</div>
+	);
+}

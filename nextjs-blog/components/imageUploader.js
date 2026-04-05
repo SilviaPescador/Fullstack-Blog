@@ -3,15 +3,15 @@
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useTranslations } from 'next-intl';
+import Icon from '@/components/Icons';
 
-// Constantes de validación (deben coincidir con el backend)
 const ALLOWED_IMAGE_TYPES = {
 	'image/jpeg': ['.jpg', '.jpeg'],
 	'image/png': ['.png'],
 	'image/gif': ['.gif'],
 	'image/webp': ['.webp'],
 };
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 const ImageUploader = ({ onImageUpload }) => {
 	const [selectedImage, setSelectedImage] = useState(null);
@@ -20,31 +20,19 @@ const ImageUploader = ({ onImageUpload }) => {
 
 	const onDrop = useCallback((acceptedFiles, rejectedFiles) => {
 		setError(null);
-
-		// Manejar archivos rechazados
-		if (rejectedFiles && rejectedFiles.length > 0) {
-			const rejection = rejectedFiles[0];
-			const errorCode = rejection.errors[0]?.code;
-			
-			if (errorCode === 'file-too-large') {
-				setError(t('errors.tooLarge'));
-			} else if (errorCode === 'file-invalid-type') {
-				setError(t('errors.invalidType'));
-			} else {
-				setError(t('errors.invalid'));
-			}
+		if (rejectedFiles?.length > 0) {
+			const code = rejectedFiles[0].errors[0]?.code;
+			setError(code === 'file-too-large' ? t('errors.tooLarge') : code === 'file-invalid-type' ? t('errors.invalidType') : t('errors.invalid'));
 			return;
 		}
-
-		// Procesar archivo aceptado
-		if (acceptedFiles && acceptedFiles.length > 0) {
+		if (acceptedFiles?.length > 0) {
 			const file = acceptedFiles[0];
 			setSelectedImage(URL.createObjectURL(file));
 			onImageUpload(file);
 		}
 	}, [onImageUpload, t]);
 
-	const { getRootProps, getInputProps, isDragActive } = useDropzone({ 
+	const { getRootProps, getInputProps, isDragActive } = useDropzone({
 		onDrop,
 		accept: ALLOWED_IMAGE_TYPES,
 		maxSize: MAX_FILE_SIZE,
@@ -60,53 +48,49 @@ const ImageUploader = ({ onImageUpload }) => {
 	};
 
 	return (
-		<div className="image-uploader">
-			<div 
-				{...getRootProps()} 
-				className={`card shadow p-4 text-center cursor-pointer ${isDragActive ? 'border-primary bg-light' : ''}`}
-				style={{ cursor: 'pointer', minHeight: '120px' }}
+		<div>
+			<div
+				{...getRootProps()}
+				className="card cursor-pointer text-center"
+				style={{
+					padding: 'var(--space-lg)',
+					borderStyle: 'dashed',
+					borderColor: isDragActive ? 'var(--color-accent-green)' : 'var(--color-border)',
+					background: isDragActive ? 'var(--color-accent-green-soft)' : 'var(--color-bg-alt)',
+				}}
 			>
 				<input {...getInputProps()} />
-				
 				{selectedImage ? (
-					<div className="position-relative">
+					<div className="relative">
 						{/* eslint-disable-next-line @next/next/no-img-element */}
-						<img 
-							src={selectedImage} 
-							alt={t('preview')} 
-							className="img-fluid rounded"
-							style={{ maxHeight: '200px', objectFit: 'contain' }}
-						/>
+						<img src={selectedImage} alt={t('preview')} className="rounded" style={{ maxHeight: '200px', objectFit: 'contain', margin: '0 auto' }} />
 						<button
 							type="button"
-							className="btn btn-sm btn-danger position-absolute top-0 end-0 m-1"
+							className="btn btn--danger btn--sm absolute"
+							style={{ top: '0.5rem', right: '0.5rem' }}
 							onClick={clearImage}
 							title={t('remove')}
 						>
-							<i className="bi bi-x"></i>
+							<Icon name="x" size={14} />
 						</button>
 					</div>
 				) : (
-					<div className="text-muted py-3">
-						<i className="bi bi-cloud-upload fs-2 mb-2 d-block"></i>
+					<div className="text-muted" style={{ padding: 'var(--space-md) 0' }}>
+						<Icon name="upload" size={32} style={{ margin: '0 auto 0.5rem' }} />
 						{isDragActive ? (
-							<p className="mb-0">{t('dropHere')}</p>
+							<p>{t('dropHere')}</p>
 						) : (
 							<>
-								<p className="mb-1">{t('dropzone')}</p>
-								<small className="text-secondary">
-									{t('formats')}
-								</small>
+								<p>{t('dropzone')}</p>
+								<p className="text-xs text-muted mt-2">{t('formats')}</p>
 							</>
 						)}
 					</div>
 				)}
 			</div>
-
 			{error && (
-				<div className="alert alert-danger mt-2 py-2 small" role="alert">
-					<i className="bi bi-exclamation-triangle me-1"></i>
-					{error}
+				<div className="alert alert--danger mt-2">
+					<Icon name="alertTriangle" size={14} /> {error}
 				</div>
 			)}
 		</div>

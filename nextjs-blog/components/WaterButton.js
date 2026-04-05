@@ -1,0 +1,47 @@
+'use client';
+
+import { useState } from 'react';
+import Icon from '@/components/Icons';
+
+export default function WaterButton({ postId, initialCount = 0 }) {
+	const [count, setCount] = useState(initialCount);
+	const [watered, setWatered] = useState(false);
+	const [animating, setAnimating] = useState(false);
+
+	const handleWater = async () => {
+		if (watered) return;
+
+		setAnimating(true);
+		try {
+			const res = await fetch('/api/water', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ post_id: postId }),
+			});
+
+			if (res.ok) {
+				const data = await res.json();
+				setCount(data.water_count);
+				setWatered(true);
+			} else if (res.status === 409) {
+				setWatered(true);
+			}
+		} catch (e) {
+			console.error('Water error:', e);
+		}
+		setTimeout(() => setAnimating(false), 600);
+	};
+
+	return (
+		<button
+			className={`btn btn--ghost btn--sm flex items-center gap-2 ${watered ? 'text-accent' : ''}`}
+			onClick={handleWater}
+			disabled={watered}
+			title={watered ? 'Ya regaste este post' : 'Regar este post'}
+			style={animating ? { transform: 'scale(1.2)', transition: 'transform 0.3s ease' } : { transition: 'transform 0.3s ease' }}
+		>
+			<Icon name="droplet" size={16} />
+			<span>{count}</span>
+		</button>
+	);
+}

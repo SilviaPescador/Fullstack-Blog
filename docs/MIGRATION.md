@@ -296,12 +296,12 @@ pnpm dev
 
 ---
 
-## 🌐 URLs del Proyecto
+## URLs del Proyecto
 
 | Entorno | URL |
 |---------|-----|
-| **Producción** | https://fullstack-blog-beta.vercel.app |
-| **Supabase** | https://app.supabase.com/project/lvjjpispbeghnhctyasr |
+| **Produccion** | https://fullstack-blog-beta.vercel.app |
+| **Supabase** | Ver dashboard en tu cuenta de Supabase |
 | **Vercel** | https://vercel.com/dashboard |
 | **GitHub** | https://github.com/SilviaPescador/Fullstack-Blog |
 

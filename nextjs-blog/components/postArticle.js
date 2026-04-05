@@ -3,23 +3,18 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
-
 import Link from 'next/link';
 
 import DeleteButton from '@/components/deleteButton';
+import WaterButton from '@/components/WaterButton';
 import ImageUploader from './imageUploader';
 import PostService from '@/services/postService';
 import formatDate from '@/common/formatDate';
 import { useAuth } from '@/hooks/useAuth';
+import Icon from '@/components/Icons';
 import Swal from 'sweetalert2';
 
-export default function PostArticle({
-	postData,
-	onDelete,
-	fullPost,
-	setIsEdited,
-	home,
-}) {
+export default function PostArticle({ postData, onDelete, fullPost, setIsEdited, home }) {
 	const [isEditing, setIsEditing] = useState(false);
 	const [truncatedContent, setTruncatedContent] = useState('');
 	const [content, setContent] = useState(postData.content || '');
@@ -31,193 +26,143 @@ export default function PostArticle({
 
 	const friendlyDate = formatDate(postData.post_date);
 	const { register } = useForm();
-
-	// Verificar permisos para este post específico
 	const canEdit = canEditPost(postData.author_id);
 	const canDelete = canDeletePost(postData.author_id);
 
 	useEffect(() => {
-		if (postData.content.length > 50) {
-			setTruncatedContent(postData.content.substring(0, 50) + '...');
-		} else {
-			setTruncatedContent(postData.content);
-		}
+		setTruncatedContent(
+			postData.content.length > 50
+				? postData.content.substring(0, 50) + '...'
+				: postData.content
+		);
 	}, [postData.content]);
 
-	const handleImageUpload = (image) => {
-		setSelectedImage(image);
-	};
+	const handleImageUpload = (image) => setSelectedImage(image);
 
 	const handleUpdates = async (newContent, newTitle) => {
-		const updates = {
-			content: newContent,
-			title: newTitle,
-			image: selectedImage,
-		};
-
 		try {
 			const postService = new PostService();
-			await postService.updatePost(postData.id, updates);
-			await Swal.fire({
-				position: 'top-end',
-				icon: 'success',
-				title: t('posts.edit.success'),
-				showConfirmButton: false,
-				timer: 1500,
-			});
+			await postService.updatePost(postData.id, { content: newContent, title: newTitle, image: selectedImage });
+			await Swal.fire({ position: 'top-end', icon: 'success', title: t('posts.edit.success'), showConfirmButton: false, timer: 1500 });
 			setIsEditing(false);
 			setIsEdited(true);
 		} catch (error) {
 			console.error(error);
-			Swal.fire({
-				icon: 'error',
-				title: '¡Vaya!',
-				text: `${t('posts.edit.error')}: ${error}`,
-			});
+			Swal.fire({ icon: 'error', title: 'Error', text: `${t('posts.edit.error')}: ${error}` });
 		}
 	};
 
-	// Estilos para truncar texto en grid
-	const titleStyle = !fullPost
-		? {
-				display: '-webkit-box',
-				WebkitLineClamp: 2,
-				WebkitBoxOrient: 'vertical',
-				overflow: 'hidden',
-				textOverflow: 'ellipsis',
-				minHeight: '3rem',
-		  }
-		: {};
+	const titleClamp = !fullPost ? {
+		display: '-webkit-box',
+		WebkitLineClamp: 2,
+		WebkitBoxOrient: 'vertical',
+		overflow: 'hidden',
+		textOverflow: 'ellipsis',
+		minHeight: '2.8rem',
+	} : {};
 
-	const contentStyle = !fullPost
-		? {
-				display: '-webkit-box',
-				WebkitLineClamp: 2,
-				WebkitBoxOrient: 'vertical',
-				overflow: 'hidden',
-				textOverflow: 'ellipsis',
-		  }
-		: {};
+	const contentClamp = !fullPost ? {
+		display: '-webkit-box',
+		WebkitLineClamp: 2,
+		WebkitBoxOrient: 'vertical',
+		overflow: 'hidden',
+		textOverflow: 'ellipsis',
+	} : {};
 
 	return (
-		<article
-			className={`card rounded shadow w-100 ${fullPost ? 'mt-3 mb-4' : 'h-100 d-flex flex-column'}`}
-		>
-			{/** IMAGE */}
+		<article className={`card ${!fullPost ? 'card--interactive' : ''}`} style={!fullPost ? { height: '100%', display: 'flex', flexDirection: 'column' } : { marginBottom: 'var(--space-lg)' }}>
 			{postData.image && !isEditing && (
-				<div
-					className="d-flex justify-content-center rounded overflow-hidden"
-					style={!fullPost ? { height: '150px' } : {}}
-				>
+				<div className="overflow-hidden" style={!fullPost ? { height: '150px' } : {}}>
 					{/* eslint-disable-next-line @next/next/no-img-element */}
 					<img
 						src={postData.image}
-						className={`img-fluid ${fullPost ? 'rounded-4 p-1 border border-dark mt-3' : 'card-img-top'}`}
+						className="card__image"
 						style={{
 							height: fullPost ? 'auto' : '150px',
-							width: '100%',
-							objectFit: 'cover',
-							maxHeight: fullPost ? '800px' : '150px',
-							maxWidth: fullPost ? '800px' : '100%',
+							maxHeight: fullPost ? '500px' : '150px',
+							borderRadius: fullPost ? 'var(--radius-md)' : 0,
+							padding: fullPost ? 'var(--space-sm)' : 0,
 						}}
 						alt={postData.title || t('posts.view.postImage')}
 					/>
 				</div>
 			)}
+
 			{isEditing && fullPost && (
 				<div className="p-3">
-					<label className="form-label fw-bold">{t('imageUploader.postImage')}:</label>
+					<label>{t('imageUploader.postImage')}:</label>
 					{postData.image && (
-						<div className="mb-2">
-							<small className="text-muted">{t('imageUploader.currentImage')}: {postData.image.split('/').pop()}</small>
-						</div>
+						<p className="text-muted text-sm mb-2">
+							{t('imageUploader.currentImage')}: {postData.image.split('/').pop()}
+						</p>
 					)}
 					<ImageUploader onImageUpload={handleImageUpload} />
 					{selectedImage && (
-						<small className="text-success mt-1 d-block">
-							<i className="bi bi-check-circle me-1"></i>
-							{t('imageUploader.newImageSelected')}: {selectedImage.name}
-						</small>
+						<p className="text-success text-sm mt-2">
+							<Icon name="check" size={14} style={{ display: 'inline', verticalAlign: 'middle' }} />
+							{' '}{t('imageUploader.newImageSelected')}: {selectedImage.name}
+						</p>
 					)}
 				</div>
 			)}
 
-			{/** TITLE + POST_DATE */}
-			<div className="card-header bg-transparent border-0 px-3 pt-3 pb-0">
+			<div className="card__header">
 				{isEditing ? (
 					<textarea
-						name="title"
 						{...register('title')}
-						className="form-control col-9"
+						className="form-textarea"
 						value={title}
 						onChange={(e) => setTitle(e.target.value)}
 						rows="1"
 					/>
 				) : !fullPost ? (
-					<Link href={`/posts/${postData.id}`}>
-						<h6 className="card-title fw-bold mb-1" style={titleStyle} title={postData.title}>
+					<Link href={`/posts/${postData.id}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+						<h3 style={{ ...titleClamp, fontSize: 'var(--text-base)', fontWeight: 600 }} title={postData.title}>
 							{postData.title}
-						</h6>
+						</h3>
 					</Link>
 				) : (
-					<h2 className="card-title">{postData.title}</h2>
+					<h2>{postData.title}</h2>
 				)}
-				<small className="text-muted">
+				<p className="text-muted text-sm" style={{ marginTop: 'var(--space-xs)' }}>
 					{friendlyDate} - {postData.author}
-				</small>
+				</p>
 			</div>
 
-			{/** POST CONTENT */}
-			<div className={`card-body px-3 py-2 ${!fullPost ? 'flex-grow-1' : ''}`}>
+			<div className="card__body" style={!fullPost ? { flex: 1 } : {}}>
 				{isEditing ? (
 					<textarea
-						name="content"
 						{...register('content')}
-						className="form-control"
+						className="form-textarea"
 						value={content}
 						onChange={(e) => setContent(e.target.value)}
 						rows="10"
 					/>
 				) : (
-					<pre className="mb-0 small" style={contentStyle}>
+					<pre className="text-sm" style={{ ...contentClamp, color: 'var(--color-text-secondary)' }}>
 						{fullPost ? postData.content : truncatedContent}
 					</pre>
 				)}
 			</div>
 
-			{/** FOOTER - BUTTONS */}
-			<div className="card-footer bg-gray-100 border-0 d-flex justify-content-end py-2 mt-auto">
-				{isEditing && (
+		<div className="card__footer">
+			<WaterButton postId={postData.id} initialCount={postData.water_count || 0} />
+			<div style={{ flex: 1 }} />
+			{isEditing && (
 					<>
-						<button
-							className="btn"
-							title={t('posts.edit.save')}
-							onClick={() => handleUpdates(content, title)}
-						>
-							<i className="bi bi-save"></i>
+						<button className="btn btn--ghost btn--icon" title={t('posts.edit.save')} onClick={() => handleUpdates(content, title)}>
+							<Icon name="save" size={18} />
 						</button>
-						<button
-							className="btn"
-							title={t('posts.edit.cancel')}
-							onClick={() => setIsEditing(false)}
-						>
-							<i className="bi bi-x-circle-fill"></i>
+						<button className="btn btn--ghost btn--icon" title={t('posts.edit.cancel')} onClick={() => setIsEditing(false)}>
+							<Icon name="x" size={18} />
 						</button>
 					</>
 				)}
-
-				{/* Solo mostrar botón de editar si tiene permisos */}
 				{fullPost && !isEditing && canEdit && !authLoading && (
-					<button
-						className="btn"
-						title={t('posts.edit.editPost')}
-						onClick={() => setIsEditing(true)}
-					>
-						<i className="bi bi-pencil-square"></i>
+					<button className="btn btn--ghost btn--icon" title={t('posts.edit.editPost')} onClick={() => setIsEditing(true)}>
+						<Icon name="edit" size={18} />
 					</button>
 				)}
-
-				{/* Solo mostrar botón de eliminar si tiene permisos */}
 				{canDelete && !authLoading && (
 					<DeleteButton id={postData.id} home={home} onDelete={onDelete} />
 				)}

@@ -1,10 +1,7 @@
-import '@/styles/global.css';
-
 export const metadata = {
-	title: 'Autenticación - Spelkit Blog',
+	title: 'Autenticacion - Our Garden',
 };
 
 export default function AuthLayout({ children }) {
 	return children;
 }
-

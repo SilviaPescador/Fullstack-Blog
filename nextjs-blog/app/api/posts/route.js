@@ -8,7 +8,7 @@ import {
 	MAX_CONTENT_LENGTH 
 } from '@/lib/validation';
 
-// GET - Obtener todos los posts
+// GET - Obtener todos los posts (solo aprobados para usuarios normales)
 export async function GET() {
 	try {
 		const supabase = await createClient();
@@ -24,6 +24,7 @@ export async function GET() {
 					avatar_url
 				)
 			`)
+			.eq('status', 'approved')
 			.order('created_at', { ascending: false });
 
 		if (error) {
@@ -34,17 +35,18 @@ export async function GET() {
 			);
 		}
 
-		// Formatear los posts para mantener compatibilidad con el frontend
 		const formattedPosts = posts.map((post) => ({
 			id: post.id,
 			title: post.title,
 			content: post.content,
 			image: post.image_url,
-			author: post.profiles?.full_name || post.profiles?.email || 'Anónimo',
+			author: post.profiles?.full_name || post.profiles?.email || 'Anonimo',
 			author_id: post.author_id,
 			post_date: post.created_at,
 			created_at: post.created_at,
 			updated_at: post.updated_at,
+			visual_dna: post.visual_dna,
+			water_count: post.water_count || 0,
 		}));
 
 		return NextResponse.json(formattedPosts);
@@ -159,7 +161,7 @@ export async function POST(request) {
 			imageUrl = publicUrl.publicUrl;
 		}
 
-		// Insertar el post
+		// Insertar el post con status pending
 		const { data: newPost, error } = await supabase
 			.from('posts')
 			.insert({
@@ -167,6 +169,7 @@ export async function POST(request) {
 				content,
 				image_url: imageUrl,
 				author_id: user.id,
+				status: 'pending',
 			})
 			.select()
 			.single();
@@ -177,6 +180,24 @@ export async function POST(request) {
 				{ error: 'Error al crear el post' },
 				{ status: 500 }
 			);
+		}
+
+		// Trigger AI moderation asynchronously
+		try {
+			const baseUrl = request.headers.get('origin') || request.headers.get('host');
+			const protocol = baseUrl?.startsWith('localhost') ? 'http' : 'https';
+			const moderateUrl = baseUrl?.startsWith('http') ? `${baseUrl}/api/moderate` : `${protocol}://${baseUrl}/api/moderate`;
+
+			fetch(moderateUrl, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Cookie': request.headers.get('cookie') || '',
+				},
+				body: JSON.stringify({ post_id: newPost.id }),
+			}).catch(err => console.error('Moderation trigger failed:', err));
+		} catch (e) {
+			console.error('Could not trigger moderation:', e);
 		}
 
 		return NextResponse.json({ insertId: newPost.id }, { status: 201 });

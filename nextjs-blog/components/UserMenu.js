@@ -1,60 +1,54 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { createClient } from '@/lib/supabase/client';
+import Icon from '@/components/Icons';
 
 export default function UserMenu() {
 	const [user, setUser] = useState(null);
 	const [profile, setProfile] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [showDropdown, setShowDropdown] = useState(false);
+	const ref = useRef(null);
 	const router = useRouter();
 	const supabase = createClient();
 	const t = useTranslations();
 
 	useEffect(() => {
 		const getUser = async () => {
-			const {
-				data: { user },
-			} = await supabase.auth.getUser();
+			const { data: { user } } = await supabase.auth.getUser();
 			setUser(user);
-
 			if (user) {
 				const { data: profile } = await supabase
-					.from('profiles')
-					.select('*')
-					.eq('id', user.id)
-					.single();
+					.from('profiles').select('*').eq('id', user.id).single();
 				setProfile(profile);
 			}
-
 			setLoading(false);
 		};
-
 		getUser();
 
-		// Escuchar cambios en la autenticación
-		const {
-			data: { subscription },
-		} = supabase.auth.onAuthStateChange((_event, session) => {
+		const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
 			setUser(session?.user ?? null);
 			if (session?.user) {
-				supabase
-					.from('profiles')
-					.select('*')
-					.eq('id', session.user.id)
-					.single()
+				supabase.from('profiles').select('*').eq('id', session.user.id).single()
 					.then(({ data }) => setProfile(data));
 			} else {
 				setProfile(null);
 			}
 		});
-
 		return () => subscription.unsubscribe();
 	}, [supabase]);
+
+	useEffect(() => {
+		function handleClickOutside(e) {
+			if (ref.current && !ref.current.contains(e.target)) setShowDropdown(false);
+		}
+		document.addEventListener('mousedown', handleClickOutside);
+		return () => document.removeEventListener('mousedown', handleClickOutside);
+	}, []);
 
 	const handleLogout = async () => {
 		await supabase.auth.signOut();
@@ -64,120 +58,79 @@ export default function UserMenu() {
 	};
 
 	if (loading) {
-		return (
-			<div className="spinner-border spinner-border-sm text-secondary" role="status">
-				<span className="visually-hidden">{t('common.loading')}</span>
-			</div>
-		);
+		return <span className="spinner spinner--sm" />;
 	}
 
 	if (!user) {
 		return (
-			<Link href="/login" className="btn btn-outline-primary btn-sm">
-				<i className="bi bi-person me-1"></i>
+			<Link href="/login" className="btn btn--outline btn--sm">
+				<Icon name="user" size={16} />
 				{t('nav.login')}
 			</Link>
 		);
 	}
 
 	return (
-		<div className="dropdown">
+		<div className="dropdown" ref={ref}>
 			<button
-				className="btn btn-link text-decoration-none d-flex align-items-center gap-2 p-0"
-				type="button"
+				className="btn btn--ghost flex items-center gap-2"
 				onClick={() => setShowDropdown(!showDropdown)}
 				aria-expanded={showDropdown}
 			>
 				{profile?.avatar_url ? (
-					// eslint-disable-next-line @next/next/no-img-element
-					<img
-						src={profile.avatar_url}
-						alt={t('metadata.avatar')}
-						className="rounded-circle"
-						style={{ width: '32px', height: '32px', objectFit: 'cover' }}
-					/>
+					/* eslint-disable-next-line @next/next/no-img-element */
+					<img src={profile.avatar_url} alt="" className="avatar" />
 				) : (
-					<div
-						className="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white"
-						style={{ width: '32px', height: '32px', fontSize: '14px' }}
-					>
+					<span className="avatar avatar--placeholder">
 						{(profile?.full_name || user.email)?.[0]?.toUpperCase() || 'U'}
-					</div>
+					</span>
 				)}
-				<span className="d-none d-md-inline text-dark">
+				<span className="hidden md:inline" style={{ color: 'var(--color-text-secondary)' }}>
 					{profile?.full_name || user.email?.split('@')[0]}
 				</span>
-				<i className="bi bi-chevron-down text-dark"></i>
+				<Icon name="chevronDown" size={14} />
 			</button>
 
 			{showDropdown && (
 				<>
-					{/* Overlay para cerrar el dropdown al hacer clic fuera */}
-					<div
-						className="position-fixed top-0 start-0 w-100 h-100"
-						style={{ zIndex: 999 }}
-						onClick={() => setShowDropdown(false)}
-					></div>
-
-					<ul
-						className="dropdown-menu dropdown-menu-end show"
-						style={{ zIndex: 1000 }}
-					>
-						<li>
-							<span className="dropdown-item-text">
-								<small className="text-muted">{user.email}</small>
-								{profile?.role === 'admin' && (
-									<span className="badge bg-danger ms-2">Admin</span>
-								)}
-							</span>
+					<div className="overlay" onClick={() => setShowDropdown(false)} />
+					<ul className="dropdown__menu">
+						<li className="dropdown__text">
+							{user.email}
+							{profile?.role === 'admin' && (
+								<span className="badge badge--danger ml-2">Admin</span>
+							)}
 						</li>
+						<li><div className="dropdown__divider" /></li>
 						<li>
-							<hr className="dropdown-divider" />
-						</li>
-						<li>
-							<Link
-								href="/profile"
-								className="dropdown-item"
-								onClick={() => setShowDropdown(false)}
-							>
-								<i className="bi bi-person me-2"></i>
-								{t('nav.myProfile')}
+							<Link href="/profile" className="dropdown__item" onClick={() => setShowDropdown(false)}>
+								<Icon name="user" size={16} /> {t('nav.myProfile')}
 							</Link>
 						</li>
 						<li>
-							<Link
-								href="/my-posts"
-								className="dropdown-item"
-								onClick={() => setShowDropdown(false)}
-							>
-								<i className="bi bi-file-text me-2"></i>
-								{t('nav.myPosts')}
+							<Link href="/my-posts" className="dropdown__item" onClick={() => setShowDropdown(false)}>
+								<Icon name="fileText" size={16} /> {t('nav.myPosts')}
 							</Link>
 						</li>
 						{profile?.role === 'admin' && (
 							<>
+								<li><div className="dropdown__divider" /></li>
 								<li>
-									<hr className="dropdown-divider" />
+									<Link href="/admin/queue" className="dropdown__item" onClick={() => setShowDropdown(false)}>
+										<Icon name="inbox" size={16} /> {t('nav.moderationQueue') || 'Moderation'}
+									</Link>
 								</li>
 								<li>
-									<Link
-										href="/admin/users"
-										className="dropdown-item"
-										onClick={() => setShowDropdown(false)}
-									>
-										<i className="bi bi-people me-2"></i>
-										{t('nav.manageUsers')}
+									<Link href="/admin/users" className="dropdown__item" onClick={() => setShowDropdown(false)}>
+										<Icon name="users" size={16} /> {t('nav.manageUsers')}
 									</Link>
 								</li>
 							</>
 						)}
+						<li><div className="dropdown__divider" /></li>
 						<li>
-							<hr className="dropdown-divider" />
-						</li>
-						<li>
-							<button className="dropdown-item text-danger" onClick={handleLogout}>
-								<i className="bi bi-box-arrow-right me-2"></i>
-								{t('nav.logout')}
+							<button className="dropdown__item dropdown__item--danger" onClick={handleLogout}>
+								<Icon name="logOut" size={16} /> {t('nav.logout')}
 							</button>
 						</li>
 					</ul>

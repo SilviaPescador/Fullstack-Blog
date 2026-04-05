@@ -1,0 +1,23 @@
+.garden-section {
+  position: relative;
+  padding: var(--space-sm) 0 var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.garden-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 50% 100%, var(--color-accent-green-soft) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* Plant hover glow -- filter only, no transform to avoid flicker */
+.plant-group {
+  transition: filter 0.25s ease;
+  cursor: pointer;
+}
+
+.plant-group:hover {
+  filter: drop-shadow(0 0 8px var(--color-accent-green)) brightness(1.3);
+}

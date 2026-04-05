@@ -18,12 +18,13 @@
 		"logout": "Cerrar Sesión",
 		"myProfile": "Mi Perfil",
 		"myPosts": "Mis Posts",
-		"manageUsers": "Gestionar Usuarios"
+		"manageUsers": "Gestionar Usuarios",
+		"moderationQueue": "Moderacion"
 	},
 	"auth": {
 		"login": {
 			"title": "Iniciar Sesión",
-			"welcome": "Bienvenido de vuelta a Spelkit Blog",
+			"welcome": "Bienvenido de vuelta a Our Garden",
 			"email": "Email",
 			"password": "Contraseña",
 			"submit": "Iniciar Sesión",
@@ -34,7 +35,7 @@
 		},
 		"register": {
 			"title": "Crear Cuenta",
-			"subtitle": "Únete a Spelkit Blog",
+			"subtitle": "Unete a Our Garden",
 			"fullName": "Nombre completo",
 			"email": "Email",
 			"password": "Contraseña",
@@ -100,7 +101,13 @@
 		}
 	},
 	"home": {
-		"description": "Aquí se plasman sueños, noticias, emociones e ideas de célula y metal."
+		"description": "Aqui se plasman suenos, noticias, emociones e ideas de celula y metal."
+	},
+	"garden": {
+		"title": "Nuestro Jardin",
+		"subtitle": "Cada post hace crecer algo nuevo. Haz clic en una planta para leer su historia.",
+		"latestPosts": "Ultimos posts",
+		"emptyGarden": "El jardin espera sus primeras semillas..."
 	},
 	"pagination": {
 		"previous": "Anterior",

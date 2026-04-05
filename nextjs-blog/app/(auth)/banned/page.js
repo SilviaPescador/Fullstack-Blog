@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { createClient } from '@/lib/supabase/client';
+import Icon from '@/components/Icons';
 
 export default function BannedPage() {
 	const router = useRouter();
@@ -17,23 +18,14 @@ export default function BannedPage() {
 	};
 
 	return (
-		<div className="min-vh-100 d-flex align-items-center justify-content-center bg-light">
-			<div className="card shadow-lg text-center" style={{ maxWidth: '500px', width: '100%' }}>
-				<div className="card-body p-5">
-					<div className="mb-4">
-						<i className="bi bi-exclamation-octagon text-danger" style={{ fontSize: '4rem' }}></i>
-					</div>
-					<h2 className="fw-bold text-danger mb-3">{t('title')}</h2>
-					<p className="text-muted mb-4">
-						{t('message')}
-					</p>
-					<button
-						onClick={handleLogout}
-						className="btn btn-outline-secondary"
-					>
-						{tNav('logout')}
-					</button>
-				</div>
+		<div className="auth-page">
+			<div className="auth-card text-center">
+				<Icon name="ban" size={64} style={{ color: 'var(--color-danger)', marginBottom: 'var(--space-md)' }} />
+				<h2 style={{ color: 'var(--color-danger)', marginBottom: 'var(--space-sm)' }}>{t('title')}</h2>
+				<p className="text-muted mb-6">{t('message')}</p>
+				<button onClick={handleLogout} className="btn btn--outline">
+					<Icon name="logOut" size={16} /> {tNav('logout')}
+				</button>
 			</div>
 		</div>
 	);

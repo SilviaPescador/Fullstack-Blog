@@ -36,33 +36,20 @@ export default function PostPageClient({ initialPost, postId, initialError }) {
 		}
 	}, [postId, edited]);
 
-	// Mostrar error
 	if (error) {
 		return (
 			<Layout>
-				<ErrorMessage
-					type="server"
-					title={t('posts.view.loadError')}
-					message={t('posts.view.loadErrorMessage')}
-					details={error.message}
-					onRetry={fetchPostData}
-					showHomeLink
-				/>
+				<ErrorMessage type="server" title={t('posts.view.loadError')} message={t('posts.view.loadErrorMessage')} details={error.message} onRetry={fetchPostData} showHomeLink />
 			</Layout>
 		);
 	}
 
-	// Mostrar loading
 	if (loading) {
 		return (
 			<Layout>
-				<div className="d-flex justify-content-center align-items-center py-5">
-					<div className="text-center">
-						<div className="spinner-border text-primary mb-3" role="status">
-							<span className="visually-hidden">{t('common.loading')}</span>
-						</div>
-						<p className="text-muted">{t('posts.view.loadingPost')}</p>
-					</div>
+				<div className="flex-center flex-col py-8">
+					<span className="spinner spinner--lg mb-3" />
+					<p className="text-muted">{t('posts.view.loadingPost')}</p>
 				</div>
 			</Layout>
 		);
@@ -71,12 +58,7 @@ export default function PostPageClient({ initialPost, postId, initialError }) {
 	if (!postData) {
 		return (
 			<Layout>
-				<ErrorMessage
-					type="empty"
-					title={t('posts.view.notAvailable')}
-					message={t('posts.view.notAvailableMessage')}
-					showHomeLink
-				/>
+				<ErrorMessage type="empty" title={t('posts.view.notAvailable')} message={t('posts.view.notAvailableMessage')} showHomeLink />
 			</Layout>
 		);
 	}

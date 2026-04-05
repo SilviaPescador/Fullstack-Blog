@@ -2,12 +2,14 @@
 
 export default function Footer() {
 	return (
-		<footer className="container-fluid position-absolute fixed-bottom py-3 ">
-			<div className="bg-gray-100 text-center">
-				<div className="bg-gray-100 container mx-auto px-6 pt-10 pb-6">
-					Spelkit Blog | 2026
-				</div>
-			</div>
+		<footer style={{
+			padding: 'var(--space-lg) var(--space-md)',
+			textAlign: 'center',
+			color: 'var(--color-text-muted)',
+			fontSize: 'var(--text-sm)',
+			borderTop: '1px solid var(--color-border)',
+		}}>
+			Our Garden | {new Date().getFullYear()}
 		</footer>
 	);
 }

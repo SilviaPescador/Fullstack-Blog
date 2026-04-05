@@ -32,3 +32,10 @@ yarn-error.log*
 
 # Internal docs
 /internal-docs
+
+# Obsolete DB dumps (old MySQL architecture)
+/db/next-blog-db.sql
+/db/fix-delete-policy.sql
+
+# Context files (local session notes)
+CONTEXT.local.md

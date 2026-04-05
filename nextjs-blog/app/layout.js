@@ -1,45 +1,25 @@
-import { Nunito } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
+import Particles from '@/components/Particles';
+import CursorGlow from '@/components/CursorGlow';
+import '../styles/tokens.css';
 import '../styles/global.css';
-
-const nunito = Nunito({
-	subsets: ['latin'],
-	display: 'swap',
-	variable: '--font-nunito',
-	weight: ['300', '400', '500', '600', '700', '800'],
-});
+import '../styles/garden.css';
 
 const siteUrl = 'https://fullstack-blog-beta.vercel.app';
 
 export const metadata = {
-	title: 'Spelkit Blog',
-	description: 'Blog personal donde se plasman sueños, noticias, emociones e ideas. By Silvia Pescador.',
-	icons: {
-		icon: '/favicon.ico',
-	},
+	title: 'Our Garden',
+	description: 'Un espacio vivo que crece con la comunidad. Cada post aprobado hace crecer el jardin.',
+	icons: { icon: '/favicon.ico' },
 	metadataBase: new URL(siteUrl),
 	openGraph: {
-		title: 'Spelkit',
-		description: 'Blog personal donde se plasman sueños, noticias, emociones e ideas ✨',
+		title: 'Our Garden',
+		description: 'Un espacio vivo que crece con la comunidad.',
 		url: siteUrl,
-		siteName: 'Spelkit Blog',
-		images: [
-			{
-				url: `${siteUrl}/images/quantum-flower-400.jpg`,
-				width: 400,
-				height: 400,
-				alt: 'Logo de Spelkit Blog',
-			},
-		],
+		siteName: 'Our Garden',
 		locale: 'es_ES',
 		type: 'website',
-	},
-	twitter: {
-		card: 'summary_large_image',
-		title: 'Spelkit',
-		description: 'Blog personal donde se plasman sueños, noticias, emociones e ideas ✨',
-		images: [`${siteUrl}/images/quantum-flower-400.jpg`],
 	},
 };
 
@@ -48,8 +28,29 @@ export default async function RootLayout({ children }) {
 	const messages = await getMessages();
 
 	return (
-		<html lang={locale} className={nunito.variable}>
+		<html lang={locale} data-theme="dark" suppressHydrationWarning>
+			<head>
+				<link
+					href="https://api.fontshare.com/v2/css?f[]=clash-display@200,300,400,500,600,700&display=swap"
+					rel="stylesheet"
+				/>
+				<link
+					href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700&display=swap"
+					rel="stylesheet"
+				/>
+				<link
+					href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&display=swap"
+					rel="stylesheet"
+				/>
+				<script
+					dangerouslySetInnerHTML={{
+						__html: `(function(){try{var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t);else if(window.matchMedia('(prefers-color-scheme:light)').matches)document.documentElement.setAttribute('data-theme','light')}catch(e){}})()`,
+					}}
+				/>
+			</head>
 			<body>
+				<CursorGlow />
+				<Particles />
 				<NextIntlClientProvider messages={messages}>
 					{children}
 				</NextIntlClientProvider>

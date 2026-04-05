@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useTransition } from 'react';
 import { useLocale } from 'next-intl';
 import { locales, localeNames } from '@/i18n/config';
+import Icon from '@/components/Icons';
 
 export default function LocaleSwitcher() {
 	const locale = useLocale();
@@ -29,29 +30,30 @@ export default function LocaleSwitcher() {
 	return (
 		<div className="dropdown" ref={ref}>
 			<button
-				className="btn btn-sm btn-outline-secondary dropdown-toggle d-flex align-items-center gap-1"
-				type="button"
+				className="btn btn--ghost btn--sm flex items-center gap-2"
 				aria-expanded={open}
 				disabled={isPending}
 				onClick={() => setOpen((v) => !v)}
 			>
-				<i className="bi bi-globe2"></i>
-				<span className="d-none d-sm-inline">{localeNames[locale]}</span>
+				<Icon name="globe" size={16} />
+				<span className="hidden sm:inline">{localeNames[locale]}</span>
 			</button>
-			<ul className={`dropdown-menu dropdown-menu-end${open ? ' show' : ''}`}>
-				{locales.map((loc) => (
-					<li key={loc}>
-						<button
-							className={`dropdown-item ${loc === locale ? 'active' : ''}`}
-							onClick={() => handleChange(loc)}
-							disabled={loc === locale || isPending}
-						>
-							{localeNames[loc]}
-							{loc === locale && <i className="bi bi-check ms-2"></i>}
-						</button>
-					</li>
-				))}
-			</ul>
+			{open && (
+				<ul className="dropdown__menu">
+					{locales.map((loc) => (
+						<li key={loc}>
+							<button
+								className={`dropdown__item ${loc === locale ? 'dropdown__item--active' : ''}`}
+								onClick={() => handleChange(loc)}
+								disabled={loc === locale || isPending}
+							>
+								{localeNames[loc]}
+								{loc === locale && <Icon name="check" size={14} />}
+							</button>
+						</li>
+					))}
+				</ul>
+			)}
 		</div>
 	);
 }

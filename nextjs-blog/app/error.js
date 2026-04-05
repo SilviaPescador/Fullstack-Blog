@@ -3,51 +3,35 @@
 import { useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import Layout from '@/components/layout';
+import Icon from '@/components/Icons';
 
 export default function Error({ error, reset }) {
 	const t = useTranslations('errors.generic');
 
 	useEffect(() => {
-		// Log del error para debugging
-		console.error('Error de aplicación:', error);
+		console.error('Application error:', error);
 	}, [error]);
 
 	return (
 		<Layout>
-			<div className="d-flex flex-column align-items-center justify-content-center py-5">
-				<div className="text-center">
-					{/* Icono de error */}
-					<i className="bi bi-exclamation-triangle text-danger" style={{ fontSize: '6rem' }}></i>
-					
-					{/* Título */}
-					<h1 className="h2 text-dark mt-4 mb-3">{t('title')}</h1>
-					
-					{/* Descripción */}
-					<p className="text-muted mb-2">
-						{t('message')}
-					</p>
-					
-					{/* Detalle del error (solo en desarrollo) */}
-					{process.env.NODE_ENV === 'development' && error?.message && (
-						<div className="alert alert-danger mx-auto mt-3" style={{ maxWidth: '500px' }}>
-							<small className="font-monospace">{error.message}</small>
-						</div>
-					)}
-					
-					{/* Botones de acción */}
-					<div className="d-flex gap-3 justify-content-center mt-4">
-						<button
-							onClick={() => reset()}
-							className="btn btn-primary px-4"
-						>
-							<i className="bi bi-arrow-clockwise me-2"></i>
-							{t('retry')}
-						</button>
-						<a href="/" className="btn btn-outline-secondary px-4">
-							<i className="bi bi-house-door me-2"></i>
-							{t('goHome')}
-						</a>
+			<div className="flex-center flex-col py-8 text-center">
+				<Icon name="alertTriangle" size={64} style={{ color: 'var(--color-danger)', marginBottom: 'var(--space-md)' }} />
+				<h1 style={{ marginBottom: 'var(--space-sm)' }}>{t('title')}</h1>
+				<p className="text-muted mb-4">{t('message')}</p>
+
+				{process.env.NODE_ENV === 'development' && error?.message && (
+					<div className="alert alert--danger mb-4 text-mono text-sm" style={{ maxWidth: '500px' }}>
+						{error.message}
 					</div>
+				)}
+
+				<div className="flex gap-3">
+					<button onClick={() => reset()} className="btn btn--primary">
+						<Icon name="refresh" size={16} /> {t('retry')}
+					</button>
+					<a href="/" className="btn btn--outline">
+						<Icon name="home" size={16} /> {t('goHome')}
+					</a>
 				</div>
 			</div>
 		</Layout>

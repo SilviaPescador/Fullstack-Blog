@@ -1,205 +1,180 @@
-# 🌸 Spelkit Blog
+# Our Garden
 
-Blog personal fullstack desarrollado con **Next.js 16**, **Supabase** y desplegado en **Vercel**.
+Plataforma de escritura colectiva con moderacion asistida por IA. Cada post aprobado genera una planta unica en un jardin interactivo SVG, basada en el analisis semantico del contenido.
 
-![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)
-![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)
-![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?logo=supabase&logoColor=white)
-![Vercel](https://img.shields.io/badge/Vercel-Deployed-black?logo=vercel)
-![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-7952B3?logo=bootstrap&logoColor=white)
+**Stack**: Next.js 16 - Supabase - Claude API - GSAP - Resend - Vercel
 
-🔗 **Demo en vivo**: [https://fullstack-blog-beta.vercel.app](https://fullstack-blog-beta.vercel.app)
+**Demo**: [https://fullstack-blog-beta.vercel.app](https://fullstack-blog-beta.vercel.app)
 
 ---
 
-## ✨ Funcionalidades
+## Concepto
 
-| Función | Descripción |
+No es un blog. Es un espacio vivo que crece con la comunidad. Cuando un post es aprobado, una planta procedural nace en el jardin de la home -- su forma, color y tipo dependen del contenido del post, analizado por IA.
+
+- **Posts tecnicos** generan plantas geometricas (circuitos, nodos angulares)
+- **Posts reflexivos** generan plantas organicas (curvas, hojas naturales)
+- **Posts creativos** generan plantas con flores (petalos, color rico)
+- **Posts educativos** generan cristales (facetados, estructurados)
+
+Los usuarios pueden "regar" posts que les gusten, haciendo crecer sus plantas.
+
+---
+
+## Funcionalidades
+
+| Funcion | Descripcion |
 |---------|-------------|
-| 📝 **CRUD Posts** | Crear, leer, editar y eliminar entradas |
-| 🔐 **Autenticación** | Login con Email/Password y GitHub OAuth |
-| 👥 **Sistema de roles** | Admin, Usuario registrado, Usuario baneado |
-| 🖼️ **Imágenes en la nube** | Almacenamiento en Supabase Storage |
-| 🎨 **Diseño responsive** | Bootstrap 5 + CSS modules |
-| ⚡ **Server Components** | Carga inicial rápida con SSR |
-| 🔄 **SWR** | Revalidación automática de datos |
-| 📄 **Paginación** | Navegación entre páginas de posts |
-| 🌐 **Multiidioma** | Soporte para Español e Inglés (next-intl) |
+| Jardin SVG interactivo | Canvas procedural en la home con GSAP animations |
+| Moderacion IA | Claude analiza, resume, clasifica y genera el ADN visual |
+| Realtime | El jardin se actualiza en vivo al aprobar posts (Supabase Realtime) |
+| Sistema de riego | Reacciones unicas que hacen crecer las plantas |
+| Particulas flotantes | Fondo animado con particulas tipo firefly (portado del portfolio) |
+| Cursor glow | Resplandor que sigue al raton con gradiente radial |
+| Dark/Light mode | Design system unificado con portfolio (CSS custom properties) |
+| Auth completa | Email, Google, GitHub OAuth con Supabase Auth |
+| Roles | Admin, Usuario, Baneado con RLS en PostgreSQL |
+| i18n | Espanol e Ingles (next-intl) |
+| Panel admin | Cola de moderacion con preview de plantas y aprobacion en un click |
+| Notificaciones | Email al autor cuando su post es aprobado (Resend) |
+| Seguridad | Input sanitization, CSP headers, rate limit prep, open redirect protection |
 
 ---
 
-## 🔐 Sistema de Permisos
+## Arquitectura
 
-| Rol | Ver posts | Crear | Editar propios | Editar todos | Eliminar propios | Eliminar todos | Gestionar usuarios |
-|-----|-----------|-------|----------------|--------------|------------------|----------------|-------------------|
-| **Visitante** | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| **Usuario** | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ |
-| **Admin** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **Baneado** | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+```
+Usuario crea post
+    -> status: pending
+    -> API /moderate -> Claude API
+    -> Claude genera: summary, tags, visual DNA, spam/toxicity score
+    -> status: reviewed_by_ai
+
+Admin aprueba
+    -> status: approved
+    -> Supabase Realtime broadcast
+    -> Jardin muestra nueva planta con animacion de nacimiento
+    -> Email al autor via Resend
+```
 
 ---
 
-## 🚀 Desarrollo Local
+## Seguridad
 
-### 1. Clonar el repositorio
+- Input sanitization (titulo, contenido, imagenes) con limites de longitud y tipo
+- Validacion de IDs en todas las API routes (UUID y bigint)
+- RLS en PostgreSQL: posts pendientes solo visibles para admin/autor
+- Proteccion contra open redirect en flujo de login
+- Content Security Policy (CSP) headers
+- Proteccion contra usuarios baneados en middleware y API routes
+- Content-Type validation en endpoints JSON
+- Prompt truncation para Claude API (max 3000 chars)
+
+---
+
+## Desarrollo local
+
+### 1. Clonar e instalar
 
 ```bash
 git clone https://github.com/SilviaPescador/Fullstack-Blog.git
 cd Fullstack-Blog/nextjs-blog
-```
-
-### 2. Instalar dependencias
-
-```bash
 pnpm install
 ```
 
-> ⚠️ Este proyecto usa **pnpm** como gestor de paquetes. Si no lo tienes instalado:
-> ```bash
-> npm install -g pnpm
-> ```
+### 2. Variables de entorno
 
-### 3. Configurar Variables de Entorno
-
-Crea el archivo `nextjs-blog/.env.local`:
+Crear `nextjs-blog/.env.local`:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://tu-proyecto.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=tu-anon-key
+
+# Opcional: moderacion con IA (funciona sin esto, pero no genera AI summary)
+ANTHROPIC_API_KEY=sk-ant-...
+
+# Opcional: notificaciones por email
+RESEND_API_KEY=re_...
+
+# Opcional: URL base para emails
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
-> Obtén estas variables en [Supabase](https://app.supabase.com) → Settings → API
+### 3. Migracion de base de datos
 
-### 4. Ejecutar en desarrollo
+Ejecutar `db/migration-garden.sql` en el SQL Editor de Supabase.
+
+### 4. Ejecutar
 
 ```bash
 pnpm dev
 ```
 
-Abre [http://localhost:3000](http://localhost:3000) 🎉
-
 ---
 
-## 📁 Estructura del Proyecto
+## Estructura del proyecto
 
 ```
 nextjs-blog/
-├── app/                    # App Router (Next.js 16)
-│   ├── api/posts/          # API Routes (backend integrado)
-│   ├── (auth)/             # Páginas de autenticación
-│   ├── admin/              # Panel de administración
-│   ├── posts/              # Páginas de posts
-│   └── page.js             # Home
-├── components/             # Componentes React
-├── hooks/                  # Custom hooks (useAuth)
-├── i18n/                   # Configuración de internacionalización
-│   ├── config.js           # Idiomas soportados (es, en)
-│   └── request.js          # Configuración de next-intl
-├── messages/               # Archivos de traducciones
-│   ├── es.json             # Español (idioma por defecto)
-│   └── en.json             # Inglés
-├── lib/supabase/           # Clientes de Supabase
-├── db/                     # Scripts SQL
-├── services/               # Servicios API
-└── styles/                 # Estilos CSS
+  app/
+    page.js                     Home con jardin SVG
+    layout.js                   Root layout con particulas y cursor glow
+    api/
+      posts/                    CRUD de posts
+      moderate/                 Moderacion con Claude
+      water/                    Sistema de riego
+      posts/approve/            Aprobar/rechazar posts
+    admin/
+      queue/                    Cola de moderacion
+      users/                    Gestion de usuarios
+    posts/[id]/                 Detalle de post
+    (auth)/                     Login, registro, banned
+  components/
+    garden/
+      Garden.js                 Contenedor SVG con Realtime
+      Plant.js                  Planta individual con GSAP
+      PlantGenerator.js         Generacion procedural SVG
+      PlantTooltip.js           Tooltip en hover
+      gardenUtils.js            Posiciones, PRNG, DNA por defecto
+    Particles.js                Particulas flotantes (fireflies)
+    CursorGlow.js               Resplandor que sigue al cursor
+    Icons.js                    Sistema de iconos SVG
+    ThemeToggle.js              Dark/light mode
+    WaterButton.js              Boton de riego
+    layout.js                   Shell del sitio (nav con logo SVG)
+    postArticle.js              Tarjeta de post
+    ...
+  lib/
+    claude.js                   Cliente Claude API
+    email.js                    Notificaciones Resend
+    validation.js               Sanitizacion y validacion de inputs
+    supabase/                   Clientes Supabase (client, server, middleware)
+  styles/
+    tokens.css                  Design tokens (colores, tipografia, spacing)
+    global.css                  Estilos base, particulas, cursor glow, utilidades
+    garden.css                  Estilos del jardin
+  db/
+    migration-garden.sql        Migracion para Our Garden
 ```
 
 ---
 
-## 🛠️ Stack Tecnológico
+## Stack
 
-| Categoría | Tecnología |
+| Categoria | Tecnologia |
 |-----------|------------|
-| **Framework** | Next.js 16 (App Router) |
-| **Frontend** | React 19, Bootstrap 5 |
-| **Backend** | API Routes de Next.js |
-| **Base de datos** | Supabase (PostgreSQL) |
-| **Autenticación** | Supabase Auth (Email, GitHub) |
-| **Almacenamiento** | Supabase Storage |
-| **Hosting** | Vercel |
-| **Internacionalización** | next-intl (ES/EN) |
-| **Librerías** | SWR, react-hook-form, react-dropzone, sweetalert2 |
-| **Gestor de paquetes** | pnpm |
+| Framework | Next.js 16 (App Router) |
+| Frontend | React 19, CSS Custom Properties, GSAP |
+| Backend | API Routes de Next.js |
+| Base de datos | Supabase (PostgreSQL + Realtime) |
+| Auth | Supabase Auth (Email, Google, GitHub) |
+| IA | Claude API (Haiku) |
+| Email | Resend |
+| Hosting | Vercel |
+| i18n | next-intl (ES/EN) |
 
 ---
 
-## 🚢 Despliegue
-
-El proyecto está configurado para **despliegue automático** con Vercel:
-
-1. Cada `git push` a `main` dispara un nuevo deploy
-2. Vercel detecta Next.js automáticamente
-3. Las variables de entorno se configuran en el dashboard de Vercel
-
-### Variables de entorno en Vercel
-
-```
-NEXT_PUBLIC_SUPABASE_URL=https://tu-proyecto.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=tu-anon-key
-```
-
----
-
-## 📖 Documentación Adicional
-
-- [Historial de Migración](./docs/MIGRATION.md) - Detalles de la migración desde Express + MySQL
-
----
-
-## 🌐 Sistema de Traducciones (i18n)
-
-El blog soporta múltiples idiomas usando **next-intl**:
-
-| Idioma | Código | Estado |
-|--------|--------|--------|
-| 🇪🇸 Español | `es` | Por defecto |
-| 🇬🇧 Inglés | `en` | Disponible |
-
-### Cambiar idioma
-
-El selector de idioma está en la barra de navegación (icono 🌐).
-
-### Añadir un nuevo idioma
-
-1. Crea el archivo `messages/XX.json` (copia de `es.json`)
-2. Traduce todos los textos
-3. Añade el código en `i18n/config.js`:
-
-```javascript
-export const locales = ['es', 'en', 'XX'];
-export const localeNames = {
-  es: 'Español',
-  en: 'English',
-  XX: 'Nuevo Idioma',
-};
-```
-
-4. ¡Listo! El nuevo idioma aparecerá en el selector
-
----
-
-## 🗺️ Roadmap
-
-- [x] Migración a Supabase
-- [x] Autenticación con GitHub
-- [x] Sistema de roles y permisos
-- [x] Imágenes en la nube
-- [x] Despliegue en Vercel
-- [x] Autenticación con Google
-- [x] Autenticación con Github
-- [x] Sistema de internacionalización (ES/EN)
-- [ ] Comentarios en posts
-- [ ] Búsqueda de posts
-- [ ] Editor de texto enriquecido
-
----
-
-## 👩‍💻 Autora
+## Autora
 
 **Silvia Pescador** - [@SilviaPescador](https://github.com/SilviaPescador)
-
----
-
-<p align="center">
-  <sub>Desarrollado con 💜 usando Claude Opus 4.5 + Next.js + Supabase + Vercel</sub>
-</p>
