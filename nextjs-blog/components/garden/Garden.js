@@ -35,8 +35,14 @@ export default function Garden({ posts: initialPosts = [], newPostIds: initialNe
 			}, (payload) => {
 				const updated = payload.new;
 				setPosts(prev => {
-					const exists = prev.some(p => p.id === updated.id);
-					if (exists) return prev;
+					const exists = prev.find(p => p.id === updated.id);
+					if (exists) {
+						// Update water_count for existing posts
+						return prev.map(p => p.id === updated.id
+							? { ...p, water_count: updated.water_count ?? p.water_count }
+							: p
+						);
+					}
 					const newPost = {
 						id: updated.id,
 						title: updated.title,
@@ -135,6 +141,7 @@ export default function Garden({ posts: initialPosts = [], newPostIds: initialNe
 								postAuthor={post.author}
 								onClick={() => router.push(`/posts/${post.id}`)}
 								isNew={newPostIds.includes(post.id)}
+								waterCount={post.water_count || 0}
 							/>
 						</g>
 					);

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import DOMPurify from 'isomorphic-dompurify';
 import { 
 	validateImage, 
 	sanitizeText, 
@@ -7,6 +8,17 @@ import {
 	MAX_TITLE_LENGTH, 
 	MAX_CONTENT_LENGTH 
 } from '@/lib/validation';
+
+const ALLOWED_CONTENT_TAGS = ['p', 'br', 'strong', 'em', 'a', 'h2', 'h3', 'ul', 'ol', 'li', 'code', 'pre', 'blockquote'];
+const ALLOWED_CONTENT_ATTR = ['href', 'target', 'rel', 'class'];
+
+function sanitizeHtml(raw) {
+	return DOMPurify.sanitize(raw || '', {
+		ALLOWED_TAGS: ALLOWED_CONTENT_TAGS,
+		ALLOWED_ATTR: ALLOWED_CONTENT_ATTR,
+		FORCE_BODY: true,
+	});
+}
 
 // GET - Obtener todos los posts (solo aprobados para usuarios normales)
 export async function GET() {
@@ -119,7 +131,7 @@ export async function POST(request) {
 		}
 
 		const title = titleValidation.value;
-		const content = contentValidation.value;
+		const content = sanitizeHtml(contentValidation.value);
 
 		let imageUrl = null;
 

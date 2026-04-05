@@ -78,6 +78,7 @@
   --color-bg-elevated: #E0E8F0;
   --color-bg-surface: #FFFFFF;
   --color-bg-hover: #D4E0EC;
+  --color-nav-bg: #D8E5F0;
 
   --color-accent-green: #3A8F6F;
   --color-accent-green-soft: rgba(58, 143, 111, 0.08);
@@ -88,8 +89,8 @@
   --color-accent-warm: #9B59A0;
   --color-accent-warm-soft: rgba(155, 89, 160, 0.08);
 
-  --color-light-primary: rgba(79, 111, 202, 0.05);
-  --color-light-secondary: rgba(155, 89, 160, 0.04);
+  --color-light-primary: rgba(79, 111, 202, 0.12);
+  --color-light-secondary: rgba(155, 89, 160, 0.08);
 
   --color-text-primary: #1E293B;
   --color-text-secondary: #475569;

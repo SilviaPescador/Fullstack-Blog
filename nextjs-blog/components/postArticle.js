@@ -8,11 +8,27 @@ import Link from 'next/link';
 import DeleteButton from '@/components/deleteButton';
 import WaterButton from '@/components/WaterButton';
 import ImageUploader from './imageUploader';
+import RichEditor from '@/components/RichEditor';
 import PostService from '@/services/postService';
 import formatDate from '@/common/formatDate';
 import { useAuth } from '@/hooks/useAuth';
 import Icon from '@/components/Icons';
-import Swal from 'sweetalert2';
+import { useToast } from '@/components/ToastProvider';
+import DOMPurify from 'isomorphic-dompurify';
+
+function plainTextToHtml(text) {
+	if (!text) return '';
+	if (text.trim().startsWith('<')) return text;
+	return text.split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+}
+
+function sanitize(html) {
+	return DOMPurify.sanitize(html, {
+		ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'a', 'h2', 'h3', 'ul', 'ol', 'li', 'code', 'pre', 'blockquote'],
+		ALLOWED_ATTR: ['href', 'target', 'rel', 'class'],
+		FORCE_BODY: true,
+	});
+}
 
 export default function PostArticle({ postData, onDelete, fullPost, setIsEdited, home }) {
 	const [isEditing, setIsEditing] = useState(false);
@@ -23,6 +39,7 @@ export default function PostArticle({ postData, onDelete, fullPost, setIsEdited,
 
 	const { canEditPost, canDeletePost, loading: authLoading } = useAuth();
 	const t = useTranslations();
+	const { showToast } = useToast();
 
 	const friendlyDate = formatDate(postData.post_date);
 	const { register } = useForm();
@@ -30,11 +47,10 @@ export default function PostArticle({ postData, onDelete, fullPost, setIsEdited,
 	const canDelete = canDeletePost(postData.author_id);
 
 	useEffect(() => {
-		setTruncatedContent(
-			postData.content.length > 50
-				? postData.content.substring(0, 50) + '...'
-				: postData.content
-		);
+		const raw = postData.content || '';
+		// Strip tags for preview truncation
+		const stripped = raw.replace(/<[^>]*>/g, '');
+		setTruncatedContent(stripped.length > 80 ? stripped.substring(0, 80) + '...' : stripped);
 	}, [postData.content]);
 
 	const handleImageUpload = (image) => setSelectedImage(image);
@@ -43,12 +59,12 @@ export default function PostArticle({ postData, onDelete, fullPost, setIsEdited,
 		try {
 			const postService = new PostService();
 			await postService.updatePost(postData.id, { content: newContent, title: newTitle, image: selectedImage });
-			await Swal.fire({ position: 'top-end', icon: 'success', title: t('posts.edit.success'), showConfirmButton: false, timer: 1500 });
+			showToast('success', t('posts.edit.success'));
 			setIsEditing(false);
 			setIsEdited(true);
 		} catch (error) {
 			console.error(error);
-			Swal.fire({ icon: 'error', title: 'Error', text: `${t('posts.edit.error')}: ${error}` });
+			showToast('error', `${t('posts.edit.error')}: ${error}`);
 		}
 	};
 
@@ -72,19 +88,19 @@ export default function PostArticle({ postData, onDelete, fullPost, setIsEdited,
 	return (
 		<article className={`card ${!fullPost ? 'card--interactive' : ''}`} style={!fullPost ? { height: '100%', display: 'flex', flexDirection: 'column' } : { marginBottom: 'var(--space-lg)' }}>
 			{postData.image && !isEditing && (
-				<div className="overflow-hidden" style={!fullPost ? { height: '150px' } : {}}>
-					{/* eslint-disable-next-line @next/next/no-img-element */}
-					<img
-						src={postData.image}
-						className="card__image"
-						style={{
-							height: fullPost ? 'auto' : '150px',
-							maxHeight: fullPost ? '500px' : '150px',
-							borderRadius: fullPost ? 'var(--radius-md)' : 0,
-							padding: fullPost ? 'var(--space-sm)' : 0,
-						}}
-						alt={postData.title || t('posts.view.postImage')}
-					/>
+		<div className="overflow-hidden" style={!fullPost ? { height: '200px' } : {}}>
+				{/* eslint-disable-next-line @next/next/no-img-element */}
+				<img
+					src={postData.image}
+					className="card__image"
+					style={{
+						height: fullPost ? 'auto' : '200px',
+						maxHeight: fullPost ? '500px' : '200px',
+						borderRadius: fullPost ? 'var(--radius-md)' : 0,
+						padding: fullPost ? 'var(--space-sm)' : 0,
+					}}
+					alt={postData.title || t('posts.view.postImage')}
+				/>
 				</div>
 			)}
 
@@ -131,17 +147,20 @@ export default function PostArticle({ postData, onDelete, fullPost, setIsEdited,
 
 			<div className="card__body" style={!fullPost ? { flex: 1 } : {}}>
 				{isEditing ? (
-					<textarea
-						{...register('content')}
-						className="form-textarea"
-						value={content}
-						onChange={(e) => setContent(e.target.value)}
-						rows="10"
+					<RichEditor
+						initialContent={plainTextToHtml(content)}
+						onChange={setContent}
+						placeholder={t('posts.edit.contentPlaceholder') || 'Escribe el contenido...'}
+					/>
+				) : fullPost ? (
+					<div
+						className="post-content"
+						dangerouslySetInnerHTML={{ __html: sanitize(plainTextToHtml(postData.content || '')) }}
 					/>
 				) : (
-					<pre className="text-sm" style={{ ...contentClamp, color: 'var(--color-text-secondary)' }}>
-						{fullPost ? postData.content : truncatedContent}
-					</pre>
+					<p className="text-sm" style={{ ...contentClamp, color: 'var(--color-text-secondary)' }}>
+						{truncatedContent}
+					</p>
 				)}
 			</div>
 

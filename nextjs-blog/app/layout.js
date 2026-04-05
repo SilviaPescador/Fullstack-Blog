@@ -2,6 +2,8 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
 import Particles from '@/components/Particles';
 import CursorGlow from '@/components/CursorGlow';
+import Navbar from '@/components/Navbar';
+import ToastProvider from '@/components/ToastProvider';
 import '../styles/tokens.css';
 import '../styles/global.css';
 import '../styles/garden.css';
@@ -52,7 +54,10 @@ export default async function RootLayout({ children }) {
 				<CursorGlow />
 				<Particles />
 				<NextIntlClientProvider messages={messages}>
-					{children}
+					<ToastProvider>
+						<Navbar />
+						{children}
+					</ToastProvider>
 				</NextIntlClientProvider>
 			</body>
 		</html>

@@ -8,26 +8,30 @@ import { useTranslations } from 'next-intl';
 import PostService from '@/services/postService';
 import ImageUploader from './imageUploader';
 import Icon from '@/components/Icons';
-import Swal from 'sweetalert2';
+import RichEditor from '@/components/RichEditor';
+import { useToast } from '@/components/ToastProvider';
 
 import utilStyles from '@/styles/utils.module.css';
 
 export default function NewPostCard() {
 	const [selectedImage, setSelectedImage] = useState(null);
+	const [content, setContent] = useState('');
 	const { register, handleSubmit, reset, formState: { errors } } = useForm();
 	const router = useRouter();
 	const t = useTranslations('posts.create');
+	const { showToast } = useToast();
 
 	const onSubmit = async (data) => {
 		data.image = selectedImage;
+		data.content = content;
 		try {
 			const postService = new PostService();
 			const response = await postService.createPost(data);
-			Swal.fire({ position: 'top-end', icon: 'success', title: t('success'), showConfirmButton: false, timer: 1500 });
+			showToast('success', t('success'));
 			router.push(`/posts/${response.insertId}`);
 		} catch (error) {
 			console.error(error);
-			Swal.fire({ icon: 'error', title: 'Error', text: `${t('error')}: ${error}` });
+			showToast('error', `${t('error')}: ${error}`);
 			reset();
 		}
 	};
@@ -46,13 +50,10 @@ export default function NewPostCard() {
 				</div>
 
 				<div className="form-group">
-					<textarea
-						{...register('content')}
-						className="form-textarea"
+					<RichEditor
 						placeholder={t('contentPlaceholder')}
-						rows="4"
+						onChange={setContent}
 					/>
-					{errors.content && <div className="alert alert--danger mt-2">{errors.content.message}</div>}
 				</div>
 
 				<ImageUploader onImageUpload={(img) => setSelectedImage(img)} />

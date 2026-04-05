@@ -1,15 +1,41 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Icon from '@/components/Icons';
+import { createClient } from '@/lib/supabase/client';
 
 export default function WaterButton({ postId, initialCount = 0 }) {
 	const [count, setCount] = useState(initialCount);
 	const [watered, setWatered] = useState(false);
+	const [loading, setLoading] = useState(true);
 	const [animating, setAnimating] = useState(false);
 
+	useEffect(() => {
+		const checkWatered = async () => {
+			try {
+				const supabase = createClient();
+				const { data: { user } } = await supabase.auth.getUser();
+				if (!user) { setLoading(false); return; }
+
+				const { data } = await supabase
+					.from('waterings')
+					.select('id')
+					.eq('post_id', postId)
+					.eq('user_id', user.id)
+					.maybeSingle();
+
+				if (data) setWatered(true);
+			} catch {
+				// silently fail - user can still try to water
+			} finally {
+				setLoading(false);
+			}
+		};
+		checkWatered();
+	}, [postId]);
+
 	const handleWater = async () => {
-		if (watered) return;
+		if (watered || loading) return;
 
 		setAnimating(true);
 		try {
@@ -36,7 +62,7 @@ export default function WaterButton({ postId, initialCount = 0 }) {
 		<button
 			className={`btn btn--ghost btn--sm flex items-center gap-2 ${watered ? 'text-accent' : ''}`}
 			onClick={handleWater}
-			disabled={watered}
+			disabled={watered || loading}
 			title={watered ? 'Ya regaste este post' : 'Regar este post'}
 			style={animating ? { transform: 'scale(1.2)', transition: 'transform 0.3s ease' } : { transition: 'transform 0.3s ease' }}
 		>
