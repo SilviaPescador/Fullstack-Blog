@@ -9,6 +9,7 @@ export default function WaterButton({ postId, initialCount = 0, onWater }) {
 	const [watered, setWatered] = useState(false);
 	const [loading, setLoading] = useState(true);
 	const [animating, setAnimating] = useState(false);
+	const [authError, setAuthError] = useState(false);
 
 	useEffect(() => {
 		const checkWatered = async () => {
@@ -50,6 +51,13 @@ export default function WaterButton({ postId, initialCount = 0, onWater }) {
 	const handleWater = async () => {
 		if (watered || loading) return;
 
+		const supabase = createClient();
+		const { data: { user } } = await supabase.auth.getUser();
+		if (!user) {
+			setAuthError(true);
+			return;
+		}
+
 		setAnimating(true);
 		try {
 			const res = await fetch('/api/water', {
@@ -65,6 +73,8 @@ export default function WaterButton({ postId, initialCount = 0, onWater }) {
 				onWater?.(postId, data.water_count);
 			} else if (res.status === 409) {
 				setWatered(true);
+			} else if (res.status === 401) {
+				setAuthError(true);
 			}
 		} catch (e) {
 			console.error('Water error:', e);
@@ -73,15 +83,22 @@ export default function WaterButton({ postId, initialCount = 0, onWater }) {
 	};
 
 	return (
-		<button
-			className={`btn btn--ghost btn--sm flex items-center gap-2 ${watered ? 'text-accent' : ''}`}
-			onClick={handleWater}
-			disabled={watered || loading}
-			title={watered ? 'Ya regaste este post' : 'Regar este post'}
-			style={animating ? { transform: 'scale(1.2)', transition: 'transform 0.3s ease' } : { transition: 'transform 0.3s ease' }}
-		>
-			<Icon name="droplet" size={16} />
-			<span>{count}</span>
-		</button>
+		<>
+			<button
+				className={`btn btn--ghost btn--sm flex items-center gap-2 ${watered ? 'text-accent' : ''}`}
+				onClick={handleWater}
+				disabled={watered || loading}
+				title={watered ? 'Ya regaste este post' : 'Regar este post'}
+				style={animating ? { transform: 'scale(1.2)', transition: 'transform 0.3s ease' } : { transition: 'transform 0.3s ease' }}
+			>
+				<Icon name="droplet" size={16} />
+				<span>{count}</span>
+			</button>
+			{authError && (
+				<span className="text-error text-xs" style={{ marginLeft: 'var(--space-xs)' }}>
+					Inicia sesion para regar
+				</span>
+			)}
+		</>
 	);
 }

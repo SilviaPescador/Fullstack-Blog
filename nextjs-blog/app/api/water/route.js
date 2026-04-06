@@ -42,7 +42,7 @@ export async function POST(request) {
 			.eq('id', post_id)
 			.single();
 
-		return NextResponse.json({ water_count: post?.water_count || 1 });
+		return NextResponse.json({ water_count: post?.water_count ?? 0 });
 	} catch (error) {
 		console.error('Water error:', error);
 		return NextResponse.json({ error: 'Error al regar' }, { status: 500 });
