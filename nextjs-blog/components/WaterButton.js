@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Icon from '@/components/Icons';
 import { createClient } from '@/lib/supabase/client';
 
-export default function WaterButton({ postId, initialCount = 0 }) {
+export default function WaterButton({ postId, initialCount = 0, onWater }) {
 	const [count, setCount] = useState(initialCount);
 	const [watered, setWatered] = useState(false);
 	const [loading, setLoading] = useState(true);
@@ -14,19 +14,32 @@ export default function WaterButton({ postId, initialCount = 0 }) {
 		const checkWatered = async () => {
 			try {
 				const supabase = createClient();
+
+				// Fetch fresh total count from DB (initialCount may be stale)
+				const { data: postData } = await supabase
+					.from('posts')
+					.select('water_count')
+					.eq('id', postId)
+					.single();
+
+				if (postData?.water_count != null) {
+					setCount(postData.water_count);
+				}
+
+				// Check if current user has already watered
 				const { data: { user } } = await supabase.auth.getUser();
 				if (!user) { setLoading(false); return; }
 
-				const { data } = await supabase
+				const { data: watering } = await supabase
 					.from('waterings')
 					.select('id')
 					.eq('post_id', postId)
 					.eq('user_id', user.id)
 					.maybeSingle();
 
-				if (data) setWatered(true);
+				if (watering) setWatered(true);
 			} catch {
-				// silently fail - user can still try to water
+				// silently fail
 			} finally {
 				setLoading(false);
 			}
@@ -49,6 +62,7 @@ export default function WaterButton({ postId, initialCount = 0 }) {
 				const data = await res.json();
 				setCount(data.water_count);
 				setWatered(true);
+				onWater?.(postId, data.water_count);
 			} else if (res.status === 409) {
 				setWatered(true);
 			}

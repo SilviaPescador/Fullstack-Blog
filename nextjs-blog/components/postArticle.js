@@ -32,7 +32,7 @@ function sanitize(html) {
 	});
 }
 
-export default function PostArticle({ postData, onDelete, fullPost, setIsEdited, home }) {
+export default function PostArticle({ postData, onDelete, onWater, fullPost, setIsEdited, home }) {
 	const [isEditing, setIsEditing] = useState(false);
 	const [truncatedContent, setTruncatedContent] = useState('');
 	const [content, setContent] = useState(postData.content || '');
@@ -167,7 +167,7 @@ export default function PostArticle({ postData, onDelete, fullPost, setIsEdited,
 			</div>
 
 		<div className="card__footer">
-			<WaterButton postId={postData.id} initialCount={postData.water_count || 0} />
+			<WaterButton postId={postData.id} initialCount={postData.water_count || 0} onWater={onWater} />
 			<div style={{ flex: 1 }} />
 			{isEditing && (
 					<>

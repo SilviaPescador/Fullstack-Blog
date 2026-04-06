@@ -35,6 +35,14 @@ export default function HomeClient({ initialPosts, initialError }) {
 
 	const handleRetry = () => mutate('/api/posts');
 
+	const handleWater = (postId, newCount) => {
+		mutate(
+			'/api/posts',
+			(current) => current?.map(p => p.id === postId ? { ...p, water_count: newCount } : p),
+			false // don't revalidate - just update cache
+		);
+	};
+
 	if (error || initialError) {
 		const errorMessage = error?.info || initialError?.message || 'Error desconocido';
 		const isServerError = error?.status >= 500 || errorMessage.includes('500');
@@ -96,9 +104,9 @@ export default function HomeClient({ initialPosts, initialError }) {
 					{t('garden.latestPosts') || 'Ultimos posts'}
 				</h2>
 				<div className="post-grid">
-					{currentPosts.map((post) => (
-						<PostArticle key={post.id} postData={post} onDelete={handleRetry} fullPost={false} home />
-					))}
+				{currentPosts.map((post) => (
+					<PostArticle key={post.id} postData={post} onDelete={handleRetry} onWater={handleWater} fullPost={false} home />
+				))}
 				</div>
 			</section>
 

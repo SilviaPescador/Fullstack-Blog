@@ -31,9 +31,9 @@ function svgElement(el, i) {
 export default function Plant({ dna, x, y, postTitle, postAuthor, onClick, isNew = false, waterCount = 0 }) {
 	const groupRef = useRef(null);
 	const { elements, totalHeight } = useMemo(() => generatePlant(dna), [dna]);
-	// Scale up to 1.4x at 20 waterings
-	const growthScale = 1 + Math.min(waterCount, 20) * 0.02;
-	const brightness = waterCount > 0 ? 1 + Math.min(waterCount, 20) * 0.015 : 1;
+	// Scale up to 1.5x at 10 waterings, brightness up to 1.3x
+	const growthScale = 1 + Math.min(waterCount, 10) * 0.05;
+	const brightness = waterCount > 0 ? 1 + Math.min(waterCount, 10) * 0.03 : 1;
 
 	useEffect(() => {
 		if (!groupRef.current || typeof window === 'undefined') return;
