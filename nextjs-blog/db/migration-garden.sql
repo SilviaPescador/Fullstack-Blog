@@ -66,13 +66,15 @@ USING (
 );
 
 -- 7. Create function to increment water_count
+-- SECURITY DEFINER: runs as function owner (postgres), bypassing RLS on posts.
+-- This is safe because waterings already has RLS controlling who can INSERT.
 CREATE OR REPLACE FUNCTION increment_water_count()
 RETURNS TRIGGER AS $$
 BEGIN
   UPDATE posts SET water_count = water_count + 1 WHERE id = NEW.post_id;
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- 8. Trigger on watering insert
 DROP TRIGGER IF EXISTS on_watering_insert ON waterings;

@@ -30,10 +30,10 @@ function svgElement(el, i) {
 
 export default function Plant({ dna, x, y, postTitle, postAuthor, onClick, isNew = false, waterCount = 0 }) {
 	const groupRef = useRef(null);
-	const { elements, totalHeight } = useMemo(() => generatePlant(dna), [dna]);
-	// Scale up to 1.5x at 10 waterings, brightness up to 1.3x
-	const growthScale = 1 + Math.min(waterCount, 10) * 0.05;
-	const brightness = waterCount > 0 ? 1 + Math.min(waterCount, 10) * 0.03 : 1;
+	// waterCount drives organic growth inside the generator
+	const { elements, totalHeight } = useMemo(() => generatePlant(dna, waterCount), [dna, waterCount]);
+	// Subtle brightness bonus on top of structural growth
+	const brightness = waterCount > 0 ? 1 + Math.min(waterCount, 10) * 0.025 : 1;
 
 	useEffect(() => {
 		if (!groupRef.current || typeof window === 'undefined') return;
@@ -68,8 +68,8 @@ export default function Plant({ dna, x, y, postTitle, postAuthor, onClick, isNew
 	return (
 		<g
 			ref={groupRef}
-			transform={`translate(${x}, ${y}) scale(${growthScale})`}
-			style={{ cursor: 'inherit', filter: waterCount > 0 ? `brightness(${brightness})` : undefined, transformOrigin: `${x}px ${y}px` }}
+			transform={`translate(${x}, ${y})`}
+			style={{ cursor: 'inherit', filter: waterCount > 0 ? `brightness(${brightness})` : undefined }}
 			onClick={onClick}
 			role="button"
 			tabIndex={0}
