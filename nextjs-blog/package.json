@@ -7,7 +7,7 @@
     "palante": "echo '¡Amo a darle! 😍' && next dev"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.82.0",
+    "@anthropic-ai/sdk": "^0.91.1",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.86.2",
     "@tiptap/extension-link": "^3.22.2",
