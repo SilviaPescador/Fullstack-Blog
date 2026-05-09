@@ -50,7 +50,7 @@ proyecto/
 │   ├── routes/
 │   ├── db/
 │   └── public/images/
-└── nextjs-blog/
+└── garden-app/
     └── pages/                # ❌ ELIMINADO
         ├── _app.js
         ├── index.js
@@ -60,7 +60,7 @@ proyecto/
 ### Fase 2: Next.js Fullstack + MySQL (Intermedia)
 
 ```
-nextjs-blog/
+garden-app/
 ├── app/                      # App Router
 │   ├── api/posts/            # API Routes
 │   └── posts/
@@ -72,7 +72,7 @@ nextjs-blog/
 ### Fase 3: Next.js + Supabase + Vercel
 
 ```
-nextjs-blog/
+garden-app/
 ├── app/
 │   ├── api/posts/            # API Routes con Supabase
 │   ├── (auth)/               # ✅ NUEVO - Páginas de auth
@@ -98,7 +98,7 @@ nextjs-blog/
 ### Fase 4: Internacionalización con next-intl (Actual)
 
 ```
-nextjs-blog/
+garden-app/
 ├── app/
 │   └── layout.js             # 🔄 MODIFICADO - NextIntlClientProvider
 ├── components/
@@ -303,7 +303,7 @@ pnpm dev
 | **Produccion** | https://fullstack-blog-beta.vercel.app |
 | **Supabase** | Ver dashboard en tu cuenta de Supabase |
 | **Vercel** | https://vercel.com/dashboard |
-| **GitHub** | https://github.com/SilviaPescador/Fullstack-Blog |
+| **GitHub** | https://github.com/SilviaPescador/the-garden |
 
 ---
 

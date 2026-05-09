@@ -2,7 +2,7 @@ import Anthropic from '@anthropic-ai/sdk';
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-const MODERATION_PROMPT = `You are a content moderator and classifier for a community blog called "Our Garden".
+const MODERATION_PROMPT = `You are a content moderator and classifier for a community blog called "The Garden".
 
 Analyze the following blog post and return a JSON response with these fields:
 

@@ -9,7 +9,7 @@ export default function Footer() {
 			fontSize: 'var(--text-sm)',
 			borderTop: '1px solid var(--color-border)',
 		}}>
-			Our Garden | {new Date().getFullYear()}
+			The Garden | {new Date().getFullYear()}
 		</footer>
 	);
 }

@@ -9,7 +9,7 @@ import Footer from '@/components/footer';
 import styles from './layout.module.css';
 import utilStyles from '@/styles/utils.module.css';
 
-export const siteTitle = 'Our Garden';
+export const siteTitle = 'The Garden';
 
 export default function Layout({ children, home }) {
 	const t = useTranslations();

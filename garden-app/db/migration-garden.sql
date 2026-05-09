@@ -1,5 +1,5 @@
 -- ============================================
--- Our Garden - Database Migration
+-- The Garden - Database Migration
 -- Run in Supabase SQL Editor
 -- ============================================
 

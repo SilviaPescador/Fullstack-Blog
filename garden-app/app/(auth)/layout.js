@@ -1,5 +1,5 @@
 export const metadata = {
-	title: 'Autenticacion - Our Garden',
+	title: 'Autenticacion - The Garden',
 };
 
 export default function AuthLayout({ children }) {

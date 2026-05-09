@@ -24,7 +24,7 @@ export default function Navbar() {
 
 	return (
 		<nav className={styles.nav}>
-			<Link href="/" className={styles.navBrand} aria-label="Our Garden - Home">
+			<Link href="/" className={styles.navBrand} aria-label="The Garden - Home">
 				<NavLogo />
 			</Link>
 			<div className={styles.navActions}>

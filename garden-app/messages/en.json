@@ -24,7 +24,7 @@
 	"auth": {
 		"login": {
 			"title": "Log In",
-			"welcome": "Welcome back to Our Garden",
+			"welcome": "Welcome back to The Garden",
 			"email": "Email",
 			"password": "Password",
 			"submit": "Log In",
@@ -35,7 +35,7 @@
 		},
 		"register": {
 			"title": "Create Account",
-			"subtitle": "Join Our Garden",
+			"subtitle": "Join The Garden",
 			"fullName": "Full name",
 			"email": "Email",
 			"password": "Password",
@@ -104,7 +104,7 @@
 		"description": "Here dreams, news, emotions and ideas of cell and metal are captured."
 	},
 	"garden": {
-		"title": "Our Garden",
+		"title": "The Garden",
 		"subtitle": "Every post grows something new. Click a plant to read its story.",
 		"latestPosts": "Latest posts",
 		"emptyGarden": "The garden awaits its first seeds..."

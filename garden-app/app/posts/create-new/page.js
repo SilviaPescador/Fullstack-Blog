@@ -2,7 +2,7 @@ import Layout from '@/components/layout';
 import NewPostCard from '@/components/newPostCard';
 
 export const metadata = {
-	title: 'Nuevo Post - Our Garden',
+	title: 'Nuevo Post - The Garden',
 };
 
 export default function CreateNew() {

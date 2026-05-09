@@ -11,15 +11,15 @@ import '../styles/garden.css';
 const siteUrl = 'https://fullstack-blog-beta.vercel.app';
 
 export const metadata = {
-	title: 'Our Garden',
+	title: 'The Garden',
 	description: 'Un espacio vivo que crece con la comunidad. Cada post aprobado hace crecer el jardin.',
 	icons: { icon: '/favicon.ico' },
 	metadataBase: new URL(siteUrl),
 	openGraph: {
-		title: 'Our Garden',
+		title: 'The Garden',
 		description: 'Un espacio vivo que crece con la comunidad.',
 		url: siteUrl,
-		siteName: 'Our Garden',
+		siteName: 'The Garden',
 		locale: 'es_ES',
 		type: 'website',
 	},

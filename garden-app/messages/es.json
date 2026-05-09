@@ -24,7 +24,7 @@
 	"auth": {
 		"login": {
 			"title": "Iniciar Sesión",
-			"welcome": "Bienvenido de vuelta a Our Garden",
+			"welcome": "Bienvenido de vuelta a The Garden",
 			"email": "Email",
 			"password": "Contraseña",
 			"submit": "Iniciar Sesión",
@@ -35,7 +35,7 @@
 		},
 		"register": {
 			"title": "Crear Cuenta",
-			"subtitle": "Unete a Our Garden",
+			"subtitle": "Unete a The Garden",
 			"fullName": "Nombre completo",
 			"email": "Email",
 			"password": "Contraseña",
@@ -104,7 +104,7 @@
 		"description": "Aqui se plasman suenos, noticias, emociones e ideas de celula y metal."
 	},
 	"garden": {
-		"title": "Nuestro Jardin",
+		"title": "The Garden",
 		"subtitle": "Cada post hace crecer algo nuevo. Haz clic en una planta para leer su historia.",
 		"latestPosts": "Ultimos posts",
 		"emptyGarden": "El jardin espera sus primeras semillas..."

@@ -1,4 +1,4 @@
-# Our Garden
+# The Garden
 
 Plataforma de escritura colectiva con moderacion asistida por IA. Cada post aprobado genera una planta unica en un jardin interactivo SVG, basada en el analisis semantico del contenido.
 
@@ -6,7 +6,7 @@ Mi objetivo al escalar este proyecto es crear un espacio vivo para la comunidad 
 
 **Stack**: Next.js 16 - Supabase - Claude API - GSAP - Resend - Vercel
 
-**Demo**: [https://fullstack-blog-beta.vercel.app](https://fullstack-blog-beta.vercel.app)
+**Demo**: [https://fullstack-blog-beta.vercel.app](https://fullstack-blog-beta.vercel.app) *(URL pendiente de actualizar)*
 
 ---
 
@@ -84,14 +84,14 @@ Admin aprueba
 ### 1. Clonar e instalar
 
 ```bash
-git clone https://github.com/SilviaPescador/Fullstack-Blog.git
-cd Fullstack-Blog/nextjs-blog
+git clone https://github.com/SilviaPescador/the-garden.git
+cd the-garden/garden-app
 pnpm install
 ```
 
 ### 2. Variables de entorno
 
-Crear `nextjs-blog/.env.local`:
+Crear `garden-app/.env.local`:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://tu-proyecto.supabase.co
@@ -122,7 +122,7 @@ pnpm dev
 ## Estructura del proyecto
 
 ```
-nextjs-blog/
+garden-app/
   app/
     page.js                     Home con jardin SVG
     layout.js                   Root layout con particulas y cursor glow
@@ -164,7 +164,7 @@ nextjs-blog/
     global.css                  Estilos base, particulas, cursor glow, utilidades
     garden.css                  Estilos del jardin
   db/
-    migration-garden.sql        Migracion para Our Garden
+    migration-garden.sql        Migracion para The Garden
 ```
 
 ---
