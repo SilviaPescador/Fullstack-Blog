@@ -1,18 +1,18 @@
 # The Garden
 
-Plataforma de escritura colectiva con moderacion asistida por IA. Cada post aprobado genera una planta unica en un jardin interactivo SVG, basada en el analisis semantico del contenido.
+Plataforma de escritura colectiva con moderación asistida por IA. Cada post aprobado genera una planta única en un jardín interactivo SVG, basada en el análisis semántico del contenido.
 
 Mi objetivo al escalar este proyecto es crear un espacio vivo para la comunidad de programadores y personas creativas que puedan dar a conocer sus ideas y proyectos. Cuanto más crece la comunidad, más crece el jardín, como en la vida misma.
 
 **Stack**: Next.js 16 - Supabase - Claude API - GSAP - Resend - Vercel
 
-**Demo**: [https://fullstack-blog-beta.vercel.app](https://fullstack-blog-beta.vercel.app) *(URL pendiente de actualizar)*
+**Demo**: [https://the-garden-blog.vercel.app](https://the-garden-blog.vercel.app)
 
 ---
 
 ## Concepto
 
-No es un blog. Es un espacio vivo que crece con la comunidad. Cuando un post es aprobado, una planta procedural nace en el jardin de la home -- su forma, color y tipo dependen del contenido del post, analizado por IA.
+No es un blog. Es un espacio vivo que crece con la comunidad. Cuando un post es aprobado, una planta procedural nace en el jardín de la home -- su forma, color y tipo dependen del contenido del post, analizado por IA.
 
 - **Posts tecnicos** generan plantas geometricas (circuitos, nodos angulares)
 - **Posts reflexivos** generan plantas organicas (curvas, hojas naturales)
@@ -29,7 +29,7 @@ Los usuarios pueden "regar" posts que les gusten, haciendo crecer sus plantas.
 |---------|-------------|
 | Jardin SVG interactivo | Canvas procedural en la home con GSAP animations |
 | Moderacion IA | Claude analiza, resume, clasifica y genera el ADN visual |
-| Realtime | El jardin se actualiza en vivo al aprobar posts (Supabase Realtime) |
+| Realtime | El jardín se actualiza en vivo al aprobar posts (Supabase Realtime) |
 | Sistema de riego | Reacciones unicas que hacen crecer las plantas visualmente (escala + brillo) |
 | Editor rich text | TipTap con toolbar (bold, italic, links, headings, listas, codigo, citas) |
 | Particulas flotantes | Fondo animado adaptativo al tema dark/light |
