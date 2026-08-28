@@ -50,8 +50,7 @@ export default function PostArticle({ postData, onDelete, onWater, fullPost, set
 
 	useEffect(() => {
 		const raw = postData.content || '';
-		// Strip tags for preview truncation
-		const stripped = raw.replace(/<[^>]*>/g, '');
+		const stripped = raw.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 		setTruncatedContent(stripped.length > 80 ? stripped.substring(0, 80) + '...' : stripped);
 	}, [postData.content]);
 

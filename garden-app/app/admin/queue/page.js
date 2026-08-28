@@ -145,6 +145,30 @@ export default function ModerationQueuePage() {
 										</h3>
 										<p className="text-sm text-muted mb-2">por {author} - {new Date(post.created_at).toLocaleDateString('es-ES')}</p>
 
+										{post.image_url && (
+											<a
+												href={post.image_url}
+												target="_blank"
+												rel="noopener noreferrer"
+												title="Ver imagen completa"
+												style={{ display: 'block', marginBottom: 'var(--space-sm)' }}
+											>
+												{/* eslint-disable-next-line @next/next/no-img-element */}
+												<img
+													src={post.image_url}
+													alt={post.title || 'Imagen del post'}
+													style={{
+														width: '100%',
+														maxHeight: '240px',
+														objectFit: 'contain',
+														borderRadius: 'var(--radius-sm)',
+														background: 'var(--color-bg-alt)',
+														border: '1px solid var(--color-border)',
+													}}
+												/>
+											</a>
+										)}
+
 										{post.ai_summary && (
 											<div style={{ background: 'var(--color-bg-alt)', padding: 'var(--space-sm)', borderRadius: 'var(--radius-sm)', marginBottom: 'var(--space-sm)' }}>
 												<p className="text-xs text-muted mb-1" style={{ fontWeight: 600 }}>Resumen IA:</p>
