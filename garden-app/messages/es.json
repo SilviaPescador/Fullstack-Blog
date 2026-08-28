@@ -99,6 +99,14 @@
 			"serverError": "Error del servidor",
 			"serverErrorMessage": "El servicio no está disponible temporalmente. Por favor, intenta más tarde.",
 			"loading": "Cargando posts..."
+		},
+		"search": {
+			"label": "Buscar posts",
+			"placeholder": "Buscar por título, contenido o autor...",
+			"clear": "Borrar búsqueda",
+			"results": "{count, plural, one {# resultado} other {# resultados}}",
+			"empty": "Sin coincidencias",
+			"emptyMessage": "Ningún post coincide con tu búsqueda. Prueba con otras palabras."
 		}
 	},
 	"home": {

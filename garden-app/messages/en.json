@@ -99,6 +99,14 @@
 			"serverError": "Server error",
 			"serverErrorMessage": "The service is temporarily unavailable. Please try again later.",
 			"loading": "Loading posts..."
+		},
+		"search": {
+			"label": "Search posts",
+			"placeholder": "Search by title, content or author...",
+			"clear": "Clear search",
+			"results": "{count, plural, one {# result} other {# results}}",
+			"empty": "No matches",
+			"emptyMessage": "No posts match your search. Try different words."
 		}
 	},
 	"home": {

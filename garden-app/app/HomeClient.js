@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import useSWR, { mutate } from 'swr';
 import { useTranslations } from 'next-intl';
 import Layout, { siteTitle } from '@/components/layout';
 import Garden from '@/components/garden/Garden';
 import PostArticle from '@/components/postArticle';
+import PostSearch from '@/components/PostSearch';
 import Pagination from '@/components/Pagination';
 import ErrorMessage from '@/components/ErrorMessage';
 
@@ -22,8 +23,21 @@ const fetcher = async (url) => {
 
 const POSTS_PER_PAGE = 6;
 
+function normalizeSearchText(text) {
+	return (text || '')
+		.replace(/<[^>]*>/g, ' ')
+		.replace(/&nbsp;/gi, ' ')
+		.replace(/\s+/g, ' ')
+		.trim()
+		.toLowerCase()
+		.normalize('NFD')
+		.replace(/[\u0300-\u036f]/g, '');
+}
+
 export default function HomeClient({ initialPosts, initialError }) {
 	const [currentPage, setCurrentPage] = useState(1);
+	const [query, setQuery] = useState('');
+	const pageBeforeSearch = useRef(1);
 	const t = useTranslations();
 
 	const { data, error, isLoading } = useSWR('/api/posts', fetcher, {
@@ -39,9 +53,35 @@ export default function HomeClient({ initialPosts, initialError }) {
 		mutate(
 			'/api/posts',
 			(current) => current?.map(p => p.id === postId ? { ...p, water_count: newCount } : p),
-			false // don't revalidate - just update cache
+			false
 		);
 	};
+
+	const handleQueryChange = (value) => {
+		const wasSearching = query.trim() !== '';
+		const isSearching = value.trim() !== '';
+
+		if (!wasSearching && isSearching) {
+			pageBeforeSearch.current = currentPage;
+			setCurrentPage(1);
+		} else if (wasSearching && !isSearching) {
+			setCurrentPage(pageBeforeSearch.current);
+		}
+
+		setQuery(value);
+	};
+
+	const filteredPosts = useMemo(() => {
+		if (!data) return [];
+		const q = normalizeSearchText(query);
+		if (!q) return data;
+		return data.filter((post) => {
+			const title = normalizeSearchText(post.title);
+			const content = normalizeSearchText(post.content);
+			const author = normalizeSearchText(post.author);
+			return title.includes(q) || content.includes(q) || author.includes(q);
+		});
+	}, [data, query]);
 
 	if (error || initialError) {
 		const errorMessage = error?.info || initialError?.message || 'Error desconocido';
@@ -84,33 +124,49 @@ export default function HomeClient({ initialPosts, initialError }) {
 		);
 	}
 
-	const totalPosts = data.length;
-	const totalPages = Math.ceil(totalPosts / POSTS_PER_PAGE);
-	const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
-	const currentPosts = data.slice(startIndex, startIndex + POSTS_PER_PAGE);
+	const isSearching = query.trim().length > 0;
+	const listPosts = isSearching
+		? filteredPosts
+		: filteredPosts.slice((currentPage - 1) * POSTS_PER_PAGE, currentPage * POSTS_PER_PAGE);
+	const totalPages = Math.ceil(data.length / POSTS_PER_PAGE);
 
 	return (
 		<Layout home>
 			<title>{siteTitle}</title>
 
-			{/* The Garden - interactive SVG hero */}
 			<section className="garden-section">
 				<Garden posts={data} />
 			</section>
 
-			{/* Post grid */}
+			<PostSearch value={query} onChange={handleQueryChange} />
+
 			<section>
 				<h2 style={{ fontSize: 'var(--text-lg)', marginBottom: 'var(--space-md)' }}>
-					{t('garden.latestPosts') || 'Ultimos posts'}
+					{isSearching
+						? t('posts.search.results', { count: filteredPosts.length })
+						: (t('garden.latestPosts') || 'Ultimos posts')}
 				</h2>
-				<div className="post-grid">
-				{currentPosts.map((post) => (
-					<PostArticle key={post.id} postData={post} onDelete={handleRetry} onWater={handleWater} fullPost={false} home />
-				))}
+				<div className="sr-only" aria-live="polite">
+					{isSearching ? t('posts.search.results', { count: filteredPosts.length }) : ''}
 				</div>
+				{listPosts.length === 0 ? (
+					<ErrorMessage
+						type="empty"
+						title={t('posts.search.empty')}
+						message={t('posts.search.emptyMessage')}
+					/>
+				) : (
+					<div className="post-grid">
+						{listPosts.map((post) => (
+							<PostArticle key={post.id} postData={post} onDelete={handleRetry} onWater={handleWater} fullPost={false} home />
+						))}
+					</div>
+				)}
 			</section>
 
-			<Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+			{!isSearching && (
+				<Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+			)}
 		</Layout>
 	);
 }

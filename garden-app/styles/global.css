@@ -412,6 +412,78 @@ hr {
   margin-bottom: var(--space-md);
 }
 
+/* ---- Post search ---- */
+.post-search {
+  position: relative;
+  margin-bottom: var(--space-md);
+}
+
+.post-search__icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+  pointer-events: none;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.post-search:focus-within .post-search__icon {
+  color: var(--color-accent-green);
+}
+
+.post-search__input {
+  width: 100%;
+  padding: 0.75rem 2.75rem;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--color-text-primary);
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  outline: none;
+  appearance: none;
+  transition: border-color var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.post-search__input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.post-search__input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.post-search__input:focus {
+  border-color: var(--color-accent-green);
+  box-shadow: 0 0 0 3px var(--color-accent-green-soft);
+}
+
+.post-search__clear {
+  position: absolute;
+  right: 0.45rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: color var(--duration-fast), background var(--duration-fast);
+}
+
+.post-search__clear:hover {
+  color: var(--color-text-primary);
+  background: var(--color-bg-hover);
+}
+
 /* ---- Cards ---- */
 .card {
   background: var(--color-bg-elevated);
