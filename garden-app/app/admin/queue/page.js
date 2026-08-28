@@ -1,36 +1,12 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { generatePlant } from '@/components/garden/PlantGenerator';
+import PlantPreview from '@/components/garden/PlantPreview';
 import { defaultVisualDna } from '@/components/garden/gardenUtils';
+import { getSpeciesMeta } from '@/components/garden/flowerSpecies';
 import Icon from '@/components/Icons';
-
-function PlantPreview({ dna }) {
-	const { elements, totalHeight } = useMemo(() => generatePlant(dna), [dna]);
-	const svgH = totalHeight + 20;
-
-	const renderEl = (el, i) => {
-		const common = { key: i, opacity: el.opacity };
-		switch (el.type) {
-			case 'path': return <path {...common} d={el.d} stroke={el.stroke} strokeWidth={el.strokeWidth} fill={el.fill || 'none'} />;
-			case 'line': return <line {...common} x1={el.x1} y1={el.y1} x2={el.x2} y2={el.y2} stroke={el.stroke} strokeWidth={el.strokeWidth} />;
-			case 'polyline': return <polyline {...common} points={el.points} stroke={el.stroke} strokeWidth={el.strokeWidth} fill={el.fill || 'none'} />;
-			case 'circle': return <circle {...common} cx={el.cx} cy={el.cy} r={el.r} fill={el.fill} />;
-			case 'ellipse': return <ellipse {...common} cx={el.cx} cy={el.cy} rx={el.rx} ry={el.ry} fill={el.fill} transform={el.transform} />;
-			case 'rect': return <rect {...common} x={el.x} y={el.y} width={el.width} height={el.height} fill={el.fill} transform={el.transform} />;
-			case 'polygon': return <polygon {...common} points={el.points} fill={el.fill} transform={el.transform} />;
-			default: return null;
-		}
-	};
-
-	return (
-		<svg width="80" height={Math.min(svgH, 140)} viewBox={`-30 ${-svgH} 60 ${svgH + 5}`} style={{ display: 'block', margin: '0 auto' }}>
-			{elements.map(renderEl)}
-		</svg>
-	);
-}
 
 export default function ModerationQueuePage() {
 	const [posts, setPosts] = useState([]);
@@ -126,6 +102,7 @@ export default function ModerationQueuePage() {
 				<div className="flex-col gap-4">
 					{posts.map(post => {
 						const dna = post.visual_dna || defaultVisualDna(post.id, post.title, post.content);
+						const species = getSpeciesMeta(dna);
 						const author = post.profiles?.full_name || post.profiles?.email || 'Anonimo';
 						const spamScore = post.visual_dna ? 0 : null;
 						const isReviewed = post.status === 'reviewed_by_ai';
@@ -136,7 +113,7 @@ export default function ModerationQueuePage() {
 									{/* Plant preview */}
 									<div style={{ width: '80px', flexShrink: 0 }}>
 										<PlantPreview dna={dna} />
-										<p className="text-xs text-muted text-center mt-2">{dna.type}</p>
+										<p className="text-xs text-muted text-center mt-2">{species.label}</p>
 									</div>
 
 									{/* Post info */}

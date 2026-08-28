@@ -19,7 +19,8 @@
 		"myProfile": "Mi Perfil",
 		"myPosts": "Mis Posts",
 		"manageUsers": "Gestionar Usuarios",
-		"moderationQueue": "Moderacion"
+		"moderationQueue": "Moderacion",
+		"plantCatalog": "Prototipos"
 	},
 	"auth": {
 		"login": {

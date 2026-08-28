@@ -1,6 +1,6 @@
 # The Garden
 
-Plataforma de escritura colectiva con moderación asistida por IA. Cada post aprobado genera una planta única en un jardín interactivo SVG, basada en el análisis semántico del contenido.
+Plataforma de escritura colectiva con moderación asistida por IA. Cada post aprobado nace como una flor completa en un jardín SVG interactivo. La especie sale de un catálogo de prototipos; color, altura y variación dependen del análisis semántico del contenido.
 
 Mi objetivo al escalar este proyecto es crear un espacio vivo para la comunidad de programadores y personas creativas que puedan dar a conocer sus ideas y proyectos. Cuanto más crece la comunidad, más crece el jardín, como en la vida misma.
 
@@ -12,14 +12,18 @@ Mi objetivo al escalar este proyecto es crear un espacio vivo para la comunidad 
 
 ## Concepto
 
-No es un blog. Es un espacio vivo que crece con la comunidad. Cuando un post es aprobado, una planta procedural nace en el jardín de la home -- su forma, color y tipo dependen del contenido del post, analizado por IA.
+No es un blog. Es un espacio vivo que crece con la comunidad. Cuando un post es aprobado, una flor completa nace en el jardin de la home. Claude elige familia y especie segun el contenido; el riego no desbloquea la flor, la hace destacar.
 
-- **Posts tecnicos** generan plantas geometricas (circuitos, nodos angulares)
-- **Posts reflexivos** generan plantas organicas (curvas, hojas naturales)
-- **Posts creativos** generan plantas con flores (petalos, color rico)
-- **Posts educativos** generan cristales (facetados, estructurados)
+Hay **20 prototipos** (4 familias x 5 especies). Dos posts con el mismo tipo y complejidad comparten silueta. Color, inclinacion, plano de profundidad y riegos los distinguen.
 
-Los usuarios pueden "regar" posts que les gusten, haciendo crecer sus plantas.
+| Familia (`type`) | Contenido | Especies (`complexity` 1-5) |
+|---|---|---|
+| `geometric` | Tecnico / codigo | Diamante, Hexagono, Circuito, Estrella, Mandala |
+| `organic` | Reflexivo / personal | Primavera, Campanilla, Silvestre, Orquidea, Hortensia |
+| `flowering` | Creativo / artistico | Margarita, Tulipan, Amapola, Lirio, Peonia |
+| `crystalline` | Educativo / recurso | Cristal, Geminis, Triada, Flor de hielo, Escarcha |
+
+Los usuarios pueden "regar" posts que les gusten. Cada riego alarga el tallo; a umbrales fijos aparecen hojas extra, rocio y destellos (tope visual a 12 riegos).
 
 ---
 
@@ -27,10 +31,12 @@ Los usuarios pueden "regar" posts que les gusten, haciendo crecer sus plantas.
 
 | Funcion | Descripcion |
 |---------|-------------|
-| Jardin SVG interactivo | Canvas procedural en la home con GSAP animations |
+| Jardin SVG panoramico | Tres planos de profundidad con flores superpuestas; camara horizontal si no caben |
+| Catalogo de especies | 20 prototipos fijos; Claude elige familia + complejidad; la flor nace completa |
 | Moderacion IA | Claude analiza, resume, clasifica y genera el ADN visual |
-| Realtime | El jardín se actualiza en vivo al aprobar posts (Supabase Realtime) |
-| Sistema de riego | Reacciones unicas que hacen crecer las plantas visualmente (escala + brillo) |
+| Realtime | El jardin se actualiza en vivo al aprobar posts (Supabase Realtime) |
+| Sistema de riego | Un riego por usuario; alarga el tallo, suma hojas, rocio y destellos |
+| Catalogo admin | `/admin/plants` para revisar prototipos y su evolucion con riegos |
 | Editor rich text | TipTap con toolbar (bold, italic, links, headings, listas, codigo, citas) |
 | Particulas flotantes | Fondo animado adaptativo al tema dark/light |
 | Cursor glow | Resplandor que sigue al raton, visible en ambos temas |
@@ -58,9 +64,11 @@ Usuario crea post
 Admin aprueba
     -> status: approved
     -> Supabase Realtime broadcast
-    -> Jardin muestra nueva planta con animacion de nacimiento
+    -> Jardin coloca la flor a la derecha (mas reciente) con animacion de nacimiento
     -> Email al autor via Resend
 ```
+
+El jardin ordena de mas antiguo (izquierda) a mas reciente (derecha). Si hay mas flores de las que caben, la camara inicial mira el extremo derecho. Flechas, rueda o teclado recorren el resto con transicion suave. Las flores se reparten en 3 planos (fondo, medio, frente) y se solapan un poco.
 
 ---
 
@@ -132,17 +140,21 @@ garden-app/
       water/                    Sistema de riego
       posts/approve/            Aprobar/rechazar posts
     admin/
-      queue/                    Cola de moderacion
+      queue/                    Cola de moderacion (preview de la especie)
+      plants/                   Catalogo de prototipos y riegos
       users/                    Gestion de usuarios
     posts/[id]/                 Detalle de post
     (auth)/                     Login, registro, banned
   components/
     garden/
-      Garden.js                 Contenedor SVG con Realtime
-      Plant.js                  Planta individual con GSAP
-      PlantGenerator.js         Generacion procedural SVG
+      Garden.js                 Viewport panoramico, 3 planos, Realtime
+      Plant.js                  Flor individual con GSAP
+      PlantGenerator.js         Dibuja la especie + evolucion por riego
+      flowerSpecies.js          Catalogo de 20 prototipos
+      PlantPreview.js           Miniatura SVG (cola y catalogo admin)
+      svgElements.js            Renderer SVG compartido
       PlantTooltip.js           Tooltip en hover
-      gardenUtils.js            Posiciones, PRNG, DNA por defecto
+      gardenUtils.js            Layout, planos, PRNG, DNA por defecto
     Particles.js                Particulas flotantes (fireflies)
     CursorGlow.js               Resplandor que sigue al cursor
     Icons.js                    Sistema de iconos SVG

@@ -1,311 +1,403 @@
-import { createRng, rngRange, rngInt } from './gardenUtils';
+import { createRng, rngRange } from './gardenUtils';
+import { resolveSpecies, getWaterGrowth, STEM_COLOR, LEAF_COLOR } from './flowerSpecies';
 
-// growthPhase: 0.0 (semilla) -> 1.0 (planta madura)
-// 0 riegos = 0.15, 10+ riegos = 1.0
-function getGrowthPhase(waterCount) {
-	if (waterCount <= 0) return 0.15;
-	if (waterCount >= 10) return 1.0;
-	return 0.15 + (waterCount / 10) * 0.85;
-}
-
-// Generate SVG elements for a plant based on its visual DNA and water count
 export function generatePlant(dna, waterCount = 0) {
 	const rng = createRng(dna.seed || 0);
-	const phase = getGrowthPhase(waterCount);
-	// Base height scales with phase: 20px brote -> full height madura
-	const maxH = 30 + dna.height * 18;
-	const h = Math.round(maxH * Math.max(0.2, phase));
-	const elements = [];
+	const { spec } = resolveSpecies(dna);
+	const water = getWaterGrowth(waterCount);
+	const swayAmp = spec.sway ?? 5;
+	const swayX = rngRange(rng, -swayAmp, swayAmp);
+	const height = Math.min(5, Math.max(1, Number(dna.height) || 3));
+	const h = Math.round(72 + height * 14 + water.stemExtra);
+	const bloomScale = water.bloomScale * 2.2;
 
-	switch (dna.type) {
-		case 'geometric':
-			generateGeometric(elements, dna, rng, h, phase);
-			break;
-		case 'organic':
-			generateOrganic(elements, dna, rng, h, phase);
-			break;
-		case 'flowering':
-			generateFlowering(elements, dna, rng, h, phase);
-			break;
-		case 'crystalline':
-			generateCrystalline(elements, dna, rng, h, phase);
-			break;
-		default:
-			generateOrganic(elements, dna, rng, h, phase);
-	}
+	const els = [];
+	drawStem(els, spec.stem, swayX, h, spec.stemW * 1.45);
+	drawLeaves(els, swayX, h, spec, water.extraLeaves);
+	drawCalyx(els, swayX, -h);
+	const primary = dna.primaryColor || '#F472B6';
+	const secondary = dna.secondaryColor || '#FDE68A';
+	drawBloom(els, swayX, -h, spec.bloom, primary, secondary, bloomScale, rng);
+	if (water.dew) drawDew(els, swayX, h, rng);
+	if (water.sparkle) drawSparkle(els, swayX, -h, secondary, rng);
 
-	return { elements, totalHeight: h };
+	return { elements: els, totalHeight: h + bloomPadding(spec.bloom, bloomScale) };
 }
 
-function generateGeometric(els, dna, rng, h, phase) {
-	// Segments grow with phase: min 1, max complexity+2
-	const maxSegments = 2 + dna.complexity;
-	const segments = Math.max(1, Math.round(maxSegments * phase));
-	let y = 0;
-	let x = 0;
-	const segH = h / segments;
-	const points = [[0, 0]];
-
-	for (let i = 1; i <= segments; i++) {
-		x += rngRange(rng, -4, 4);
-		y -= segH;
-		points.push([x, y]);
-	}
-
-	els.push({
-		type: 'polyline',
-		points: points.map(p => p.join(',')).join(' '),
-		stroke: dna.primaryColor,
-		strokeWidth: 2,
-		fill: 'none',
-		className: 'plant-stem',
-	});
-
-	// Nodes at joints - all visible once stem is drawn
-	for (let i = 1; i < points.length; i++) {
-		const [px, py] = points[i];
-		const size = rngRange(rng, 2, 4);
-
+function drawStem(els, style, swayX, h, width) {
+	if (style === 'angular') {
 		els.push({
-			type: 'rect',
-			x: px - size / 2,
-			y: py - size / 2,
-			width: size,
-			height: size,
-			fill: dna.secondaryColor,
-			transform: `rotate(${rngRange(rng, 0, 45)} ${px} ${py})`,
-			className: 'plant-node',
+			type: 'polyline',
+			points: `0,0 ${swayX * 0.35},${(-h * 0.38).toFixed(1)} ${swayX * 0.75},${(-h * 0.72).toFixed(1)} ${swayX},${-h}`,
+			stroke: STEM_COLOR,
+			strokeWidth: width,
+			fill: 'none',
+			strokeLinejoin: 'round',
+			className: 'plant-stem',
 		});
-
-		// Branches appear from phase 0.3+
-		if (i < points.length - 1 && phase >= 0.3 && rng() > 0.3) {
-			const dir = rng() > 0.5 ? 1 : -1;
-			const bLen = rngRange(rng, 8, 16 + dna.branching * 3) * phase;
-			els.push({
-				type: 'line',
-				x1: px, y1: py,
-				x2: px + dir * bLen, y2: py - rngRange(rng, 0, 6),
-				stroke: dna.primaryColor,
-				strokeWidth: 1.5,
-				opacity: 0.7,
-				className: 'plant-branch',
-			});
-			els.push({
-				type: 'circle',
-				cx: px + dir * bLen,
-				cy: py - rngRange(rng, 0, 6),
-				r: rngRange(rng, 1.5, 3),
-				fill: dna.secondaryColor,
-				className: 'plant-leaf',
-			});
-		}
+		return;
 	}
 
-	// Crown: diamond - appears from phase 0.5+
-	if (phase >= 0.5) {
-		const [tx, ty] = points[points.length - 1];
-		const ds = (4 + dna.complexity) * Math.min(1, (phase - 0.5) * 2);
+	if (style === 'straight') {
 		els.push({
-			type: 'polygon',
-			points: `${tx},${ty - ds} ${tx + ds},${ty} ${tx},${ty + ds * 0.3} ${tx - ds},${ty}`,
-			fill: dna.secondaryColor,
-			opacity: 0.6 + phase * 0.3,
-			className: 'plant-crown',
+			type: 'line',
+			x1: 0, y1: 0, x2: swayX, y2: -h,
+			stroke: STEM_COLOR,
+			strokeWidth: width,
+			strokeLinecap: 'round',
+			className: 'plant-stem',
 		});
+		return;
 	}
-}
-
-function generateOrganic(els, dna, rng, h, phase) {
-	const swayX = rngRange(rng, -8, 8);
-	const d = `M 0 0 C ${rngRange(rng, -5, 5)} ${-h * 0.33} ${swayX + rngRange(rng, -3, 3)} ${-h * 0.66} ${swayX} ${-h}`;
 
 	els.push({
 		type: 'path',
-		d,
-		stroke: dna.primaryColor,
-		strokeWidth: 2.5,
+		d: `M 0 0 Q ${swayX * 0.5} ${-h * 0.5} ${swayX} ${-h}`,
+		stroke: STEM_COLOR,
+		strokeWidth: width,
 		fill: 'none',
+		strokeLinecap: 'round',
 		className: 'plant-stem',
 	});
-
-	// Leaves scale with phase
-	const maxLeaves = dna.branching + 1;
-	const leafCount = Math.max(1, Math.round(maxLeaves * phase));
-	for (let i = 0; i < leafCount; i++) {
-		const t = 0.25 + (i / maxLeaves) * 0.65;
-		const lx = swayX * t + rngRange(rng, -2, 2);
-		const ly = -h * t;
-		const dir = i % 2 === 0 ? 1 : -1;
-		const maxLeafSize = 6 + 12 + dna.complexity * 2;
-		const leafSize = (6 + rngRange(rng, 0, 6 + dna.complexity * 2)) * Math.min(1, phase + 0.3);
-		const angle = dir * rngRange(rng, 20, 50);
-
-		els.push({
-			type: 'ellipse',
-			cx: lx + dir * leafSize * 0.6,
-			cy: ly,
-			rx: leafSize,
-			ry: leafSize * 0.35,
-			fill: dna.secondaryColor,
-			opacity: rngRange(rng, 0.3, 0.5) + phase * 0.25,
-			transform: `rotate(${angle} ${lx + dir * leafSize * 0.6} ${ly})`,
-			className: 'plant-leaf',
-		});
-	}
-
-	// Crown blob: appears from phase 0.4+
-	if (phase >= 0.4) {
-		const topR = (5 + dna.complexity * 1.5) * Math.min(1, (phase - 0.4) / 0.6);
-		els.push({
-			type: 'circle',
-			cx: swayX,
-			cy: -h - topR * 0.3,
-			r: topR,
-			fill: dna.primaryColor,
-			opacity: 0.4 + phase * 0.3,
-			className: 'plant-crown',
-		});
-	}
 }
 
-function generateFlowering(els, dna, rng, h, phase) {
-	const swayX = rngRange(rng, -5, 5);
-	const d = `M 0 0 Q ${swayX * 0.5} ${-h * 0.5} ${swayX} ${-h}`;
-
-	els.push({
-		type: 'path',
-		d,
-		stroke: '#3ECF8E',
-		strokeWidth: 2,
-		fill: 'none',
-		className: 'plant-stem',
-	});
-
-	// Leaves: scale count with phase
-	const maxLeaves = Math.max(2, dna.branching - 1);
-	const leafCount = Math.max(0, Math.round(maxLeaves * phase));
-	for (let i = 0; i < leafCount; i++) {
-		const t = 0.3 + (i / maxLeaves) * 0.5;
+function drawLeaves(els, swayX, h, spec, extra) {
+	const total = spec.leaf.count + extra;
+	for (let i = 0; i < total; i++) {
+		const t = 0.28 + (i / Math.max(1, total - 1)) * 0.44;
 		const lx = swayX * t;
 		const ly = -h * t;
 		const dir = i % 2 === 0 ? 1 : -1;
-		const leafW = 6 * Math.min(1, phase + 0.2);
+		const scale = i >= spec.leaf.count ? 0.85 : 1;
+		drawLeaf(els, lx, ly, dir, spec.leaf, scale);
+	}
+}
 
+function drawLeaf(els, lx, ly, dir, leaf, scale) {
+	const angle = dir * (leaf.angle || 32);
+	const rx = leaf.rx * scale * 1.7;
+	const ry = leaf.ry * scale * 1.7;
+
+	if (leaf.shape === 'rect') {
+		const cx = lx + dir * 6;
 		els.push({
-			type: 'ellipse',
-			cx: lx + dir * 8,
-			cy: ly,
-			rx: leafW,
-			ry: 2.5,
-			fill: '#2DD4BF',
-			opacity: 0.3 + phase * 0.3,
-			transform: `rotate(${dir * 30} ${lx + dir * 8} ${ly})`,
-			className: 'plant-leaf',
+			type: 'rect',
+			x: cx - rx / 2,
+			y: ly - ry / 2,
+			width: rx,
+			height: ry,
+			fill: LEAF_COLOR,
+			opacity: 0.75,
+			transform: `rotate(${angle + 45} ${cx} ${ly})`,
+			className: 'plant-node',
 		});
+		return;
 	}
 
-	// Flower: appears from phase 0.5+
-	if (phase >= 0.5) {
-		const flowerProgress = (phase - 0.5) * 2; // 0 -> 1 in second half
-		const petalCount = Math.max(3, Math.round((4 + dna.complexity) * flowerProgress));
-		const petalR = (4 + dna.complexity * 1.2) * flowerProgress;
-		const cx = swayX;
-		const cy = -h;
+	if (leaf.shape === 'shard') {
+		const tipX = lx + dir * rx;
+		const tipY = ly - 2;
+		els.push({
+			type: 'polygon',
+			points: `${lx},${ly} ${tipX},${tipY - ry} ${tipX},${tipY + ry}`,
+			fill: LEAF_COLOR,
+			opacity: 0.7,
+			className: 'plant-leaf',
+		});
+		return;
+	}
 
-		for (let i = 0; i < petalCount; i++) {
-			const angle = (360 / petalCount) * i + rngRange(rng, -10, 10);
-			const rad = (angle * Math.PI) / 180;
-			const px = cx + Math.cos(rad) * petalR * 0.8;
-			const py = cy + Math.sin(rad) * petalR * 0.8;
+	const cx = lx + dir * rx * 0.7;
+	els.push({
+		type: 'ellipse',
+		cx,
+		cy: ly,
+		rx,
+		ry,
+		fill: LEAF_COLOR,
+		opacity: 0.72,
+		transform: `rotate(${angle} ${cx} ${ly})`,
+		className: 'plant-leaf',
+	});
+}
 
+function drawCalyx(els, cx, cy) {
+	[-1, 1].forEach((dir) => {
+		els.push({
+			type: 'ellipse',
+			cx: cx + dir * 5,
+			cy: cy + 3,
+			rx: 7,
+			ry: 3.2,
+			fill: LEAF_COLOR,
+			opacity: 0.7,
+			transform: `rotate(${dir * 40} ${cx} ${cy + 3})`,
+			className: 'plant-leaf',
+		});
+	});
+}
+
+function drawBloom(els, cx, cy, bloom, primary, secondary, scale, rng) {
+	switch (bloom.kind) {
+		case 'cup':
+			bloomCup(els, cx, cy, bloom, primary, secondary, scale);
+			break;
+		case 'pointed':
+			bloomPointed(els, cx, cy, bloom, primary, secondary, scale, rng);
+			break;
+		case 'layered':
+			bloomLayered(els, cx, cy, bloom, primary, secondary, scale, rng);
+			break;
+		case 'crystal':
+			bloomCrystal(els, cx, cy, bloom, primary, secondary, scale);
+			break;
+		case 'cluster':
+			bloomCluster(els, cx, cy, bloom, primary, secondary, scale);
+			break;
+		default:
+			bloomRadial(els, cx, cy, bloom, primary, secondary, scale, rng);
+	}
+}
+
+function bloomRadial(els, cx, cy, bloom, primary, secondary, scale, rng) {
+	const n = bloom.n;
+	const r = bloom.r * scale;
+	const rot = rngRange(rng, -6, 6);
+	for (let i = 0; i < n; i++) {
+		const angle = (360 / n) * i + rot;
+		const rad = (angle * Math.PI) / 180;
+		const px = cx + Math.cos(rad) * r;
+		const py = cy + Math.sin(rad) * r;
+		if (bloom.shape === 'diamond') {
+			const s = (bloom.size || 5) * scale;
+			els.push({
+				type: 'polygon',
+				points: `${px},${py - s} ${px + s * 0.45},${py} ${px},${py + s * 0.45} ${px - s * 0.45},${py}`,
+				fill: primary,
+				opacity: 0.92,
+				transform: `rotate(${angle} ${px} ${py})`,
+				className: 'plant-petal',
+			});
+		} else {
 			els.push({
 				type: 'ellipse',
 				cx: px,
 				cy: py,
-				rx: petalR * 0.7,
-				ry: petalR * 0.35,
-				fill: dna.primaryColor,
-				opacity: rngRange(rng, 0.4, 0.7) * flowerProgress,
+				rx: bloom.rx * scale,
+				ry: bloom.ry * scale,
+				fill: primary,
+				opacity: 0.92,
 				transform: `rotate(${angle} ${px} ${py})`,
-				className: 'plant-leaf',
+				className: 'plant-petal',
 			});
 		}
+	}
+	drawCenter(els, cx, cy, bloom, secondary, scale);
+}
 
-		// Center
-		if (petalR > 1) {
+function bloomLayered(els, cx, cy, bloom, primary, secondary, scale, rng) {
+	bloomRadial(els, cx, cy, { ...bloom.outer, shape: bloom.shape, centerR: 0 }, primary, secondary, scale, rng);
+	bloomRadial(els, cx, cy, { ...bloom.inner, shape: bloom.shape, centerR: bloom.centerR, center: bloom.center }, secondary, primary, scale, rng);
+}
+
+function bloomCup(els, cx, cy, bloom, primary, secondary, scale) {
+	const h = bloom.h * scale;
+	const w = bloom.w * scale;
+	const spread = bloom.bell ? 18 : 30;
+	[-spread, 0, spread].forEach((angle, i) => {
+		const mid = i === 1;
+		els.push({
+			type: 'ellipse',
+			cx,
+			cy: cy - h * 0.42,
+			rx: w * (mid ? 0.52 : 0.4),
+			ry: h * 0.52,
+			fill: mid ? secondary : primary,
+			opacity: mid ? 0.95 : 0.78,
+			transform: `rotate(${angle} ${cx} ${cy})`,
+			className: 'plant-petal',
+		});
+	});
+}
+
+function bloomPointed(els, cx, cy, bloom, primary, secondary, scale, rng) {
+	const n = bloom.n;
+	const r = bloom.r * scale;
+	for (let i = 0; i < n; i++) {
+		const angle = (360 / n) * i - 90 + rngRange(rng, -4, 4);
+		const rad = (angle * Math.PI) / 180;
+		const px = cx + Math.cos(rad) * r * 0.55;
+		const py = cy + Math.sin(rad) * r * 0.55;
+		els.push({
+			type: 'ellipse',
+			cx: px,
+			cy: py,
+			rx: bloom.rx * scale,
+			ry: bloom.ry * scale,
+			fill: primary,
+			opacity: 0.8,
+			transform: `rotate(${angle} ${px} ${py})`,
+			className: 'plant-petal',
+		});
+	}
+	if (bloom.stamens) {
+		for (let i = 0; i < bloom.stamens; i++) {
+			const angle = (360 / bloom.stamens) * i - 90;
+			const rad = (angle * Math.PI) / 180;
+			const len = r * 0.7;
+			const ex = cx + Math.cos(rad) * len;
+			const ey = cy + Math.sin(rad) * len;
+			els.push({
+				type: 'line',
+				x1: cx, y1: cy, x2: ex, y2: ey,
+				stroke: secondary,
+				strokeWidth: 0.8,
+				strokeLinecap: 'round',
+				className: 'plant-petal',
+			});
 			els.push({
 				type: 'circle',
-				cx,
-				cy,
-				r: petalR * 0.3,
-				fill: dna.secondaryColor,
-				opacity: flowerProgress,
+				cx: ex,
+				cy: ey,
+				r: 1.3 * scale,
+				fill: secondary,
 				className: 'plant-crown',
 			});
 		}
+	}
+	drawCenter(els, cx, cy, bloom, secondary, scale);
+}
+
+function bloomCrystal(els, cx, cy, bloom, primary, secondary, scale) {
+	const n = bloom.n;
+	const size = bloom.size * scale;
+	if (n === 1) {
+		els.push({
+			type: 'polygon',
+			points: `${cx - 3.2},${cy} ${cx},${cy - size} ${cx + 3.2},${cy}`,
+			fill: primary,
+			opacity: 0.88,
+			className: 'plant-crown',
+		});
+		return;
+	}
+	const fan = n <= 3;
+	const step = fan ? 48 : 360 / n;
+	const start = fan ? -90 - ((n - 1) * step) / 2 : -90;
+	for (let i = 0; i < n; i++) {
+		const angle = start + i * step;
+		const rad = (angle * Math.PI) / 180;
+		const tipX = cx + Math.cos(rad) * size;
+		const tipY = cy + Math.sin(rad) * size;
+		els.push({
+			type: 'polygon',
+			points: `${cx - 2.2},${cy} ${tipX},${tipY} ${cx + 2.2},${cy}`,
+			fill: i % 2 ? secondary : primary,
+			opacity: 0.75,
+			className: 'plant-petal',
+		});
+	}
+	els.push({
+		type: 'circle',
+		cx,
+		cy,
+		r: 2.2 * scale,
+		fill: secondary,
+		className: 'plant-crown',
+	});
+}
+
+function bloomCluster(els, cx, cy, bloom, primary, secondary, scale) {
+	const spread = bloom.spread * scale;
+	const r = bloom.r * scale;
+	els.push({
+		type: 'circle',
+		cx,
+		cy,
+		r,
+		fill: secondary,
+		className: 'plant-crown',
+	});
+	for (let i = 0; i < bloom.n - 1; i++) {
+		const angle = (360 / (bloom.n - 1)) * i - 90;
+		const rad = (angle * Math.PI) / 180;
+		els.push({
+			type: 'circle',
+			cx: cx + Math.cos(rad) * spread,
+			cy: cy + Math.sin(rad) * spread,
+			r: r * 0.85,
+			fill: i % 2 ? secondary : primary,
+			opacity: 0.85,
+			className: 'plant-petal',
+		});
 	}
 }
 
-function generateCrystalline(els, dna, rng, h, phase) {
-	const tilt = rngRange(rng, -3, 3);
-
-	els.push({
-		type: 'line',
-		x1: 0, y1: 0,
-		x2: tilt, y2: -h,
-		stroke: dna.primaryColor,
-		strokeWidth: 2,
-		className: 'plant-stem',
-	});
-
-	// Crystals along stem: scale count with phase
-	const maxCrystals = dna.branching;
-	const crystalCount = Math.max(0, Math.round(maxCrystals * phase));
-	for (let i = 0; i < crystalCount; i++) {
-		const t = 0.3 + (i / maxCrystals) * 0.55;
-		const cx = tilt * t;
-		const cy = -h * t;
-		const dir = i % 2 === 0 ? 1 : -1;
-		const size = rngRange(rng, 5, 10 + dna.complexity) * Math.min(1, phase + 0.2);
-		const angle = rngRange(rng, -20, 20);
-
-		const pts = [
-			`${cx + dir * size * 0.3},${cy - size}`,
-			`${cx + dir * size},${cy}`,
-			`${cx + dir * size * 0.3},${cy + size * 0.4}`,
-			`${cx},${cy}`,
-		].join(' ');
-
+function drawCenter(els, cx, cy, bloom, fill, scale) {
+	if (!bloom.centerR) return;
+	if (bloom.center === 'square') {
+		const s = bloom.centerR * scale;
 		els.push({
-			type: 'polygon',
-			points: pts,
-			fill: dna.secondaryColor,
-			opacity: (rngRange(rng, 0.2, 0.4) + phase * 0.25),
-			transform: `rotate(${angle} ${cx + dir * size * 0.5} ${cy})`,
-			className: 'plant-leaf',
+			type: 'rect',
+			x: cx - s,
+			y: cy - s,
+			width: s * 2,
+			height: s * 2,
+			fill,
+			transform: `rotate(45 ${cx} ${cy})`,
+			className: 'plant-crown',
+		});
+		return;
+	}
+	els.push({
+		type: 'circle',
+		cx,
+		cy,
+		r: bloom.centerR * scale,
+		fill,
+		className: 'plant-crown',
+	});
+}
+
+function drawDew(els, swayX, h, rng) {
+	for (let i = 0; i < 2; i++) {
+		const t = 0.42 + i * 0.18;
+		els.push({
+			type: 'circle',
+			cx: swayX * t + rngRange(rng, -3, 3),
+			cy: -h * t,
+			r: 1.4,
+			fill: '#E0F2FE',
+			opacity: 0.55,
+			className: 'plant-dew',
 		});
 	}
+}
 
-	// Top crystal cluster: appears from phase 0.45+
-	if (phase >= 0.45) {
-		const clusterProgress = (phase - 0.45) / 0.55;
-		const topX = tilt;
-		const topY = -h;
-		const mainSize = (6 + dna.complexity * 2) * clusterProgress;
+function drawSparkle(els, cx, cy, color, rng) {
+	const spots = [[12, -10], [-14, -6], [8, 8]];
+	spots.forEach(([dx, dy]) => {
+		const x = cx + dx + rngRange(rng, -2, 2);
+		const y = cy + dy;
+		const s = 2.2;
+		els.push({
+			type: 'polygon',
+			points: `${x},${y - s} ${x + 0.7},${y - 0.7} ${x + s},${y} ${x + 0.7},${y + 0.7} ${x},${y + s} ${x - 0.7},${y + 0.7} ${x - s},${y} ${x - 0.7},${y - 0.7}`,
+			fill: color,
+			opacity: 0.7,
+			className: 'plant-sparkle',
+		});
+	});
+}
 
-		for (let i = 0; i < 3; i++) {
-			const angle = -90 + (i - 1) * rngRange(rng, 20, 35);
-			const rad = (angle * Math.PI) / 180;
-			const tipX = topX + Math.cos(rad) * mainSize;
-			const tipY = topY + Math.sin(rad) * mainSize;
-
-			els.push({
-				type: 'polygon',
-				points: `${topX - 2},${topY} ${tipX},${tipY} ${topX + 2},${topY}`,
-				fill: dna.primaryColor,
-				opacity: rngRange(rng, 0.4, 0.7) * clusterProgress,
-				className: 'plant-crown',
-			});
-		}
+function bloomPadding(bloom, scale) {
+	if (bloom.kind === 'cup') return bloom.h * scale + 4;
+	if (bloom.kind === 'crystal') return bloom.size * scale + 6;
+	if (bloom.kind === 'cluster') return (bloom.spread + bloom.r) * scale + 4;
+	if (bloom.kind === 'layered') {
+		const outer = bloom.outer;
+		return ((outer.r || 0) + (outer.rx || outer.size || 4)) * scale + 4;
 	}
+	if (bloom.kind === 'pointed') return (bloom.r + bloom.ry) * scale * 0.55 + 4;
+	return ((bloom.r || 0) + (bloom.rx || bloom.size || 4)) * scale + 6;
 }

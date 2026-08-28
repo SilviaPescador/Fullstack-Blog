@@ -24,6 +24,7 @@ const securityHeaders = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+	agentRules: false,
 	images: {
 		unoptimized: false,
 		remotePatterns: [

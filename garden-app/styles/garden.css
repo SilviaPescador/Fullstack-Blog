@@ -12,7 +12,95 @@
   pointer-events: none;
 }
 
-/* Plant hover glow -- filter only, no transform to avoid flicker */
+.garden-frame {
+  position: relative;
+  width: 100%;
+  margin-bottom: var(--space-lg);
+}
+
+.garden-viewport {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x;
+}
+
+.garden-viewport::-webkit-scrollbar {
+  display: none;
+}
+
+.garden-viewport:focus-visible {
+  outline: 1px solid var(--color-border-accent);
+  outline-offset: 4px;
+}
+
+.garden-viewport svg {
+  display: block;
+}
+
+.garden-pan {
+  position: absolute;
+  top: 50%;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: opacity 0.25s ease, background 0.2s ease;
+}
+
+.garden-pan:hover:not(:disabled) {
+  background: var(--color-bg-hover);
+  border-color: var(--color-border-hover);
+}
+
+.garden-pan:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
+.garden-pan--left {
+  left: 8px;
+}
+
+.garden-pan--right {
+  right: 8px;
+}
+
+.garden-fade {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 56px;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.garden-fade.is-visible {
+  opacity: 1;
+}
+
+.garden-fade--left {
+  left: 0;
+  background: linear-gradient(to right, var(--color-bg), transparent);
+}
+
+.garden-fade--right {
+  right: 0;
+  background: linear-gradient(to left, var(--color-bg), transparent);
+}
+
 .plant-group {
   transition: filter 0.25s ease;
   cursor: pointer;

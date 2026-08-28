@@ -121,6 +121,11 @@ export default function UserMenu() {
 									</Link>
 								</li>
 								<li>
+									<Link href="/admin/plants" className="dropdown__item" onClick={() => setShowDropdown(false)}>
+										<Icon name="flower" size={16} /> {t('nav.plantCatalog')}
+									</Link>
+								</li>
+								<li>
 									<Link href="/admin/users" className="dropdown__item" onClick={() => setShowDropdown(false)}>
 										<Icon name="users" size={16} /> {t('nav.manageUsers')}
 									</Link>

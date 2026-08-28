@@ -17,27 +17,48 @@ export function rngInt(rng, min, max) {
 	return Math.floor(rngRange(rng, min, max + 1));
 }
 
-// Calculate plant positions in the garden SVG to avoid overlap
-export function calculatePlantPositions(plants, gardenWidth, gardenHeight) {
-	const groundY = gardenHeight - 20;
-	const padding = 40;
-	const usableWidth = gardenWidth - padding * 2;
+const SLOT_WIDTH = 46;
+const GARDEN_PADDING = 72;
+export const GARDEN_GROUND = 20;
+
+export const PLANES = [
+	{ yOffset: -54, scale: 0.7, opacity: 0.75 },
+	{ yOffset: -26, scale: 0.86, opacity: 0.9 },
+	{ yOffset: 0, scale: 1, opacity: 1 },
+];
+
+export function calculateGardenLayout(plants, viewportWidth, gardenHeight) {
 	const count = plants.length;
+	const groundY = gardenHeight - GARDEN_GROUND;
+	const packed = count * SLOT_WIDTH;
+	const worldWidth = Math.max(viewportWidth, packed + GARDEN_PADDING * 2);
+	const startX = packed + GARDEN_PADDING * 2 <= viewportWidth
+		? (viewportWidth - packed) / 2
+		: GARDEN_PADDING;
 
-	if (count === 0) return [];
-
-	const positions = [];
-	const minSpacing = Math.max(30, usableWidth / (count + 1));
-
-	for (let i = 0; i < count; i++) {
-		const rng = createRng(plants[i].seed || i * 7919);
-		const baseX = padding + ((i + 0.5) / count) * usableWidth;
-		const jitterX = rngRange(rng, -minSpacing * 0.2, minSpacing * 0.2);
-		const x = Math.max(padding, Math.min(gardenWidth - padding, baseX + jitterX));
-		positions.push({ x, y: groundY });
+	if (count === 0) {
+		return { positions: [], worldWidth, needsPan: false };
 	}
 
-	return positions;
+	const positions = plants.map((plant, i) => {
+		const rng = createRng(plant.seed || i * 7919);
+		const plane = rngInt(rng, 0, 2);
+		const spec = PLANES[plane];
+		const jitterX = rngRange(rng, -SLOT_WIDTH * 0.14, SLOT_WIDTH * 0.14);
+		return {
+			x: startX + SLOT_WIDTH * 0.5 + i * SLOT_WIDTH + jitterX,
+			y: groundY + spec.yOffset,
+			plane,
+			scale: spec.scale,
+			opacity: spec.opacity,
+		};
+	});
+
+	return {
+		positions,
+		worldWidth,
+		needsPan: worldWidth > viewportWidth + 1,
+	};
 }
 
 // Default visual DNA for posts that don't have AI-generated DNA yet
@@ -56,7 +77,6 @@ export function defaultVisualDna(postId, title = '', content = '') {
 		type,
 		height: Math.min(5, Math.max(1, Math.floor(len / 200) + 1)),
 		complexity: Math.min(5, Math.max(1, Math.floor(len / 300) + 1)),
-		branching: Math.min(5, Math.max(2, (hash % 4) + 1)),
 		primaryColor,
 		secondaryColor,
 		seed: hash,

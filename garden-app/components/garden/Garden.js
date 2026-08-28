@@ -1,28 +1,34 @@
 'use client';
 
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback, useEffect, useMemo, useLayoutEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import Plant from './Plant';
 import PlantTooltip from './PlantTooltip';
-import { calculatePlantPositions, defaultVisualDna } from './gardenUtils';
+import { calculateGardenLayout, defaultVisualDna, PLANES, GARDEN_GROUND } from './gardenUtils';
+import Icon from '@/components/Icons';
 
-const GARDEN_HEIGHT = 320;
+const GARDEN_HEIGHT = 400;
+const PAN_RATIO = 0.7;
 
 export default function Garden({ posts: initialPosts = [], newPostIds: initialNewIds = [] }) {
 	const router = useRouter();
-	const containerRef = useRef(null);
+	const frameRef = useRef(null);
+	const viewportRef = useRef(null);
+	const stickToNewest = useRef(true);
+	const didInitScroll = useRef(false);
+
 	const [posts, setPosts] = useState(initialPosts);
 	const [newPostIds, setNewPostIds] = useState(initialNewIds);
 	const [dimensions, setDimensions] = useState({ width: 900, height: GARDEN_HEIGHT });
 	const [tooltip, setTooltip] = useState({ visible: false, post: null, x: 0, y: 0 });
+	const [canLeft, setCanLeft] = useState(false);
+	const [canRight, setCanRight] = useState(false);
 
-	// Keep posts in sync with props
 	useEffect(() => {
 		setPosts(initialPosts);
 	}, [initialPosts]);
 
-	// Supabase Realtime: listen for newly approved posts
 	useEffect(() => {
 		const supabase = createClient();
 		const channel = supabase
@@ -37,7 +43,6 @@ export default function Garden({ posts: initialPosts = [], newPostIds: initialNe
 				setPosts(prev => {
 					const exists = prev.find(p => p.id === updated.id);
 					if (exists) {
-						// Update water_count for existing posts
 						return prev.map(p => p.id === updated.id
 							? { ...p, water_count: updated.water_count ?? p.water_count }
 							: p
@@ -65,7 +70,7 @@ export default function Garden({ posts: initialPosts = [], newPostIds: initialNe
 	}, []);
 
 	useEffect(() => {
-		const el = containerRef.current;
+		const el = frameRef.current;
 		if (!el) return;
 		const obs = new ResizeObserver(([entry]) => {
 			setDimensions({ width: entry.contentRect.width, height: GARDEN_HEIGHT });
@@ -74,19 +79,78 @@ export default function Garden({ posts: initialPosts = [], newPostIds: initialNe
 		return () => obs.disconnect();
 	}, []);
 
-	const plantsData = posts.map((post) => ({
-		...post,
-		dna: post.visual_dna || defaultVisualDna(post.id, post.title, post.content),
-	}));
+	const plantsData = useMemo(() => {
+		return [...posts]
+			.sort((a, b) => new Date(a.created_at || a.post_date) - new Date(b.created_at || b.post_date))
+			.map((post) => ({
+				...post,
+				dna: post.visual_dna || defaultVisualDna(post.id, post.title, post.content),
+			}));
+	}, [posts]);
 
-	const positions = calculatePlantPositions(
+	const layout = useMemo(() => calculateGardenLayout(
 		plantsData.map(p => p.dna),
 		dimensions.width,
 		dimensions.height
-	);
+	), [plantsData, dimensions]);
+
+	const planted = useMemo(() => {
+		return plantsData
+			.map((post, i) => ({ post, pos: layout.positions[i] }))
+			.filter(item => item.pos)
+			.sort((a, b) => a.pos.plane - b.pos.plane || a.pos.x - b.pos.x);
+	}, [plantsData, layout.positions]);
+
+	const updatePanState = useCallback(() => {
+		const el = viewportRef.current;
+		if (!el) return;
+		const max = el.scrollWidth - el.clientWidth;
+		const left = el.scrollLeft;
+		setCanLeft(left > 8);
+		setCanRight(left < max - 8);
+		stickToNewest.current = left >= max - 48;
+	}, []);
+
+	useLayoutEffect(() => {
+		const el = viewportRef.current;
+		if (!el || !layout.needsPan) {
+			didInitScroll.current = !layout.needsPan;
+			setCanLeft(false);
+			setCanRight(false);
+			return;
+		}
+
+		const max = Math.max(0, el.scrollWidth - el.clientWidth);
+		if (!didInitScroll.current) {
+			el.scrollLeft = max;
+			didInitScroll.current = true;
+		} else if (stickToNewest.current) {
+			el.scrollTo({ left: max, behavior: 'smooth' });
+		}
+		requestAnimationFrame(updatePanState);
+	}, [layout.worldWidth, layout.needsPan, plantsData.length, updatePanState]);
+
+	const pan = useCallback((dir) => {
+		const el = viewportRef.current;
+		if (!el) return;
+		stickToNewest.current = false;
+		el.scrollBy({ left: dir * el.clientWidth * PAN_RATIO, behavior: 'smooth' });
+	}, []);
+
+	const handleScroll = useCallback(() => {
+		updatePanState();
+		setTooltip(prev => (prev.visible ? { ...prev, visible: false } : prev));
+	}, [updatePanState]);
+
+	const handleKeyDown = useCallback((e) => {
+		if (!layout.needsPan) return;
+		if (e.key === 'ArrowLeft') { e.preventDefault(); pan(-1); }
+		if (e.key === 'ArrowRight') { e.preventDefault(); pan(1); }
+	}, [layout.needsPan, pan]);
 
 	const handlePlantEnter = useCallback((post, plantX, plantY) => {
-		setTooltip({ visible: true, post, x: plantX, y: plantY });
+		const scroll = viewportRef.current?.scrollLeft || 0;
+		setTooltip({ visible: true, post, x: plantX - scroll, y: plantY });
 	}, []);
 
 	const handlePlantLeave = useCallback(() => {
@@ -94,49 +158,82 @@ export default function Garden({ posts: initialPosts = [], newPostIds: initialNe
 	}, []);
 
 	return (
-		<div ref={containerRef} className="relative" style={{ width: '100%', marginBottom: 'var(--space-lg)' }}>
-			<svg
-				width="100%"
-				height={GARDEN_HEIGHT}
-				viewBox={`0 0 ${dimensions.width} ${dimensions.height}`}
-				preserveAspectRatio="xMidYMax meet"
-				style={{ display: 'block', overflow: 'visible' }}
+		<div ref={frameRef} className="garden-frame">
+			{layout.needsPan && (
+				<>
+					<button
+						type="button"
+						className="garden-pan garden-pan--left"
+						aria-label="Ver plantas anteriores"
+						disabled={!canLeft}
+						onClick={() => pan(-1)}
+					>
+						<Icon name="chevronLeft" size={22} />
+					</button>
+					<button
+						type="button"
+						className="garden-pan garden-pan--right"
+						aria-label="Ver plantas mas recientes"
+						disabled={!canRight}
+						onClick={() => pan(1)}
+					>
+						<Icon name="chevronRight" size={22} />
+					</button>
+					<div className={`garden-fade garden-fade--left ${canLeft ? 'is-visible' : ''}`} />
+					<div className={`garden-fade garden-fade--right ${canRight ? 'is-visible' : ''}`} />
+				</>
+			)}
+
+			<div
+				ref={viewportRef}
+				className="garden-viewport"
+				tabIndex={layout.needsPan ? 0 : -1}
+				onScroll={handleScroll}
+				onKeyDown={handleKeyDown}
+				aria-label="Jardin"
 			>
-				<defs>
-					<radialGradient id="gardenGlow" cx="50%" cy="100%" r="60%">
-						<stop offset="0%" stopColor="var(--color-accent-green)" stopOpacity="0.06" />
-						<stop offset="100%" stopColor="transparent" stopOpacity="0" />
-					</radialGradient>
-				</defs>
+				<svg
+					width={layout.worldWidth}
+					height={GARDEN_HEIGHT}
+					viewBox={`0 0 ${layout.worldWidth} ${dimensions.height}`}
+					preserveAspectRatio="xMidYMax meet"
+				>
+					<defs>
+						<radialGradient id="gardenGlow" cx="50%" cy="100%" r="60%">
+							<stop offset="0%" stopColor="var(--color-accent-green)" stopOpacity="0.06" />
+							<stop offset="100%" stopColor="transparent" stopOpacity="0" />
+						</radialGradient>
+					</defs>
 
-				{/* Subtle ground glow */}
-				<rect x="0" y={dimensions.height * 0.5} width={dimensions.width} height={dimensions.height * 0.5} fill="url(#gardenGlow)" />
+					<rect x="0" y={dimensions.height * 0.5} width={layout.worldWidth} height={dimensions.height * 0.5} fill="url(#gardenGlow)" />
 
-				{/* Ground line */}
-				<line
-					x1="0" y1={dimensions.height - 20}
-					x2={dimensions.width} y2={dimensions.height - 20}
-					stroke="var(--color-border)"
-					strokeWidth="1"
-					strokeDasharray="4 4"
-					opacity="0.5"
-				/>
+					{PLANES.map((plane, i) => (
+						<line
+							key={plane.yOffset}
+							x1="0"
+							y1={dimensions.height - GARDEN_GROUND + plane.yOffset}
+							x2={layout.worldWidth}
+							y2={dimensions.height - GARDEN_GROUND + plane.yOffset}
+							stroke="var(--color-border)"
+							strokeWidth="1"
+							strokeDasharray={i === 2 ? '4 4' : '3 5'}
+							opacity={0.22 + i * 0.14}
+						/>
+					))}
 
-				{/* Plants */}
-				{plantsData.map((post, i) => {
-					const pos = positions[i];
-					if (!pos) return null;
-					return (
+					{planted.map(({ post, pos }) => (
 						<g
 							key={post.id}
 							className="plant-group"
+							opacity={pos.opacity}
+							transform={`translate(${pos.x}, ${pos.y}) scale(${pos.scale})`}
 							onMouseEnter={() => handlePlantEnter(post, pos.x, pos.y - 10)}
 							onMouseLeave={handlePlantLeave}
 						>
 							<Plant
 								dna={post.dna}
-								x={pos.x}
-								y={pos.y}
+								x={0}
+								y={0}
 								postTitle={post.title}
 								postAuthor={post.author}
 								onClick={() => router.push(`/posts/${post.id}`)}
@@ -144,23 +241,22 @@ export default function Garden({ posts: initialPosts = [], newPostIds: initialNe
 								waterCount={post.water_count || 0}
 							/>
 						</g>
-					);
-				})}
+					))}
 
-				{/* Empty state */}
-				{posts.length === 0 && (
-					<text
-						x={dimensions.width / 2}
-						y={dimensions.height / 2}
-						textAnchor="middle"
-						fill="var(--color-text-muted)"
-						fontSize="14"
-						fontFamily="var(--font-body)"
-					>
-						El jardin espera sus primeras semillas...
-					</text>
-				)}
-			</svg>
+					{posts.length === 0 && (
+						<text
+							x={layout.worldWidth / 2}
+							y={dimensions.height / 2}
+							textAnchor="middle"
+							fill="var(--color-text-muted)"
+							fontSize="14"
+							fontFamily="var(--font-body)"
+						>
+							El jardin espera sus primeras semillas...
+						</text>
+					)}
+				</svg>
+			</div>
 
 			<PlantTooltip {...tooltip} containerWidth={dimensions.width} containerHeight={dimensions.height} />
 		</div>

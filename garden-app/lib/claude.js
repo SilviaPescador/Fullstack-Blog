@@ -12,9 +12,8 @@ Analyze the following blog post and return a JSON response with these fields:
 4. "toxicity_score": A number 0-1 indicating toxicity level (0 = friendly, 1 = very toxic).
 5. "visual_dna": An object describing what kind of plant this post should generate:
    - "type": one of "geometric" (technical/code), "organic" (reflective/personal), "flowering" (creative/artistic), "crystalline" (educational/resource)
-   - "height": 1-5 (based on content depth)
-   - "complexity": 1-5 (based on content richness)
-   - "branching": 1-5 (based on how many topics/ideas)
+   - "complexity": 1-5 selecting the species prototype within that family (1 = simplest form, 5 = most elaborate). The flower is always complete at publish.
+   - "height": 1-5 (base stem length from content depth)
    - "primaryColor": a hex color that matches the post mood
    - "secondaryColor": a complementary hex color
    - "seed": a random integer 1-99999
@@ -50,7 +49,6 @@ export async function moderatePost(title, content) {
 			type: result.visual_dna?.type || 'organic',
 			height: Math.min(5, Math.max(1, Number(result.visual_dna?.height) || 3)),
 			complexity: Math.min(5, Math.max(1, Number(result.visual_dna?.complexity) || 3)),
-			branching: Math.min(5, Math.max(1, Number(result.visual_dna?.branching) || 3)),
 			primaryColor: result.visual_dna?.primaryColor || '#3ECF8E',
 			secondaryColor: result.visual_dna?.secondaryColor || '#2DD4BF',
 			seed: Number(result.visual_dna?.seed) || Math.floor(Math.random() * 99999),

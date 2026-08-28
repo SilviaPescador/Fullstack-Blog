@@ -2,37 +2,11 @@
 
 import { useRef, useEffect, useMemo } from 'react';
 import { generatePlant } from './PlantGenerator';
-
-function svgElement(el, i) {
-	const s = { transition: 'opacity 0.3s' };
-	const cls = el.className || '';
-	const o = el.opacity;
-
-	switch (el.type) {
-		case 'path':
-			return <path key={i} opacity={o} className={cls} style={s} d={el.d} stroke={el.stroke} strokeWidth={el.strokeWidth} fill={el.fill || 'none'} />;
-		case 'line':
-			return <line key={i} opacity={o} className={cls} style={s} x1={el.x1} y1={el.y1} x2={el.x2} y2={el.y2} stroke={el.stroke} strokeWidth={el.strokeWidth} />;
-		case 'polyline':
-			return <polyline key={i} opacity={o} className={cls} style={s} points={el.points} stroke={el.stroke} strokeWidth={el.strokeWidth} fill={el.fill || 'none'} />;
-		case 'circle':
-			return <circle key={i} opacity={o} className={cls} style={s} cx={el.cx} cy={el.cy} r={el.r} fill={el.fill} />;
-		case 'ellipse':
-			return <ellipse key={i} opacity={o} className={cls} style={s} cx={el.cx} cy={el.cy} rx={el.rx} ry={el.ry} fill={el.fill} transform={el.transform} />;
-		case 'rect':
-			return <rect key={i} opacity={o} className={cls} style={s} x={el.x} y={el.y} width={el.width} height={el.height} fill={el.fill} transform={el.transform} />;
-		case 'polygon':
-			return <polygon key={i} opacity={o} className={cls} style={s} points={el.points} fill={el.fill} transform={el.transform} />;
-		default:
-			return null;
-	}
-}
+import { renderSvgElement } from './svgElements';
 
 export default function Plant({ dna, x, y, postTitle, postAuthor, onClick, isNew = false, waterCount = 0 }) {
 	const groupRef = useRef(null);
-	// waterCount drives organic growth inside the generator
 	const { elements, totalHeight } = useMemo(() => generatePlant(dna, waterCount), [dna, waterCount]);
-	// Subtle brightness bonus on top of structural growth
 	const brightness = waterCount > 0 ? 1 + Math.min(waterCount, 10) * 0.025 : 1;
 
 	useEffect(() => {
@@ -57,7 +31,7 @@ export default function Plant({ dna, x, y, postTitle, postAuthor, onClick, isNew
 					}
 				});
 
-				const leaves = group.querySelectorAll('.plant-leaf, .plant-node, .plant-crown');
+				const leaves = group.querySelectorAll('.plant-leaf, .plant-node, .plant-crown, .plant-petal, .plant-dew, .plant-sparkle');
 				gsapModule.fromTo(leaves,
 					{ scale: 0, opacity: 0, transformOrigin: 'center' },
 					{ scale: 1, opacity: (i, el) => el.getAttribute('opacity') || 1, duration: 0.4, stagger: 0.06, delay: 0.5, ease: 'back.out(2)' });
@@ -77,11 +51,10 @@ export default function Plant({ dna, x, y, postTitle, postAuthor, onClick, isNew
 			onKeyDown={(e) => { if (e.key === 'Enter') onClick?.(); }}
 		>
 			<title>{`${postTitle} - ${postAuthor}`}</title>
-			{elements.map((el, i) => svgElement(el, i))}
-			{/* Invisible hit area for easier clicking */}
+			{elements.map((el, i) => renderSvgElement(el, i))}
 			<rect
-				x={-20} y={-totalHeight - 10}
-				width={40} height={totalHeight + 15}
+				x={-40} y={-totalHeight - 12}
+				width={80} height={totalHeight + 18}
 				fill="transparent"
 				stroke="none"
 			/>
