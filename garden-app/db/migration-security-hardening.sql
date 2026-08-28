@@ -144,6 +144,19 @@ BEGIN
     RETURN NEW;
   END IF;
 
+  -- Posts legacy o moderacion fallida: se puede escribir visual_dna una vez
+  IF OLD.visual_dna IS NULL
+     AND NEW.visual_dna IS NOT NULL
+     AND NEW.author_id IS NOT DISTINCT FROM OLD.author_id
+  THEN
+    NEW.status := OLD.status;
+    NEW.water_count := OLD.water_count;
+    NEW.author_id := OLD.author_id;
+    NEW.approved_at := OLD.approved_at;
+    NEW.rejection_reason := OLD.rejection_reason;
+    RETURN NEW;
+  END IF;
+
   NEW.status := OLD.status;
   NEW.water_count := OLD.water_count;
   NEW.visual_dna := OLD.visual_dna;

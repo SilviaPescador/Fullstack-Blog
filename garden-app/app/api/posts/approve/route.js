@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { sendApprovalEmail } from '@/lib/email';
 import { isValidPostId } from '@/lib/validation';
+import { defaultVisualDna } from '@/components/garden/gardenUtils';
 
 const VALID_ACTIONS = ['approve', 'reject'];
 const MAX_REASON_LENGTH = 500;
@@ -34,18 +35,21 @@ export async function POST(request) {
 		}
 
 		if (action === 'approve') {
-			// Approve the post
-			await supabase.from('posts').update({
-				status: 'approved',
-				approved_at: new Date().toISOString(),
-			}).eq('id', post_id);
-
-			// Send email notification to author
 			const { data: post } = await supabase
 				.from('posts')
-				.select('title, author_id')
+				.select('id, title, content, author_id, visual_dna')
 				.eq('id', post_id)
 				.single();
+
+			const approved = {
+				status: 'approved',
+				approved_at: new Date().toISOString(),
+			};
+			if (post && !post.visual_dna) {
+				approved.visual_dna = defaultVisualDna(post.id, post.title, post.content);
+			}
+
+			await supabase.from('posts').update(approved).eq('id', post_id);
 
 			if (post?.author_id) {
 				const { data: authorEmail } = await supabase.rpc('admin_profile_email', {

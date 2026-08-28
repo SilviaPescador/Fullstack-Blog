@@ -9,6 +9,7 @@ import {
 	MAX_TITLE_LENGTH, 
 	MAX_CONTENT_LENGTH 
 } from '@/lib/validation';
+import { defaultVisualDna } from '@/components/garden/gardenUtils';
 
 function sanitizeHtml(raw) {
 	return sanitizeHtmlLib(raw || '', {
@@ -223,6 +224,14 @@ export async function PATCH(request, { params }) {
 				.getPublicUrl(uploadData.path);
 
 			updatedFields.image_url = publicUrl.publicUrl;
+		}
+
+		if (!existingPost.visual_dna) {
+			updatedFields.visual_dna = defaultVisualDna(
+				existingPost.id,
+				updatedFields.title ?? existingPost.title,
+				updatedFields.content ?? existingPost.content
+			);
 		}
 
 		// Si no hay campos actualizados

@@ -137,6 +137,7 @@ Ejecutar en el SQL Editor de Supabase, en este orden:
 1. `db/rls-policies.sql` (legacy; no usar en un proyecto ya endurecido)
 2. `db/migration-garden.sql`
 3. `db/migration-security-hardening.sql` (obligatorio antes de invitar usuarios)
+4. `db/migration-visual-dna-backfill.sql` (permite guardar visual_dna en posts antiguos)
 
 ### 4. Ejecutar
 
@@ -196,6 +197,7 @@ garden-app/
     garden.css                  Estilos del jardin
   db/
     migration-garden.sql        Migracion para The Garden
+    migration-visual-dna-backfill.sql  Permite persistir visual_dna en posts legacy
 ```
 
 ---

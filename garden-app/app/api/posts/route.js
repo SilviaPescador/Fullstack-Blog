@@ -1,4 +1,4 @@
-import { NextResponse, after } from 'next/server';
+import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import sanitizeHtmlLib from 'sanitize-html';
 import { 
@@ -193,12 +193,10 @@ export async function POST(request) {
 			);
 		}
 
-		after(async () => {
-			await runModeration(supabase, {
-				postId: newPost.id,
-				title,
-				content,
-			});
+		await runModeration(supabase, {
+			postId: newPost.id,
+			title,
+			content,
 		});
 
 		return NextResponse.json({ insertId: newPost.id }, { status: 201 });
