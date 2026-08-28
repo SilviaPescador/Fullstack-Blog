@@ -1,3 +1,9 @@
+<p align="center">
+  <a href="https://the-garden-blog.vercel.app">
+    <img src="docs/cover.png" alt="The Garden" width="820">
+  </a>
+</p>
+
 # The Garden
 
 Plataforma de escritura colectiva. Cada post aprobado nace como una flor completa en un jardín SVG interactivo. La especie sale de un catálogo de 20 prototipos; color, altura y variación se calculan hoy con una regla determinista (familia y paleta por hash del post, altura y complejidad por longitud del texto). La clasificación semántica con Claude está preparada en el código, pero no está activa.
