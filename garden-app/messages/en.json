@@ -98,11 +98,12 @@
 			"loadErrorMessage": "There was a problem getting the blog posts.",
 			"serverError": "Server error",
 			"serverErrorMessage": "The service is temporarily unavailable. Please try again later.",
-			"loading": "Loading posts..."
+			"loading": "Loading posts...",
+			"showMore": "Show more posts"
 		},
 		"search": {
 			"label": "Search posts",
-			"placeholder": "Search by title, content or author...",
+			"placeholder": "Search",
 			"clear": "Clear search",
 			"results": "{count, plural, one {# result} other {# results}}",
 			"empty": "No matches",
@@ -117,12 +118,6 @@
 		"subtitle": "Every post grows something new. Click a plant to read its story.",
 		"latestPosts": "Latest posts",
 		"emptyGarden": "The garden awaits its first seeds..."
-	},
-	"pagination": {
-		"previous": "Previous",
-		"next": "Next",
-		"page": "Page",
-		"of": "of"
 	},
 	"errors": {
 		"notFound": {

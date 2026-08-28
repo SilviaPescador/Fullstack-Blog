@@ -5,10 +5,10 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import Plant from './Plant';
 import PlantTooltip from './PlantTooltip';
-import { calculateGardenLayout, defaultVisualDna, PLANES, GARDEN_GROUND } from './gardenUtils';
+import { calculateGardenLayout, defaultVisualDna } from './gardenUtils';
 import Icon from '@/components/Icons';
 
-const GARDEN_HEIGHT = 400;
+const GARDEN_HEIGHT = 340;
 const PAN_RATIO = 0.7;
 
 export default function Garden({ posts: initialPosts = [], newPostIds: initialNewIds = [] }) {
@@ -198,29 +198,6 @@ export default function Garden({ posts: initialPosts = [], newPostIds: initialNe
 					viewBox={`0 0 ${layout.worldWidth} ${dimensions.height}`}
 					preserveAspectRatio="xMidYMax meet"
 				>
-					<defs>
-						<radialGradient id="gardenGlow" cx="50%" cy="100%" r="60%">
-							<stop offset="0%" stopColor="var(--color-accent-green)" stopOpacity="0.06" />
-							<stop offset="100%" stopColor="transparent" stopOpacity="0" />
-						</radialGradient>
-					</defs>
-
-					<rect x="0" y={dimensions.height * 0.5} width={layout.worldWidth} height={dimensions.height * 0.5} fill="url(#gardenGlow)" />
-
-					{PLANES.map((plane, i) => (
-						<line
-							key={plane.yOffset}
-							x1="0"
-							y1={dimensions.height - GARDEN_GROUND + plane.yOffset}
-							x2={layout.worldWidth}
-							y2={dimensions.height - GARDEN_GROUND + plane.yOffset}
-							stroke="var(--color-border)"
-							strokeWidth="1"
-							strokeDasharray={i === 2 ? '4 4' : '3 5'}
-							opacity={0.22 + i * 0.14}
-						/>
-					))}
-
 					{planted.map(({ post, pos }) => (
 						<g
 							key={post.id}

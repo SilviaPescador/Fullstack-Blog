@@ -9,7 +9,7 @@ export default function PostSearch({ value, onChange }) {
 	return (
 		<div className="post-search">
 			<label htmlFor="post-search" className="sr-only">{t('label')}</label>
-			<Icon name="search" size={18} className="post-search__icon" />
+			<Icon name="search" size={15} className="post-search__icon" />
 			<input
 				id="post-search"
 				type="search"

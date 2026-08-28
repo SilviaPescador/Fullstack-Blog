@@ -1,21 +1,20 @@
 .garden-section {
   position: relative;
-  padding: var(--space-sm) 0 var(--space-md);
-  margin-bottom: var(--space-lg);
+  padding: var(--space-sm) 0 0;
+  margin-bottom: var(--space-md);
 }
 
 .garden-section::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse 80% 60% at 50% 100%, var(--color-accent-green-soft) 0%, transparent 70%);
+  background: radial-gradient(ellipse 70% 50% at 50% 62%, var(--color-accent-green-soft) 0%, transparent 72%);
   pointer-events: none;
 }
 
 .garden-frame {
   position: relative;
   width: 100%;
-  margin-bottom: var(--space-lg);
 }
 
 .garden-viewport {

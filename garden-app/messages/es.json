@@ -98,11 +98,12 @@
 			"loadErrorMessage": "Hubo un problema al obtener los posts del blog.",
 			"serverError": "Error del servidor",
 			"serverErrorMessage": "El servicio no está disponible temporalmente. Por favor, intenta más tarde.",
-			"loading": "Cargando posts..."
+			"loading": "Cargando posts...",
+			"showMore": "Mostrar más posts"
 		},
 		"search": {
 			"label": "Buscar posts",
-			"placeholder": "Buscar por título, contenido o autor...",
+			"placeholder": "Buscar...",
 			"clear": "Borrar búsqueda",
 			"results": "{count, plural, one {# resultado} other {# resultados}}",
 			"empty": "Sin coincidencias",
@@ -117,12 +118,6 @@
 		"subtitle": "Cada post hace crecer algo nuevo. Haz clic en una planta para leer su historia.",
 		"latestPosts": "Ultimos posts",
 		"emptyGarden": "El jardin espera sus primeras semillas..."
-	},
-	"pagination": {
-		"previous": "Anterior",
-		"next": "Siguiente",
-		"page": "Página",
-		"of": "de"
 	},
 	"errors": {
 		"notFound": {

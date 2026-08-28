@@ -1,13 +1,12 @@
 'use client';
 
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import useSWR, { mutate } from 'swr';
 import { useTranslations } from 'next-intl';
 import Layout, { siteTitle } from '@/components/layout';
 import Garden from '@/components/garden/Garden';
 import PostArticle from '@/components/postArticle';
 import PostSearch from '@/components/PostSearch';
-import Pagination from '@/components/Pagination';
 import ErrorMessage from '@/components/ErrorMessage';
 
 const fetcher = async (url) => {
@@ -21,7 +20,7 @@ const fetcher = async (url) => {
 	return res.json();
 };
 
-const POSTS_PER_PAGE = 6;
+const POSTS_PER_PAGE = 9;
 
 function normalizeSearchText(text) {
 	return (text || '')
@@ -35,9 +34,8 @@ function normalizeSearchText(text) {
 }
 
 export default function HomeClient({ initialPosts, initialError }) {
-	const [currentPage, setCurrentPage] = useState(1);
+	const [visibleCount, setVisibleCount] = useState(POSTS_PER_PAGE);
 	const [query, setQuery] = useState('');
-	const pageBeforeSearch = useRef(1);
 	const t = useTranslations();
 
 	const { data, error, isLoading } = useSWR('/api/posts', fetcher, {
@@ -58,17 +56,8 @@ export default function HomeClient({ initialPosts, initialError }) {
 	};
 
 	const handleQueryChange = (value) => {
-		const wasSearching = query.trim() !== '';
-		const isSearching = value.trim() !== '';
-
-		if (!wasSearching && isSearching) {
-			pageBeforeSearch.current = currentPage;
-			setCurrentPage(1);
-		} else if (wasSearching && !isSearching) {
-			setCurrentPage(pageBeforeSearch.current);
-		}
-
 		setQuery(value);
+		setVisibleCount(POSTS_PER_PAGE);
 	};
 
 	const filteredPosts = useMemo(() => {
@@ -125,10 +114,8 @@ export default function HomeClient({ initialPosts, initialError }) {
 	}
 
 	const isSearching = query.trim().length > 0;
-	const listPosts = isSearching
-		? filteredPosts
-		: filteredPosts.slice((currentPage - 1) * POSTS_PER_PAGE, currentPage * POSTS_PER_PAGE);
-	const totalPages = Math.ceil(data.length / POSTS_PER_PAGE);
+	const listPosts = filteredPosts.slice(0, visibleCount);
+	const hasMore = filteredPosts.length > visibleCount;
 
 	return (
 		<Layout home>
@@ -138,14 +125,15 @@ export default function HomeClient({ initialPosts, initialError }) {
 				<Garden posts={data} />
 			</section>
 
-			<PostSearch value={query} onChange={handleQueryChange} />
-
 			<section>
-				<h2 style={{ fontSize: 'var(--text-lg)', marginBottom: 'var(--space-md)' }}>
-					{isSearching
-						? t('posts.search.results', { count: filteredPosts.length })
-						: (t('garden.latestPosts') || 'Ultimos posts')}
-				</h2>
+				<div className="posts-toolbar">
+					<h2>
+						{isSearching
+							? t('posts.search.results', { count: filteredPosts.length })
+							: (t('garden.latestPosts') || 'Ultimos posts')}
+					</h2>
+					<PostSearch value={query} onChange={handleQueryChange} />
+				</div>
 				<div className="sr-only" aria-live="polite">
 					{isSearching ? t('posts.search.results', { count: filteredPosts.length }) : ''}
 				</div>
@@ -162,11 +150,18 @@ export default function HomeClient({ initialPosts, initialError }) {
 						))}
 					</div>
 				)}
+				{hasMore && (
+					<div className="posts-more">
+						<button
+							type="button"
+							className="btn btn--outline"
+							onClick={() => setVisibleCount((n) => n + POSTS_PER_PAGE)}
+						>
+							{t('posts.list.showMore')}
+						</button>
+					</div>
+				)}
 			</section>
-
-			{!isSearching && (
-				<Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
-			)}
 		</Layout>
 	);
 }
