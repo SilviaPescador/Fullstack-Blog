@@ -8,7 +8,8 @@ SECURITY DEFINER
 SET search_path = ''
 AS $$
 BEGIN
-  IF private.is_admin() THEN
+  -- Dashboard SQL editor / service role no traen auth.uid(); no bloquear esos updates.
+  IF private.is_admin() OR (SELECT auth.uid()) IS NULL THEN
     RETURN NEW;
   END IF;
 
@@ -64,7 +65,7 @@ BEGIN
 END;
 $$;
 
--- Post legacy (id 3): ADN equivalente al fallback que ya pinta el jardin.
+-- Post 3: petalos neon (el trigger ya no pisa updates del dashboard).
 UPDATE public.posts
-SET visual_dna = '{"type":"geometric","height":5,"complexity":5,"primaryColor":"#3ECF8E","secondaryColor":"#E8A87C","seed":873608664}'::jsonb
-WHERE id = 3 AND visual_dna IS NULL;
+SET visual_dna = visual_dna || '{"primaryColor":"#F472B6","secondaryColor":"#6C9CFF"}'::jsonb
+WHERE id = 3;

@@ -61,25 +61,59 @@ export function calculateGardenLayout(plants, viewportWidth, gardenHeight) {
 	};
 }
 
-// Default visual DNA for posts that don't have AI-generated DNA yet
+export const BLOOM_CENTER_COLOR = '#FDE68A';
+
+export const PETAL_COLORS = [
+	'#F472B6',
+	'#FB7185',
+	'#E879F9',
+	'#C084FC',
+	'#A78BFA',
+	'#818CF8',
+	'#6C9CFF',
+	'#38BDF8',
+	'#FACC15',
+	'#FBBF24',
+	'#E8A87C',
+	'#F97316',
+];
+
+const GREEN_PETAL_HEX = new Set([
+	'#3ECF8E', '#2DD4BF', '#34D399', '#10B981', '#22C55E',
+	'#4ADE80', '#6EE7B7', '#A7F3D0', '#86EFAC',
+]);
+
+export function pickPetalColors(seed) {
+	const rng = createRng(seed || 1);
+	const i = rngInt(rng, 0, PETAL_COLORS.length - 1);
+	let j = rngInt(rng, 0, PETAL_COLORS.length - 1);
+	if (j === i) j = (j + 4) % PETAL_COLORS.length;
+	return { primaryColor: PETAL_COLORS[i], secondaryColor: PETAL_COLORS[j] };
+}
+
+export function resolvePetalColors(dna) {
+	const primary = dna?.primaryColor;
+	const secondary = dna?.secondaryColor;
+	if (primary && secondary && !GREEN_PETAL_HEX.has(primary.toUpperCase()) && !GREEN_PETAL_HEX.has(secondary.toUpperCase())) {
+		return { primaryColor: primary, secondaryColor: secondary };
+	}
+	return pickPetalColors(Number(dna?.seed) || 1);
+}
+
 export function defaultVisualDna(postId, title = '', content = '') {
 	const hash = simpleHash(postId + title);
 	const len = (content || '').length;
-
 	const types = ['geometric', 'organic', 'flowering', 'crystalline'];
-	const type = types[hash % 4];
-
-	const greens = ['#3ECF8E', '#2DD4BF', '#6C9CFF', '#E8A87C', '#A78BFA', '#F472B6'];
-	const primaryColor = greens[hash % greens.length];
-	const secondaryColor = greens[(hash + 3) % greens.length];
+	const seed = Math.floor(Math.random() * 90000) + 1;
+	const { primaryColor, secondaryColor } = pickPetalColors(seed);
 
 	return {
-		type,
+		type: types[hash % 4],
 		height: Math.min(5, Math.max(1, Math.floor(len / 200) + 1)),
 		complexity: Math.min(5, Math.max(1, Math.floor(len / 300) + 1)),
 		primaryColor,
 		secondaryColor,
-		seed: hash,
+		seed,
 	};
 }
 

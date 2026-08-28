@@ -1,4 +1,4 @@
-import { createRng, rngRange } from './gardenUtils';
+import { createRng, rngRange, resolvePetalColors, BLOOM_CENTER_COLOR } from './gardenUtils';
 import { resolveSpecies, getWaterGrowth, STEM_COLOR, LEAF_COLOR } from './flowerSpecies';
 
 export function generatePlant(dna, waterCount = 0) {
@@ -15,8 +15,7 @@ export function generatePlant(dna, waterCount = 0) {
 	drawStem(els, spec.stem, swayX, h, spec.stemW * 1.45);
 	drawLeaves(els, swayX, h, spec, water.extraLeaves);
 	drawCalyx(els, swayX, -h);
-	const primary = dna.primaryColor || '#F472B6';
-	const secondary = dna.secondaryColor || '#FDE68A';
+	const { primaryColor: primary, secondaryColor: secondary } = resolvePetalColors(dna);
 	drawBloom(els, swayX, -h, spec.bloom, primary, secondary, bloomScale, rng);
 	if (water.dew) drawDew(els, swayX, h, rng);
 	if (water.sparkle) drawSparkle(els, swayX, -h, secondary, rng);
@@ -192,7 +191,7 @@ function bloomRadial(els, cx, cy, bloom, primary, secondary, scale, rng) {
 			});
 		}
 	}
-	drawCenter(els, cx, cy, bloom, secondary, scale);
+	drawCenter(els, cx, cy, bloom, BLOOM_CENTER_COLOR, scale);
 }
 
 function bloomLayered(els, cx, cy, bloom, primary, secondary, scale, rng) {
@@ -217,6 +216,14 @@ function bloomCup(els, cx, cy, bloom, primary, secondary, scale) {
 			transform: `rotate(${angle} ${cx} ${cy})`,
 			className: 'plant-petal',
 		});
+	});
+	els.push({
+		type: 'circle',
+		cx,
+		cy: cy - h * 0.15,
+		r: w * 0.22,
+		fill: BLOOM_CENTER_COLOR,
+		className: 'plant-crown',
 	});
 }
 
@@ -250,7 +257,7 @@ function bloomPointed(els, cx, cy, bloom, primary, secondary, scale, rng) {
 			els.push({
 				type: 'line',
 				x1: cx, y1: cy, x2: ex, y2: ey,
-				stroke: secondary,
+				stroke: BLOOM_CENTER_COLOR,
 				strokeWidth: 0.8,
 				strokeLinecap: 'round',
 				className: 'plant-petal',
@@ -260,12 +267,12 @@ function bloomPointed(els, cx, cy, bloom, primary, secondary, scale, rng) {
 				cx: ex,
 				cy: ey,
 				r: 1.3 * scale,
-				fill: secondary,
+				fill: BLOOM_CENTER_COLOR,
 				className: 'plant-crown',
 			});
 		}
 	}
-	drawCenter(els, cx, cy, bloom, secondary, scale);
+	drawCenter(els, cx, cy, bloom, BLOOM_CENTER_COLOR, scale);
 }
 
 function bloomCrystal(els, cx, cy, bloom, primary, secondary, scale) {
@@ -302,7 +309,7 @@ function bloomCrystal(els, cx, cy, bloom, primary, secondary, scale) {
 		cx,
 		cy,
 		r: 2.2 * scale,
-		fill: secondary,
+		fill: BLOOM_CENTER_COLOR,
 		className: 'plant-crown',
 	});
 }
@@ -315,7 +322,7 @@ function bloomCluster(els, cx, cy, bloom, primary, secondary, scale) {
 		cx,
 		cy,
 		r,
-		fill: secondary,
+		fill: BLOOM_CENTER_COLOR,
 		className: 'plant-crown',
 	});
 	for (let i = 0; i < bloom.n - 1; i++) {

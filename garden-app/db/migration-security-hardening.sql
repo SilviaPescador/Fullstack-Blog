@@ -113,7 +113,8 @@ SECURITY DEFINER
 SET search_path = ''
 AS $$
 BEGIN
-  IF private.is_admin() THEN
+  -- Dashboard SQL editor / service role no traen auth.uid(); no bloquear esos updates.
+  IF private.is_admin() OR (SELECT auth.uid()) IS NULL THEN
     RETURN NEW;
   END IF;
 

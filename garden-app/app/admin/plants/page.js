@@ -8,10 +8,10 @@ import { SPECIES, FAMILIES } from '@/components/garden/flowerSpecies';
 import Icon from '@/components/Icons';
 
 const FAMILY_META = {
-	flowering: { label: 'Creativa', hint: 'Posts artisticos', primary: '#F472B6', secondary: '#FDE68A' },
-	organic: { label: 'Reflexiva', hint: 'Posts personales', primary: '#34D399', secondary: '#A7F3D0' },
-	geometric: { label: 'Tecnica', hint: 'Posts de codigo', primary: '#6C9CFF', secondary: '#C4B5FD' },
-	crystalline: { label: 'Educativa', hint: 'Recursos y guias', primary: '#67E8F9', secondary: '#A78BFA' },
+	flowering: { label: 'Creativa', hint: 'Posts artisticos', primary: '#F472B6', secondary: '#E879F9' },
+	organic: { label: 'Reflexiva', hint: 'Posts personales', primary: '#FB7185', secondary: '#A78BFA' },
+	geometric: { label: 'Tecnica', hint: 'Posts de codigo', primary: '#6C9CFF', secondary: '#C084FC' },
+	crystalline: { label: 'Educativa', hint: 'Recursos y guias', primary: '#38BDF8', secondary: '#FACC15' },
 };
 
 function sampleDna(type, complexity) {
