@@ -1,10 +1,10 @@
 # The Garden
 
-Plataforma de escritura colectiva con moderación asistida por IA. Cada post aprobado nace como una flor completa en un jardín SVG interactivo. La especie sale de un catálogo de prototipos; color, altura y variación dependen del análisis semántico del contenido.
+Plataforma de escritura colectiva. Cada post aprobado nace como una flor completa en un jardín SVG interactivo. La especie sale de un catálogo de 20 prototipos; color, altura y variación se calculan hoy con una regla determinista (familia y paleta por hash del post, altura y complejidad por longitud del texto). La clasificación semántica con Claude está preparada en el código, pero no está activa.
 
 Mi objetivo al escalar este proyecto es crear un espacio vivo para la comunidad de programadores y personas creativas que puedan dar a conocer sus ideas y proyectos. Cuanto más crece la comunidad, más crece el jardín, como en la vida misma.
 
-**Stack**: Next.js 16 - Supabase - Claude API - GSAP - Resend - Vercel
+**Stack**: Next.js 16 - Supabase - GSAP - Resend - Vercel (Claude API, pendiente de activar)
 
 **Demo**: [https://the-garden-blog.vercel.app](https://the-garden-blog.vercel.app)
 
@@ -12,9 +12,21 @@ Mi objetivo al escalar este proyecto es crear un espacio vivo para la comunidad 
 
 ## Concepto
 
-No es un blog. Es un espacio vivo que crece con la comunidad. Cuando un post es aprobado, una flor completa nace en el jardin de la home. Claude elige familia y especie segun el contenido; el riego no desbloquea la flor, la hace destacar.
+No es un blog. Es un espacio vivo que crece con la comunidad. Cuando un post es aprobado, una flor completa nace en el jardin de la home. El riego no desbloquea la flor, la hace destacar.
 
 Hay **20 prototipos** (4 familias x 5 especies). Dos posts con el mismo tipo y complejidad comparten silueta. Color, inclinacion, plano de profundidad y riegos los distinguen.
+
+### Como se elige la flor (estado actual)
+
+Hoy **no llama a ninguna IA**. Al moderar un post se guarda un `visual_dna` en la fila de `posts` (JSONB). El SVG no se almacena como imagen: se regenera en el cliente a partir de ese ADN, el catalogo de prototipos y el contador de riegos.
+
+Sin `ANTHROPIC_API_KEY`, el ADN se calcula asi:
+
+- `type` y colores: hash de `id + titulo`
+- `height` y `complexity` (1-5): longitud del contenido
+- `seed`: el mismo hash (inclinacion y plano de profundidad)
+
+Claude (Haiku) ya esta cableado en `lib/claude.js` para, en el futuro, elegir familia y especie segun el sentido del texto, ademas de resumen, tags y scores de spam/toxicidad. Seguiria usando los **mismos 20 prototipos**: la IA no dibuja la flor, solo rellena el ADN. Activarlo requiere una API key de Anthropic (pago por uso). Los posts que ya tienen `visual_dna` no cambiarian al encenderla.
 
 | Familia (`type`) | Contenido | Especies (`complexity` 1-5) |
 |---|---|---|
@@ -32,8 +44,9 @@ Los usuarios pueden "regar" posts que les gusten. Cada riego alarga el tallo; a 
 | Funcion | Descripcion |
 |---------|-------------|
 | Jardin SVG panoramico | Tres planos de profundidad con flores superpuestas; camara horizontal si no caben |
-| Catalogo de especies | 20 prototipos fijos; Claude elige familia + complejidad; la flor nace completa |
-| Moderacion IA | Claude analiza, resume, clasifica y genera el ADN visual |
+| Catalogo de especies | 20 prototipos fijos; la flor nace completa al aprobar |
+| ADN visual | Hoy: hash + longitud del texto. Previsto: Claude elige familia y complejidad |
+| Moderacion IA | Preparada (resumen, tags, ADN, spam/toxicidad). Inactiva sin API key |
 | Realtime | El jardin se actualiza en vivo al aprobar posts (Supabase Realtime) |
 | Sistema de riego | Un riego por usuario; alarga el tallo, suma hojas, rocio y destellos |
 | Catalogo admin | `/admin/plants` para revisar prototipos y su evolucion con riegos |
@@ -57,9 +70,11 @@ Los usuarios pueden "regar" posts que les gusten. Cada riego alarga el tallo; a 
 ```
 Usuario crea post
     -> status: pending
-    -> API /moderate -> Claude API
-    -> Claude genera: summary, tags, visual DNA, spam/toxicity score
+    -> API /moderate
+         si hay ANTHROPIC_API_KEY -> Claude (summary, tags, visual DNA, scores)
+         si no                   -> ADN por hash/longitud, resumen recortado, tag unclassified
     -> status: reviewed_by_ai
+    -> visual_dna queda guardado en posts (JSONB)
 
 Admin aprueba
     -> status: approved
@@ -105,7 +120,8 @@ Crear `garden-app/.env.local`:
 NEXT_PUBLIC_SUPABASE_URL=https://tu-proyecto.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=tu-anon-key
 
-# Opcional: moderacion con IA (funciona sin esto, pero no genera AI summary)
+# Opcional: clasificacion semantica con Claude (pago por uso).
+# Sin esta clave el jardin funciona igual: el ADN se calcula por hash y longitud.
 ANTHROPIC_API_KEY=sk-ant-...
 
 # Opcional: notificaciones por email
@@ -139,7 +155,7 @@ garden-app/
     layout.js                   Root layout con particulas y cursor glow
     api/
       posts/                    CRUD de posts
-      moderate/                 Moderacion con Claude
+      moderate/                 Moderacion (Claude si hay API key; si no, fallback)
       water/                    Sistema de riego
       posts/approve/            Aprobar/rechazar posts
     admin/
@@ -170,7 +186,7 @@ garden-app/
     postArticle.js              Tarjeta de post con renderizado HTML
     ...
   lib/
-    claude.js                   Cliente Claude API
+    claude.js                   Cliente Claude API (inactivo sin ANTHROPIC_API_KEY)
     email.js                    Notificaciones Resend
     validation.js               Sanitizacion y validacion de inputs
     supabase/                   Clientes Supabase (client, server, middleware)
@@ -193,7 +209,7 @@ garden-app/
 | Backend | API Routes de Next.js |
 | Base de datos | Supabase (PostgreSQL + Realtime) |
 | Auth | Supabase Auth (Email, Google, GitHub) |
-| IA | Claude API (Haiku) |
+| IA | Claude API (Haiku), pendiente de activar |
 | Email | Resend |
 | Hosting | Vercel |
 | i18n | next-intl (ES/EN) |

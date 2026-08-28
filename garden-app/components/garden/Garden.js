@@ -186,7 +186,7 @@ export default function Garden({ posts: initialPosts = [], newPostIds: initialNe
 
 			<div
 				ref={viewportRef}
-				className="garden-viewport"
+				className={`garden-viewport${layout.needsPan ? ' is-pannable' : ''}`}
 				tabIndex={layout.needsPan ? 0 : -1}
 				onScroll={handleScroll}
 				onKeyDown={handleKeyDown}

@@ -18,12 +18,17 @@
 }
 
 .garden-viewport {
-  overflow-x: auto;
+  overflow-x: hidden;
   overflow-y: hidden;
   scroll-behavior: smooth;
   scrollbar-width: none;
   overscroll-behavior-x: contain;
-  touch-action: pan-x;
+  touch-action: pan-y;
+}
+
+.garden-viewport.is-pannable {
+  overflow-x: auto;
+  touch-action: pan-x pan-y;
 }
 
 .garden-viewport::-webkit-scrollbar {
@@ -37,6 +42,7 @@
 
 .garden-viewport svg {
   display: block;
+  touch-action: inherit;
 }
 
 .garden-pan {
