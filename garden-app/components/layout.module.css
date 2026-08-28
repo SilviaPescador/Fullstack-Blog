@@ -45,7 +45,14 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: var(--space-xl) 0 var(--space-lg);
+  padding: var(--space-xl) clamp(1.75rem, 8vw, 3rem) var(--space-lg);
+  text-align: center;
+}
+
+.subtitle {
+  margin-top: var(--space-xs);
+  max-width: 18rem;
+  padding: 0 0.5rem;
 }
 
 .main {

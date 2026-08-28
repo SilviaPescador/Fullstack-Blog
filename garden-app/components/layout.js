@@ -29,7 +29,7 @@ export default function Layout({ children, home }) {
 						/>
 					</Link>
 					<h1 className={utilStyles.heading2Xl}>{siteTitle}</h1>
-					<p className="text-muted" style={{ marginTop: 'var(--space-xs)' }}>
+					<p className={`${styles.subtitle} text-muted`}>
 						{t('garden.subtitle')}
 					</p>
 				</header>
