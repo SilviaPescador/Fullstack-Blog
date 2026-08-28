@@ -4,11 +4,12 @@ export async function runModeration(supabase, { postId, title, content }) {
 	if (!process.env.ANTHROPIC_API_KEY) {
 		const { defaultVisualDna } = await import('@/components/garden/gardenUtils');
 		const dna = defaultVisualDna(postId, title, content);
+		const plain = content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 		const { error } = await supabase
 			.from('posts')
 			.update({
 				status: 'reviewed_by_ai',
-				ai_summary: content.substring(0, 150) + '...',
+				ai_summary: plain.length > 150 ? plain.substring(0, 150) + '...' : plain,
 				ai_tags: ['unclassified'],
 				visual_dna: dna,
 				reviewed_at: new Date().toISOString(),

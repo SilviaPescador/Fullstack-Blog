@@ -2,11 +2,33 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import sanitizeHtml from 'sanitize-html';
 import { createClient } from '@/lib/supabase/client';
 import PlantPreview from '@/components/garden/PlantPreview';
 import { defaultVisualDna } from '@/components/garden/gardenUtils';
 import { getSpeciesMeta } from '@/components/garden/flowerSpecies';
 import Icon from '@/components/Icons';
+
+function plainTextToHtml(text) {
+	if (!text) return '';
+	if (text.trim().startsWith('<')) return text;
+	return text.split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+}
+
+function sanitize(html) {
+	return sanitizeHtml(html, {
+		allowedTags: ['p', 'br', 'strong', 'em', 'a', 'h2', 'h3', 'ul', 'ol', 'li', 'code', 'pre', 'blockquote'],
+		allowedAttributes: { a: ['href', 'target', 'rel', 'class'] },
+		transformTags: {
+			a: sanitizeHtml.simpleTransform('a', { rel: 'noopener noreferrer', target: '_blank' }),
+		},
+	});
+}
+
+function stripHtml(text) {
+	if (!text) return '';
+	return text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+}
 
 export default function ModerationQueuePage() {
 	const [posts, setPosts] = useState([]);
@@ -126,7 +148,7 @@ export default function ModerationQueuePage() {
 										{post.ai_summary && (
 											<div style={{ background: 'var(--color-bg-alt)', padding: 'var(--space-sm)', borderRadius: 'var(--radius-sm)', marginBottom: 'var(--space-sm)' }}>
 												<p className="text-xs text-muted mb-1" style={{ fontWeight: 600 }}>Resumen IA:</p>
-												<p className="text-sm">{post.ai_summary}</p>
+												<p className="text-sm">{stripHtml(post.ai_summary)}</p>
 											</div>
 										)}
 
@@ -138,11 +160,11 @@ export default function ModerationQueuePage() {
 											</div>
 										)}
 
-										<p className="text-sm text-muted" style={{
-											display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
-										}}>
-											{post.content}
-										</p>
+										<div
+											className="post-content text-sm"
+											style={{ maxHeight: '16rem', overflowY: 'auto' }}
+											dangerouslySetInnerHTML={{ __html: sanitize(plainTextToHtml(post.content || '')) }}
+										/>
 									</div>
 
 									{/* Actions */}

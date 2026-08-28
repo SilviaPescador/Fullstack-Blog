@@ -333,6 +333,8 @@ hr {
   font-family: var(--font-body);
 }
 
+.post-content > :first-child { margin-top: 0; }
+
 .post-content p { margin-bottom: var(--space-sm); }
 .post-content a {
   color: var(--color-accent-green);
