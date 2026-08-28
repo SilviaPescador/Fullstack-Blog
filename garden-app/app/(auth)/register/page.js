@@ -95,6 +95,12 @@ export default function RegisterPage() {
 					{t('hasAccount')}{' '}
 					<Link href="/login" className="text-accent font-medium">{t('login')}</Link>
 				</p>
+
+				<p className="text-center text-xs text-muted mt-4">
+					{t.rich('privacyNotice', {
+						privacy: (chunks) => <Link href="/privacy">{chunks}</Link>,
+					})}
+				</p>
 			</div>
 		</div>
 	);

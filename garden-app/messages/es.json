@@ -46,13 +46,14 @@
 			"orRegisterWith": "o regístrate con",
 			"hasAccount": "¿Ya tienes cuenta?",
 			"login": "Inicia sesión",
+			"privacyNotice": "Al crear una cuenta aceptas la <privacy>política de privacidad</privacy>.",
 			"success": "¡Registro exitoso! Revisa tu email para confirmar tu cuenta.",
 			"passwordMismatch": "Las contraseñas no coinciden",
 			"passwordTooShort": "La contraseña debe tener al menos 8 caracteres"
 		},
 		"banned": {
 			"title": "Cuenta Suspendida",
-			"message": "Tu cuenta ha sido suspendida por violar las normas de la comunidad. Si crees que esto es un error, contacta con el administrador."
+			"message": "Tu cuenta ha sido suspendida por violar las normas de la comunidad. Si crees que esto es un error, <contact>contacta con el administrador</contact>."
 		}
 	},
 	"posts": {
@@ -203,5 +204,107 @@
 		"blogLogo": "logo del blog",
 		"goHome": "Ir al inicio",
 		"avatar": "Avatar"
+	},
+	"footer": {
+		"designedBy": "Diseñado y desarrollado por",
+		"privacy": "Privacidad",
+		"contact": "Contacto",
+		"github": "Ver The Garden en GitHub",
+		"navLabel": "Enlaces legales"
+	},
+	"privacy": {
+		"metaTitle": "Privacidad - The Garden",
+		"metaDescription": "Cómo The Garden trata los datos de cuenta, posts e imágenes con Supabase.",
+		"title": "Política de privacidad",
+		"updated": "Última actualización: 29 de agosto de 2026",
+		"intro": "The Garden es un espacio de escritura colectiva. Esta política explica qué datos se recogen, para qué se usan y con quién se comparten. Es un texto básico y honesto sobre cómo funciona el sitio, no un dictamen legal.",
+		"responsible": {
+			"title": "Quién es responsable",
+			"body": "El sitio lo opera {name}. Para cualquier consulta sobre tus datos: {email}."
+		},
+		"data": {
+			"title": "Qué datos se recogen",
+			"intro": "Solo se piden los datos necesarios para que la comunidad funcione. No hay publicidad ni perfiles comerciales.",
+			"accountTitle": "Cuenta",
+			"account": [
+				"Email y contraseña. La contraseña la guarda Supabase Auth de forma cifrada; The Garden no la almacena en texto plano.",
+				"Nombre que indiques al registrarte.",
+				"Si entras con Google o GitHub: email, nombre y avatar que esos servicios envían al iniciar sesión."
+			],
+			"contentTitle": "Contenido que publicas",
+			"content": [
+				"Título, texto e imágenes de tus posts (las imágenes van a Supabase Storage y, si el post se aprueba, son públicas).",
+				"Qué posts riegas (se guarda tu usuario y el post, una vez por persona).",
+				"Si la moderación con Claude está activa, el título y un recorte del texto se envían a Anthropic para clasificar el post. Hoy esa vía está apagada si no hay clave de API."
+			],
+			"techTitle": "Datos técnicos",
+			"tech": [
+				"Cookies de sesión de Supabase para mantener la sesión.",
+				"Cookie NEXT_LOCALE para recordar el idioma.",
+				"Preferencia de tema claro u oscuro en localStorage del navegador (no es una cookie y no sale de tu dispositivo)."
+			]
+		},
+		"purpose": {
+			"title": "Para qué se usan",
+			"items": [
+				"Crear y mantener tu cuenta (base jurídica: ejecución del servicio que pides al registrarte).",
+				"Mostrar posts, el jardín y los riegos (base jurídica: el servicio comunitario).",
+				"Moderar contenido y, si aplica, enviar un email cuando tu post se aprueba (Resend).",
+				"Seguridad: roles, cuentas suspendidas y protección de la plataforma."
+			]
+		},
+		"processors": {
+			"title": "Con quién se comparten",
+			"intro": "No se venden datos. Estos proveedores procesan lo mínimo para que el sitio funcione:",
+			"items": [
+				"Supabase: autenticación, base de datos PostgreSQL, Storage de imágenes y Realtime del jardín.",
+				"Vercel: alojamiento de la aplicación.",
+				"Resend: email transaccional cuando un post se aprueba (solo si está configurado).",
+				"Google o GitHub: solo si eliges iniciar sesión con ellos.",
+				"Anthropic: solo si la moderación con Claude está activa; recibe texto del post, no tu contraseña.",
+				"Fontshare y Google Fonts: cargan las tipografías; pueden ver tu IP como cualquier petición a su CDN."
+			],
+			"supabase": "Política de privacidad de Supabase:"
+		},
+		"cookies": {
+			"title": "Cookies",
+			"body": "No hay cookies de analítica ni de publicidad. Solo estas:",
+			"items": [
+				"Sesión de Supabase Auth: imprescindibles para entrar y publicar. Sin ellas el login no funciona.",
+				"NEXT_LOCALE: recuerda si eliges español o inglés."
+			],
+			"noTracking": "No se usan Google Analytics, píxeles ni rastreadores de terceros con fines publicitarios."
+		},
+		"public": {
+			"title": "Qué es público",
+			"body": "El nombre, el avatar y los posts aprobados son visibles para cualquiera. El recuento de riegos de cada planta también. El email no se muestra en el jardín ni en los posts."
+		},
+		"retention": {
+			"title": "Cuánto se conservan",
+			"body": "La cuenta, los posts y las imágenes se guardan mientras la cuenta exista o el contenido no se borre. Puedes eliminar tus posts desde el sitio. Para borrar la cuenta y el resto de datos, escribe al email de contacto. Los logs de hosting pueden durar lo que fije cada proveedor."
+		},
+		"rights": {
+			"title": "Tus derechos",
+			"body": "Puedes pedir acceso, rectificación, supresión, limitación u oposición, y portabilidad de tus datos, escribiendo a {email}. También puedes reclamar ante la Agencia Española de Protección de Datos (AEPD) si consideras que el tratamiento no es correcto.",
+			"items": [
+				"Acceso: qué datos hay sobre ti.",
+				"Rectificación: corregir nombre u otros datos inexactos.",
+				"Supresión: borrar cuenta, posts e imágenes asociadas.",
+				"Oposición y limitación: en los casos que permita el RGPD."
+			],
+			"contactLine": "La vía más directa es la página de <contact>contacto</contact>."
+		},
+		"changes": {
+			"title": "Cambios",
+			"body": "Si el tratamiento cambia de forma relevante (por ejemplo, al activar analítica o la moderación con Claude), esta página se actualizará."
+		}
+	},
+	"contact": {
+		"metaTitle": "Contacto - The Garden",
+		"metaDescription": "Contacto de The Garden para dudas, cuenta y privacidad.",
+		"title": "Contacto",
+		"heading": "¿Hablamos?",
+		"body": "The Garden es un proyecto personal. Para dudas, problemas de cuenta, contenido o para ejercer tus derechos de privacidad, escríbeme. No hay formulario: un email basta y no se guarda una copia extra en el sitio.",
+		"cta": "Escríbeme"
 	}
 }

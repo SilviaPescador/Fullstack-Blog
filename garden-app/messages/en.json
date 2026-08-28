@@ -46,13 +46,14 @@
 			"orRegisterWith": "or register with",
 			"hasAccount": "Already have an account?",
 			"login": "Log in",
+			"privacyNotice": "By creating an account you accept the <privacy>privacy policy</privacy>.",
 			"success": "Registration successful! Check your email to confirm your account.",
 			"passwordMismatch": "Passwords do not match",
 			"passwordTooShort": "Password must be at least 8 characters"
 		},
 		"banned": {
 			"title": "Account Suspended",
-			"message": "Your account has been suspended for violating community guidelines. If you believe this is a mistake, contact the administrator."
+			"message": "Your account has been suspended for violating community guidelines. If you believe this is a mistake, <contact>contact the administrator</contact>."
 		}
 	},
 	"posts": {
@@ -203,5 +204,107 @@
 		"blogLogo": "blog logo",
 		"goHome": "Go home",
 		"avatar": "Avatar"
+	},
+	"footer": {
+		"designedBy": "Designed and developed by",
+		"privacy": "Privacy",
+		"contact": "Contact",
+		"github": "View The Garden on GitHub",
+		"navLabel": "Legal links"
+	},
+	"privacy": {
+		"metaTitle": "Privacy - The Garden",
+		"metaDescription": "How The Garden handles account data, posts and images with Supabase.",
+		"title": "Privacy policy",
+		"updated": "Last updated: 29 August 2026",
+		"intro": "The Garden is a collective writing space. This policy explains what data is collected, why, and who it is shared with. It is a plain description of how the site works, not a legal opinion.",
+		"responsible": {
+			"title": "Who is responsible",
+			"body": "The site is run by {name}. For any question about your data: {email}."
+		},
+		"data": {
+			"title": "What data is collected",
+			"intro": "Only what the community needs. There is no advertising and no commercial profiling.",
+			"accountTitle": "Account",
+			"account": [
+				"Email and password. The password is stored encrypted by Supabase Auth; The Garden does not keep it in plain text.",
+				"The name you enter when you register.",
+				"If you sign in with Google or GitHub: email, name and avatar those services send on login."
+			],
+			"contentTitle": "Content you publish",
+			"content": [
+				"Title, text and images of your posts (images go to Supabase Storage and, if the post is approved, they are public).",
+				"Which posts you water (your user and the post, once per person).",
+				"If Claude moderation is on, the title and a truncated excerpt of the text are sent to Anthropic to classify the post. That path is off when there is no API key."
+			],
+			"techTitle": "Technical data",
+			"tech": [
+				"Supabase session cookies to keep you signed in.",
+				"NEXT_LOCALE cookie to remember the language.",
+				"Light or dark theme preference in the browser localStorage (not a cookie, and it does not leave your device)."
+			]
+		},
+		"purpose": {
+			"title": "Why it is used",
+			"items": [
+				"Creating and keeping your account (legal basis: the service you request when you register).",
+				"Showing posts, the garden and waterings (legal basis: the community service).",
+				"Moderating content and, if configured, emailing you when a post is approved (Resend).",
+				"Security: roles, suspended accounts and protecting the platform."
+			]
+		},
+		"processors": {
+			"title": "Who it is shared with",
+			"intro": "Data is not sold. These providers process the minimum needed to run the site:",
+			"items": [
+				"Supabase: authentication, PostgreSQL, image Storage and garden Realtime.",
+				"Vercel: application hosting.",
+				"Resend: transactional email when a post is approved (only if configured).",
+				"Google or GitHub: only if you choose to sign in with them.",
+				"Anthropic: only if Claude moderation is on; it receives post text, not your password.",
+				"Fontshare and Google Fonts: they serve the typefaces and may see your IP like any CDN request."
+			],
+			"supabase": "Supabase privacy policy:"
+		},
+		"cookies": {
+			"title": "Cookies",
+			"body": "There are no analytics or advertising cookies. Only these:",
+			"items": [
+				"Supabase Auth session: required to sign in and publish. Login cannot work without them.",
+				"NEXT_LOCALE: remembers whether you choose Spanish or English."
+			],
+			"noTracking": "Google Analytics, pixels and third-party advertising trackers are not used."
+		},
+		"public": {
+			"title": "What is public",
+			"body": "Your name, avatar and approved posts are visible to anyone. Each plant's watering count is too. Your email is not shown on the garden or on posts."
+		},
+		"retention": {
+			"title": "How long it is kept",
+			"body": "The account, posts and images stay while the account exists or until the content is deleted. You can delete your posts from the site. To delete the account and remaining data, write to the contact email. Hosting logs last as long as each provider sets."
+		},
+		"rights": {
+			"title": "Your rights",
+			"body": "You can request access, rectification, erasure, restriction or objection, and data portability, by writing to {email}. You can also lodge a complaint with the Spanish Data Protection Agency (AEPD) if you believe the processing is not correct.",
+			"items": [
+				"Access: what data is held about you.",
+				"Rectification: correcting your name or other inaccurate data.",
+				"Erasure: deleting the account, posts and associated images.",
+				"Objection and restriction: in the cases allowed by the GDPR."
+			],
+			"contactLine": "The most direct way is the <contact>contact page</contact>."
+		},
+		"changes": {
+			"title": "Changes",
+			"body": "If processing changes in a meaningful way (for example enabling analytics or Claude moderation), this page will be updated."
+		}
+	},
+	"contact": {
+		"metaTitle": "Contact - The Garden",
+		"metaDescription": "Contact The Garden for questions, account issues and privacy.",
+		"title": "Contact",
+		"heading": "Shall we talk?",
+		"body": "The Garden is a personal project. For questions, account issues, content, or to exercise your privacy rights, email me. There is no form: an email is enough and the site does not store an extra copy.",
+		"cta": "Email me"
 	}
 }
