@@ -117,7 +117,10 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 
 ### 3. Migracion de base de datos
 
-Ejecutar `db/migration-garden.sql` en el SQL Editor de Supabase.
+Ejecutar en el SQL Editor de Supabase, en este orden:
+1. `db/rls-policies.sql` (legacy; no usar en un proyecto ya endurecido)
+2. `db/migration-garden.sql`
+3. `db/migration-security-hardening.sql` (obligatorio antes de invitar usuarios)
 
 ### 4. Ejecutar
 

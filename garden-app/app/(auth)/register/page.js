@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { createClient } from '@/lib/supabase/client';
+import { MIN_PASSWORD_LENGTH } from '@/lib/validation';
 import Icon from '@/components/Icons';
 
 export default function RegisterPage() {
@@ -24,7 +25,7 @@ export default function RegisterPage() {
 		setError('');
 		setSuccess('');
 		if (password !== confirmPassword) { setError(t('passwordMismatch')); return; }
-		if (password.length < 6) { setError(t('passwordTooShort')); return; }
+		if (password.length < MIN_PASSWORD_LENGTH) { setError(t('passwordTooShort')); return; }
 		setLoading(true);
 		const { error } = await supabase.auth.signUp({
 			email, password,
@@ -66,7 +67,7 @@ export default function RegisterPage() {
 					</div>
 					<div className="form-group">
 						<label htmlFor="password">{t('password')}</label>
-						<input type="password" id="password" className="form-input" value={password} onChange={(e) => setPassword(e.target.value)} required disabled={loading} minLength={6} />
+						<input type="password" id="password" className="form-input" value={password} onChange={(e) => setPassword(e.target.value)} required disabled={loading} minLength={MIN_PASSWORD_LENGTH} />
 					</div>
 					<div className="form-group">
 						<label htmlFor="confirmPassword">{t('confirmPassword')}</label>

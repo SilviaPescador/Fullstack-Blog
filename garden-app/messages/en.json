@@ -48,7 +48,7 @@
 			"login": "Log in",
 			"success": "Registration successful! Check your email to confirm your account.",
 			"passwordMismatch": "Passwords do not match",
-			"passwordTooShort": "Password must be at least 6 characters"
+			"passwordTooShort": "Password must be at least 8 characters"
 		},
 		"banned": {
 			"title": "Account Suspended",

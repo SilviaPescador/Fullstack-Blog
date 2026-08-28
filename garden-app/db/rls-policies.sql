@@ -1,6 +1,7 @@
+-- SUPERSEDED by db/migration-security-hardening.sql
+-- Do not run this file on a live project; it leaves privilege-escalation gaps.
 -- ============================================
--- Row Level Security (RLS) Policies
--- Ejecutar en Supabase SQL Editor
+-- Row Level Security (RLS) Policies (legacy)
 -- ============================================
 
 -- Habilitar RLS en las tablas

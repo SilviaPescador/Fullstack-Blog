@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { createClient } from '@/lib/supabase/client';
+import { safeRedirectPath } from '@/lib/validation';
 import Icon from '@/components/Icons';
 
 export default function LoginForm() {
@@ -14,8 +15,7 @@ export default function LoginForm() {
 	const [loading, setLoading] = useState(false);
 	const router = useRouter();
 	const searchParams = useSearchParams();
-	const rawRedirect = searchParams.get('redirectTo') || '/';
-	const redirectTo = rawRedirect.startsWith('/') && !rawRedirect.startsWith('//') ? rawRedirect : '/';
+	const redirectTo = safeRedirectPath(searchParams.get('redirectTo') || '/');
 	const t = useTranslations('auth.login');
 	const supabase = createClient();
 

@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, after } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import sanitizeHtmlLib from 'sanitize-html';
 import { 
@@ -8,6 +8,7 @@ import {
 	MAX_TITLE_LENGTH, 
 	MAX_CONTENT_LENGTH 
 } from '@/lib/validation';
+import { runModeration } from '@/lib/moderation';
 
 function sanitizeHtml(raw) {
 	return sanitizeHtmlLib(raw || '', {
@@ -31,7 +32,6 @@ export async function GET() {
 				profiles:author_id (
 					id,
 					full_name,
-					email,
 					avatar_url
 				)
 			`)
@@ -51,7 +51,7 @@ export async function GET() {
 			title: post.title,
 			content: post.content,
 			image: post.image_url,
-			author: post.profiles?.full_name || post.profiles?.email || 'Anonimo',
+			author: post.profiles?.full_name || 'Anonimo',
 			author_id: post.author_id,
 			post_date: post.created_at,
 			created_at: post.created_at,
@@ -193,23 +193,13 @@ export async function POST(request) {
 			);
 		}
 
-		// Trigger AI moderation asynchronously
-		try {
-			const baseUrl = request.headers.get('origin') || request.headers.get('host');
-			const protocol = baseUrl?.startsWith('localhost') ? 'http' : 'https';
-			const moderateUrl = baseUrl?.startsWith('http') ? `${baseUrl}/api/moderate` : `${protocol}://${baseUrl}/api/moderate`;
-
-			fetch(moderateUrl, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'Cookie': request.headers.get('cookie') || '',
-				},
-				body: JSON.stringify({ post_id: newPost.id }),
-			}).catch(err => console.error('Moderation trigger failed:', err));
-		} catch (e) {
-			console.error('Could not trigger moderation:', e);
-		}
+		after(async () => {
+			await runModeration(supabase, {
+				postId: newPost.id,
+				title,
+				content,
+			});
+		});
 
 		return NextResponse.json({ insertId: newPost.id }, { status: 201 });
 	} catch (error) {

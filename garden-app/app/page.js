@@ -14,7 +14,6 @@ async function getPosts() {
 				profiles:author_id (
 					id,
 					full_name,
-					email,
 					avatar_url
 				)
 			`)
@@ -34,7 +33,7 @@ async function getPosts() {
 			title: post.title,
 			content: post.content,
 			image: post.image_url,
-			author: post.profiles?.full_name || post.profiles?.email || 'Anonimo',
+			author: post.profiles?.full_name || 'Anonimo',
 			author_id: post.author_id,
 			post_date: post.created_at,
 			created_at: post.created_at,

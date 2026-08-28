@@ -11,6 +11,8 @@ export const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
 export const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 export const MAX_TITLE_LENGTH = 200;
 export const MAX_CONTENT_LENGTH = 50000;
+export const MIN_PASSWORD_LENGTH = 8;
+export const PROFILE_PUBLIC_COLUMNS = 'id, full_name, avatar_url, role, created_at, updated_at';
 
 // Regex para validar UUID v4 (formato de IDs de Supabase)
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -123,4 +125,13 @@ export function getSafeExtension(filename) {
 export function isValidPostId(id) {
 	if (id === null || id === undefined) return false;
 	return isValidUUID(String(id)) || /^\d+$/.test(String(id));
-  }
+}
+
+export function safeRedirectPath(raw) {
+	if (typeof raw !== 'string') return '/';
+	const path = raw.trim();
+	if (!path.startsWith('/') || path.startsWith('//') || path.startsWith('/\\')) return '/';
+	if (path.includes('\\') || path.includes('@') || path.includes('://')) return '/';
+	if (/[\x00-\x1f]/.test(path)) return '/';
+	return path;
+}

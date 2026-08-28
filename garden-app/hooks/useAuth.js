@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { PROFILE_PUBLIC_COLUMNS } from '@/lib/validation';
 
 /**
  * Hook para obtener el usuario actual y su perfil
@@ -23,7 +24,7 @@ export function useAuth() {
 			if (user) {
 				const { data: profile } = await supabase
 					.from('profiles')
-					.select('*')
+					.select(PROFILE_PUBLIC_COLUMNS)
 					.eq('id', user.id)
 					.single();
 				setProfile(profile);
@@ -42,7 +43,7 @@ export function useAuth() {
 			if (session?.user) {
 				supabase
 					.from('profiles')
-					.select('*')
+					.select(PROFILE_PUBLIC_COLUMNS)
 					.eq('id', session.user.id)
 					.single()
 					.then(({ data }) => setProfile(data));

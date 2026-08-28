@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { createClient } from '@/lib/supabase/client';
+import { PROFILE_PUBLIC_COLUMNS } from '@/lib/validation';
 import Icon from '@/components/Icons';
 
 export default function UserMenu() {
@@ -23,7 +24,7 @@ export default function UserMenu() {
 			setUser(user);
 			if (user) {
 				const { data: profile } = await supabase
-					.from('profiles').select('*').eq('id', user.id).single();
+					.from('profiles').select(PROFILE_PUBLIC_COLUMNS).eq('id', user.id).single();
 				setProfile(profile);
 			}
 			setLoading(false);
@@ -33,7 +34,7 @@ export default function UserMenu() {
 		const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
 			setUser(session?.user ?? null);
 			if (session?.user) {
-				supabase.from('profiles').select('*').eq('id', session.user.id).single()
+				supabase.from('profiles').select(PROFILE_PUBLIC_COLUMNS).eq('id', session.user.id).single()
 					.then(({ data }) => setProfile(data));
 			} else {
 				setProfile(null);

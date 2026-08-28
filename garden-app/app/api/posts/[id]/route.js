@@ -42,7 +42,6 @@ export async function GET(request, { params }) {
 				profiles:author_id (
 					id,
 					full_name,
-					email,
 					avatar_url
 				)
 			`)
@@ -62,7 +61,7 @@ export async function GET(request, { params }) {
 			title: post.title,
 			content: post.content,
 			image: post.image_url,
-			author: post.profiles?.full_name || post.profiles?.email || 'Anónimo',
+			author: post.profiles?.full_name || 'Anónimo',
 			author_id: post.author_id,
 			post_date: post.created_at,
 			created_at: post.created_at,

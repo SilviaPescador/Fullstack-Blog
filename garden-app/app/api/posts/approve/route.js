@@ -43,12 +43,17 @@ export async function POST(request) {
 			// Send email notification to author
 			const { data: post } = await supabase
 				.from('posts')
-				.select('title, author_id, profiles:author_id(email)')
+				.select('title, author_id')
 				.eq('id', post_id)
 				.single();
 
-			if (post?.profiles?.email) {
-				await sendApprovalEmail(post.profiles.email, post.title, post_id);
+			if (post?.author_id) {
+				const { data: authorEmail } = await supabase.rpc('admin_profile_email', {
+					target_id: post.author_id,
+				});
+				if (authorEmail) {
+					await sendApprovalEmail(authorEmail, post.title, post_id);
+				}
 			}
 
 			return NextResponse.json({ message: 'Post aprobado' });

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { moderatePost } from '@/lib/claude';
 import { isValidPostId } from '@/lib/validation';
+import { runModeration } from '@/lib/moderation';
 
 export async function POST(request) {
 	try {
@@ -22,10 +22,9 @@ export async function POST(request) {
 			return NextResponse.json({ error: 'post_id invalido' }, { status: 400 });
 		}
 
-		// Fetch the post
 		const { data: post, error: fetchError } = await supabase
 			.from('posts')
-			.select('title, content, status')
+			.select('title, content, status, author_id')
 			.eq('id', post_id)
 			.single();
 
@@ -33,54 +32,41 @@ export async function POST(request) {
 			return NextResponse.json({ error: 'Post no encontrado' }, { status: 404 });
 		}
 
+		const { data: profile } = await supabase
+			.from('profiles')
+			.select('role')
+			.eq('id', user.id)
+			.single();
+
+		const isAuthor = post.author_id === user.id;
+		const isAdmin = profile?.role === 'admin';
+		if (!isAuthor && !isAdmin) {
+			return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
+		}
+
 		if (post.status !== 'pending') {
 			return NextResponse.json({ error: 'El post ya fue revisado' }, { status: 400 });
 		}
 
-		// Skip moderation if no API key configured (graceful degradation)
-		if (!process.env.ANTHROPIC_API_KEY) {
-			const { defaultVisualDna } = await import('@/components/garden/gardenUtils');
-			const dna = defaultVisualDna(post_id, post.title, post.content);
+		const outcome = await runModeration(supabase, {
+			postId: post_id,
+			title: post.title,
+			content: post.content,
+		});
 
-			await supabase
-				.from('posts')
-				.update({
-					status: 'reviewed_by_ai',
-					ai_summary: post.content.substring(0, 150) + '...',
-					ai_tags: ['unclassified'],
-					visual_dna: dna,
-					reviewed_at: new Date().toISOString(),
-				})
-				.eq('id', post_id);
-
-			return NextResponse.json({ message: 'Moderacion omitida (sin API key)', status: 'reviewed_by_ai' });
+		if (!outcome.ok) {
+			return NextResponse.json({ error: 'Error al guardar resultados' }, { status: 500 });
 		}
 
-		// Call Claude for moderation
-		const result = await moderatePost(post.title, post.content);
-
-		// Update post with AI results
-		const { error: updateError } = await supabase
-			.from('posts')
-			.update({
-				status: 'reviewed_by_ai',
-				ai_summary: result.summary,
-				ai_tags: result.tags,
-				visual_dna: result.visual_dna,
-				reviewed_at: new Date().toISOString(),
-			})
-			.eq('id', post_id);
-
-		if (updateError) {
-			console.error('Error updating post with AI results:', updateError);
-			return NextResponse.json({ error: 'Error al guardar resultados' }, { status: 500 });
+		if (outcome.skipped) {
+			return NextResponse.json({ message: 'Moderacion omitida (sin API key)', status: 'reviewed_by_ai' });
 		}
 
 		return NextResponse.json({
 			message: 'Post moderado correctamente',
 			status: 'reviewed_by_ai',
-			spam_score: result.spam_score,
-			toxicity_score: result.toxicity_score,
+			spam_score: outcome.result.spam_score,
+			toxicity_score: outcome.result.toxicity_score,
 		});
 	} catch (error) {
 		console.error('Moderation error:', error);

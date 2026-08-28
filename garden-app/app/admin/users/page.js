@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { createClient } from '@/lib/supabase/client';
+import { PROFILE_PUBLIC_COLUMNS } from '@/lib/validation';
 import Icon from '@/components/Icons';
 
 export default function AdminUsersPage() {
@@ -22,10 +23,10 @@ export default function AdminUsersPage() {
 		const init = async () => {
 			const { data: { user } } = await supabase.auth.getUser();
 			if (!user) { router.push('/login'); return; }
-			const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+			const { data: profile } = await supabase.from('profiles').select(PROFILE_PUBLIC_COLUMNS).eq('id', user.id).single();
 			if (profile?.role !== 'admin') { router.push('/'); return; }
 			setCurrentUser({ ...user, profile });
-			const { data: allProfiles, error } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
+			const { data: allProfiles, error } = await supabase.rpc('admin_list_profiles');
 			if (error) { setError(t('loadError')); } else { setUsers(allProfiles || []); }
 			setLoading(false);
 		};

@@ -1,10 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 
-/**
- * Cliente de Supabase para el middleware
- * Refresca la sesión del usuario en cada request
- */
 export async function updateSession(request) {
 	let supabaseResponse = NextResponse.next({
 		request,
@@ -33,27 +29,21 @@ export async function updateSession(request) {
 		}
 	);
 
-	// IMPORTANTE: No escribir lógica entre createServerClient y supabase.auth.getUser()
-	// Un simple error podría hacer que el usuario se desloguee aleatoriamente.
-
 	const {
 		data: { user },
 	} = await supabase.auth.getUser();
 
-	// Rutas protegidas - redirigir a login si no está autenticado
-	const protectedRoutes = ['/posts/create-new'];
-	const isProtectedRoute = protectedRoutes.some((route) =>
-		request.nextUrl.pathname.startsWith(route)
-	);
+	const pathname = request.nextUrl.pathname;
+	const isAdminRoute = pathname.startsWith('/admin');
+	const isProtectedRoute = pathname.startsWith('/posts/create-new') || isAdminRoute;
 
 	if (isProtectedRoute && !user) {
 		const url = request.nextUrl.clone();
 		url.pathname = '/login';
-		url.searchParams.set('redirectTo', request.nextUrl.pathname);
+		url.searchParams.set('redirectTo', pathname);
 		return NextResponse.redirect(url);
 	}
 
-	// Si el usuario está baneado, redirigir a página de baneo
 	if (user) {
 		const { data: profile } = await supabase
 			.from('profiles')
@@ -61,13 +51,18 @@ export async function updateSession(request) {
 			.eq('id', user.id)
 			.single();
 
-		if (profile?.role === 'banned' && request.nextUrl.pathname !== '/banned') {
+		if (profile?.role === 'banned' && pathname !== '/banned') {
 			const url = request.nextUrl.clone();
 			url.pathname = '/banned';
+			return NextResponse.redirect(url);
+		}
+
+		if (isAdminRoute && profile?.role !== 'admin') {
+			const url = request.nextUrl.clone();
+			url.pathname = '/';
 			return NextResponse.redirect(url);
 		}
 	}
 
 	return supabaseResponse;
 }
-

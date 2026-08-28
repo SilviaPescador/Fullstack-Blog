@@ -32,7 +32,7 @@ export default function ModerationQueuePage() {
 		const statuses = tab === 'reviewed_by_ai' ? ['pending', 'reviewed_by_ai'] : [tab];
 		const { data, error } = await supabase
 			.from('posts')
-			.select('*, profiles:author_id(full_name, email)')
+			.select('*, profiles:author_id(full_name)')
 			.in('status', statuses)
 			.order('created_at', { ascending: false });
 
@@ -103,7 +103,7 @@ export default function ModerationQueuePage() {
 					{posts.map(post => {
 						const dna = post.visual_dna || defaultVisualDna(post.id, post.title, post.content);
 						const species = getSpeciesMeta(dna);
-						const author = post.profiles?.full_name || post.profiles?.email || 'Anonimo';
+						const author = post.profiles?.full_name || 'Anonimo';
 						const spamScore = post.visual_dna ? 0 : null;
 						const isReviewed = post.status === 'reviewed_by_ai';
 
