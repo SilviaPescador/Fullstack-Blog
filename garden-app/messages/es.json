@@ -281,7 +281,7 @@
 		},
 		"retention": {
 			"title": "Cuánto se conservan",
-			"body": "La cuenta, los posts y las imágenes se guardan mientras la cuenta exista o el contenido no se borre. Puedes eliminar tus posts desde el sitio. Para borrar la cuenta y el resto de datos, escribe al email de contacto. Los logs de hosting pueden durar lo que fije cada proveedor."
+			"body": "La cuenta, los posts y las imágenes se guardan mientras la cuenta exista o el contenido no se borre. Puedes eliminar tus posts y tu cuenta desde tu perfil. Los logs de hosting pueden durar lo que fije cada proveedor."
 		},
 		"rights": {
 			"title": "Tus derechos",
@@ -297,6 +297,36 @@
 		"changes": {
 			"title": "Cambios",
 			"body": "Si el tratamiento cambia de forma relevante (por ejemplo, al activar analítica o la moderación con Claude), esta página se actualizará."
+		}
+	},
+	"profile": {
+		"metaTitle": "Mi perfil - The Garden",
+		"memberSince": "En el jardín desde {date}",
+		"comingSoonTitle": "Más funciones en camino",
+		"comingSoonBody": "Este rincón aún está germinando. Pronto podrás cacharrear más por aquí :)",
+		"dangerTitle": "Eliminar cuenta",
+		"dangerBody": "Se borrarán tu cuenta, tus posts y las imágenes asociadas. No se puede deshacer.",
+		"deleteAccount": "Eliminar mi cuenta",
+		"deleteCancel": "Cancelar",
+		"deleteConfirmTitle": "¿Eliminar tu cuenta?",
+		"deleteConfirmMessage": "Se borrarán tu cuenta, tus posts y las imágenes asociadas. Esta acción no se puede deshacer.",
+		"deleting": "Eliminando...",
+		"deleteSuccess": "Tu cuenta ha sido eliminada",
+		"deleteError": "No se pudo eliminar la cuenta"
+	},
+	"myPosts": {
+		"metaTitle": "Mis posts - The Garden",
+		"title": "Mis posts",
+		"create": "Nuevo post",
+		"createFirst": "Escribir el primero",
+		"empty": "Aún no has creado posts",
+		"emptyMessage": "Cuando publiques algo, aparecerá aquí con su estado de moderación.",
+		"loadError": "No se pudieron cargar tus posts",
+		"loadErrorMessage": "Hubo un problema al obtener tus posts. Inténtalo más tarde.",
+		"status": {
+			"approved": "Aprobado",
+			"pending": "Pendiente de aprobar",
+			"rejected": "Rechazado"
 		}
 	},
 	"contact": {

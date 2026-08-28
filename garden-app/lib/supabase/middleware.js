@@ -35,7 +35,11 @@ export async function updateSession(request) {
 
 	const pathname = request.nextUrl.pathname;
 	const isAdminRoute = pathname.startsWith('/admin');
-	const isProtectedRoute = pathname.startsWith('/posts/create-new') || isAdminRoute;
+	const isProtectedRoute =
+		pathname.startsWith('/posts/create-new') ||
+		pathname.startsWith('/profile') ||
+		pathname.startsWith('/my-posts') ||
+		isAdminRoute;
 
 	if (isProtectedRoute && !user) {
 		const url = request.nextUrl.clone();

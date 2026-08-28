@@ -281,7 +281,7 @@
 		},
 		"retention": {
 			"title": "How long it is kept",
-			"body": "The account, posts and images stay while the account exists or until the content is deleted. You can delete your posts from the site. To delete the account and remaining data, write to the contact email. Hosting logs last as long as each provider sets."
+			"body": "The account, posts and images stay while the account exists or until the content is deleted. You can delete your posts and your account from your profile. Hosting logs last as long as each provider sets."
 		},
 		"rights": {
 			"title": "Your rights",
@@ -297,6 +297,36 @@
 		"changes": {
 			"title": "Changes",
 			"body": "If processing changes in a meaningful way (for example enabling analytics or Claude moderation), this page will be updated."
+		}
+	},
+	"profile": {
+		"metaTitle": "My profile - The Garden",
+		"memberSince": "In the garden since {date}",
+		"comingSoonTitle": "More features on the way",
+		"comingSoonBody": "This corner is still sprouting. You'll be able to tinker around here very soon :)",
+		"dangerTitle": "Delete account",
+		"dangerBody": "Your account, posts and associated images will be removed. This cannot be undone.",
+		"deleteAccount": "Delete my account",
+		"deleteCancel": "Cancel",
+		"deleteConfirmTitle": "Delete your account?",
+		"deleteConfirmMessage": "Your account, posts and associated images will be removed. This cannot be undone.",
+		"deleting": "Deleting...",
+		"deleteSuccess": "Your account has been deleted",
+		"deleteError": "Could not delete the account"
+	},
+	"myPosts": {
+		"metaTitle": "My posts - The Garden",
+		"title": "My posts",
+		"create": "New post",
+		"createFirst": "Write the first one",
+		"empty": "You haven't created any posts yet",
+		"emptyMessage": "When you publish something, it will show up here with its moderation status.",
+		"loadError": "Could not load your posts",
+		"loadErrorMessage": "There was a problem getting your posts. Please try again later.",
+		"status": {
+			"approved": "Approved",
+			"pending": "Pending approval",
+			"rejected": "Rejected"
 		}
 	},
 	"contact": {
