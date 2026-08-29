@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import useSWR, { mutate } from 'swr';
+import useSWR from 'swr';
 import { useTranslations } from 'next-intl';
 import Layout, { siteTitle } from '@/components/layout';
 import Garden from '@/components/garden/Garden';
@@ -43,13 +43,23 @@ export default function HomeClient({ initialPosts, initialError }) {
 	const prevUserId = useRef(undefined);
 	const [newPostIds, setNewPostIds] = useState([]);
 
-	const { data, error, isLoading } = useSWR('/api/posts', fetcher, {
+	const { data, error, isLoading, mutate: mutatePosts } = useSWR('/api/posts', fetcher, {
 		fallbackData: initialPosts,
 		revalidateOnFocus: false,
 		revalidateOnMount: false,
 		shouldRetryOnError: true,
 		errorRetryCount: 3,
 	});
+	const postsRef = useRef(data ?? initialPosts);
+	postsRef.current = data ?? initialPosts;
+
+	const patchPost = (postId, patch) => {
+		const id = Number(postId);
+		mutatePosts((current) => {
+			const list = current ?? postsRef.current ?? [];
+			return list.map((p) => Number(p.id) === id ? { ...p, ...patch } : p);
+		}, { revalidate: false, populateCache: true });
+	};
 
 	useEffect(() => {
 		if (authLoading) return;
@@ -60,9 +70,9 @@ export default function HomeClient({ initialPosts, initialError }) {
 		}
 		if (prevUserId.current !== next) {
 			prevUserId.current = next;
-			mutate('/api/posts');
+			mutatePosts();
 		}
-	}, [authLoading, user?.id]);
+	}, [authLoading, user?.id, mutatePosts]);
 
 	useEffect(() => {
 		const supabase = createClient();
@@ -75,16 +85,16 @@ export default function HomeClient({ initialPosts, initialError }) {
 				filter: 'status=eq.approved',
 			}, (payload) => {
 				const updated = payload.new;
-				mutate('/api/posts', (current) => {
-					if (!current) return current;
-					const exists = current.find((p) => p.id === updated.id);
+				mutatePosts((current) => {
+					const list = current ?? postsRef.current ?? [];
+					const exists = list.find((p) => p.id === updated.id);
 					if (exists) {
-						return current.map((p) => p.id === updated.id
+						return list.map((p) => p.id === updated.id
 							? { ...p, water_count: updated.water_count ?? p.water_count }
 							: p);
 					}
 					setNewPostIds((ids) => ids.includes(updated.id) ? ids : [...ids, updated.id]);
-					return [...current, {
+					return [...list, {
 						id: updated.id,
 						title: updated.title,
 						content: updated.content,
@@ -97,23 +107,17 @@ export default function HomeClient({ initialPosts, initialError }) {
 						water_count: updated.water_count || 0,
 						watered_by_me: false,
 					}];
-				}, false);
+				}, { revalidate: false, populateCache: true });
 			})
 			.subscribe();
 
 		return () => { supabase.removeChannel(channel); };
-	}, []);
+	}, [mutatePosts]);
 
-	const handleRetry = () => mutate('/api/posts');
+	const handleRetry = () => mutatePosts();
 
 	const handleWater = (postId, newCount, wateredByMe) => {
-		mutate(
-			'/api/posts',
-			(current) => current?.map((p) => p.id === postId
-				? { ...p, water_count: newCount, watered_by_me: wateredByMe }
-				: p),
-			false
-		);
+		patchPost(postId, { water_count: newCount, watered_by_me: wateredByMe });
 	};
 
 	const handleQueryChange = (value) => {
