@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { createClient } from '@/lib/supabase/server';
+import { expireAuthCookies } from '@/lib/supabase/authCookies';
 import { AccountDeleteError, deleteUserAccount } from '@/lib/deleteAccount';
 
 export async function DELETE() {
@@ -15,9 +17,10 @@ export async function DELETE() {
 		}
 
 		await deleteUserAccount(user.id);
-		const { error: signOutError } = await supabase.auth.signOut();
-		if (signOutError) console.error('signOut after delete', signOutError);
-		return NextResponse.json({ ok: true });
+
+		const response = NextResponse.json({ ok: true });
+		const cookieStore = await cookies();
+		return expireAuthCookies(response, cookieStore.getAll());
 	} catch (error) {
 		if (error instanceof AccountDeleteError) {
 			return NextResponse.json({ error: error.code }, { status: error.status });

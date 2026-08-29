@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
+import { expireAuthCookies } from '@/lib/supabase/authCookies';
 
 export async function updateSession(request) {
 	let supabaseResponse = NextResponse.next({
@@ -53,15 +54,22 @@ export async function updateSession(request) {
 			.from('profiles')
 			.select('role')
 			.eq('id', user.id)
-			.single();
+			.maybeSingle();
 
-		if (profile?.role === 'banned' && pathname !== '/banned') {
+		if (!profile) {
+			const dest = pathname === '/'
+				? NextResponse.next({ request })
+				: NextResponse.redirect(new URL('/', request.url));
+			return expireAuthCookies(dest, request.cookies.getAll());
+		}
+
+		if (profile.role === 'banned' && pathname !== '/banned') {
 			const url = request.nextUrl.clone();
 			url.pathname = '/banned';
 			return NextResponse.redirect(url);
 		}
 
-		if (isAdminRoute && profile?.role !== 'admin') {
+		if (isAdminRoute && profile.role !== 'admin') {
 			const url = request.nextUrl.clone();
 			url.pathname = '/';
 			return NextResponse.redirect(url);

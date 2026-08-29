@@ -1,15 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { createClient } from '@/lib/supabase/client';
 import Icon from '@/components/Icons';
 import { useToast } from '@/components/ToastProvider';
 import formatDate from '@/common/formatDate';
 
 export default function ProfileClient({ email, fullName, avatarUrl, createdAt }) {
 	const [deleting, setDeleting] = useState(false);
-	const router = useRouter();
 	const t = useTranslations('profile');
 	const { showToast, showConfirm } = useToast();
 	const displayName = fullName || email?.split('@')[0] || '';
@@ -34,9 +33,9 @@ export default function ProfileClient({ email, fullName, avatarUrl, createdAt })
 				if (body.error === 'LAST_ADMIN') throw new Error(t('deleteLastAdmin'));
 				throw new Error(body.error || t('deleteError'));
 			}
-			showToast('success', t('deleteSuccess'));
-			router.push('/');
-			router.refresh();
+			const supabase = createClient();
+			await supabase.auth.signOut({ scope: 'local' });
+			window.location.assign('/');
 		} catch (error) {
 			showToast('error', error.message || t('deleteError'));
 			setDeleting(false);
