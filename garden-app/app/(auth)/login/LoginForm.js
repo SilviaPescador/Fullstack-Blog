@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl';
 import { createClient } from '@/lib/supabase/client';
 import { safeRedirectPath } from '@/lib/validation';
 import Icon from '@/components/Icons';
+import PasswordInput from '@/components/PasswordInput';
 
 export default function LoginForm() {
 	const [email, setEmail] = useState('');
@@ -55,7 +56,7 @@ export default function LoginForm() {
 					</div>
 					<div className="form-group">
 						<label htmlFor="password">{t('password')}</label>
-						<input type="password" id="password" className="form-input" value={password} onChange={(e) => setPassword(e.target.value)} required disabled={loading} />
+						<PasswordInput id="password" value={password} onChange={(e) => setPassword(e.target.value)} required disabled={loading} autoComplete="current-password" />
 					</div>
 					<button type="submit" className="btn btn--primary btn--full mb-4" disabled={loading}>
 						{loading ? <><span className="spinner spinner--sm mr-2" /> {t('loading')}</> : t('submit')}

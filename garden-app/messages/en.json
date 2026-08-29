@@ -25,6 +25,8 @@
 		"plantCatalog": "Prototypes"
 	},
 	"auth": {
+		"showPassword": "Show password",
+		"hidePassword": "Hide password",
 		"login": {
 			"title": "Log In",
 			"welcome": "Welcome back to The Garden",
@@ -65,7 +67,7 @@
 			"titlePlaceholder": "Title",
 			"contentPlaceholder": "Share your thoughts...",
 			"publish": "Publish",
-			"success": "Congrats, new post created!",
+			"success": "Your post was submitted. It's pending approval.",
 			"error": "Something went wrong!"
 		},
 		"edit": {
@@ -338,6 +340,8 @@
 		"emptyMessage": "When you publish something, it will show up here with its moderation status.",
 		"loadError": "Could not load your posts",
 		"loadErrorMessage": "There was a problem getting your posts. Please try again later.",
+		"createdTitle": "Your post is under review",
+		"createdMessage": "Thanks for sharing. A moderator will review it before it appears in the garden. In the meantime, you can check the status of your posts here, in My Posts.",
 		"status": {
 			"approved": "Approved",
 			"pending": "Pending approval",

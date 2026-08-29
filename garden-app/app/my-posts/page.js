@@ -26,8 +26,10 @@ function statusKey(status) {
 	return 'pending';
 }
 
-export default async function MyPostsPage() {
+export default async function MyPostsPage({ searchParams }) {
 	const t = await getTranslations('myPosts');
+	const params = await searchParams;
+	const justCreated = params.created === '1';
 	const supabase = await createClient();
 	const {
 		data: { user },
@@ -53,6 +55,16 @@ export default async function MyPostsPage() {
 						{t('create')}
 					</Link>
 				</div>
+
+				{justCreated && (
+					<div className="profile-note mb-4">
+						<Icon name="flower" size={18} />
+						<div>
+							<p className="profile-note__title">{t('createdTitle')}</p>
+							<p>{t('createdMessage')}</p>
+						</div>
+					</div>
+				)}
 
 				{error ? (
 					<ErrorMessage

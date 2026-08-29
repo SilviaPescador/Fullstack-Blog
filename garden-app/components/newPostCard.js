@@ -26,9 +26,9 @@ export default function NewPostCard() {
 		data.content = content;
 		try {
 			const postService = new PostService();
-			const response = await postService.createPost(data);
-			showToast('success', t('success'));
-			router.push(`/posts/${response.insertId}`);
+			await postService.createPost(data);
+			showToast('success', t('success'), 6000);
+			router.push('/my-posts?created=1');
 		} catch (error) {
 			console.error(error);
 			showToast('error', `${t('error')}: ${error}`);

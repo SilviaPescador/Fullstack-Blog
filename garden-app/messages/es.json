@@ -25,6 +25,8 @@
 		"plantCatalog": "Prototipos"
 	},
 	"auth": {
+		"showPassword": "Mostrar contraseña",
+		"hidePassword": "Ocultar contraseña",
 		"login": {
 			"title": "Iniciar Sesión",
 			"welcome": "Bienvenido de vuelta a The Garden",
@@ -65,7 +67,7 @@
 			"titlePlaceholder": "Título",
 			"contentPlaceholder": "Comparte tus pensamientos...",
 			"publish": "Publicar",
-			"success": "¡Enhorabuena, nuevo post creado!",
+			"success": "Tu post se ha enviado. Está pendiente de aprobación.",
 			"error": "¡Algo ha salido mal!"
 		},
 		"edit": {
@@ -338,6 +340,8 @@
 		"emptyMessage": "Cuando publiques algo, aparecerá aquí con su estado de moderación.",
 		"loadError": "No se pudieron cargar tus posts",
 		"loadErrorMessage": "Hubo un problema al obtener tus posts. Inténtalo más tarde.",
+		"createdTitle": "Tu post está en revisión",
+		"createdMessage": "Gracias por compartir. Un moderador lo revisará antes de que aparezca en el jardín. Mientras tanto, puedes seguir el estado de tus posts aquí, en Mis Posts.",
 		"status": {
 			"approved": "Aprobado",
 			"pending": "Pendiente de aprobar",

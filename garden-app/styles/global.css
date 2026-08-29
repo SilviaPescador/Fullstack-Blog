@@ -456,6 +456,54 @@ hr {
   margin-bottom: var(--space-md);
 }
 
+.password-input {
+  position: relative;
+}
+
+.password-input .form-input {
+  padding-right: 2.75rem;
+}
+
+.password-input .form-input::-ms-reveal,
+.password-input .form-input::-ms-clear {
+  display: none;
+}
+
+.password-input__toggle {
+  position: absolute;
+  right: 0.4rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: color var(--duration-fast) var(--ease-out),
+              background var(--duration-fast) var(--ease-out);
+}
+
+.password-input__toggle:hover:not(:disabled) {
+  color: var(--color-accent-green);
+  background: var(--color-accent-green-soft);
+}
+
+.password-input__toggle:focus-visible {
+  outline: 2px solid var(--color-accent-green);
+  outline-offset: 1px;
+}
+
+.password-input__toggle:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* ---- Posts toolbar ---- */
 .posts-toolbar {
   display: flex;
@@ -622,7 +670,7 @@ hr {
   box-shadow: var(--shadow-lg);
   font-size: var(--text-sm);
   font-family: var(--font-body);
-  max-width: 320px;
+  max-width: 360px;
   cursor: pointer;
   animation: toast-in 0.25s var(--ease-out) both;
   transition: opacity 0.2s ease;
@@ -646,7 +694,11 @@ hr {
 }
 .toast--info svg { color: var(--color-accent-blue); }
 
-.toast span { color: var(--color-text-primary); }
+.toast span {
+  color: var(--color-text-primary);
+  flex: 1;
+  min-width: 0;
+}
 
 /* ---- Confirm Dialog ---- */
 @keyframes dialog-in {

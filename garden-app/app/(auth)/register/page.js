@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl';
 import { createClient } from '@/lib/supabase/client';
 import { MIN_PASSWORD_LENGTH } from '@/lib/validation';
 import Icon from '@/components/Icons';
+import PasswordInput from '@/components/PasswordInput';
 
 export default function RegisterPage() {
 	const [email, setEmail] = useState('');
@@ -67,11 +68,11 @@ export default function RegisterPage() {
 					</div>
 					<div className="form-group">
 						<label htmlFor="password">{t('password')}</label>
-						<input type="password" id="password" className="form-input" value={password} onChange={(e) => setPassword(e.target.value)} required disabled={loading} minLength={MIN_PASSWORD_LENGTH} />
+						<PasswordInput id="password" value={password} onChange={(e) => setPassword(e.target.value)} required disabled={loading} minLength={MIN_PASSWORD_LENGTH} autoComplete="new-password" />
 					</div>
 					<div className="form-group">
 						<label htmlFor="confirmPassword">{t('confirmPassword')}</label>
-						<input type="password" id="confirmPassword" className="form-input" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required disabled={loading} />
+						<PasswordInput id="confirmPassword" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required disabled={loading} autoComplete="new-password" />
 					</div>
 					<button type="submit" className="btn btn--primary btn--full mb-4" disabled={loading}>
 						{loading ? <><span className="spinner spinner--sm mr-2" /> {t('loading')}</> : t('submit')}
