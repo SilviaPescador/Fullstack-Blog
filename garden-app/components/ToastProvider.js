@@ -41,15 +41,14 @@ function ConfirmDialogEl({ dialog, onConfirm, onCancel }) {
 	const isDanger = dialog.variant === 'danger';
 	const iconName = dialog.icon || (isDanger ? 'alertTriangle' : 'info');
 	return (
-		<>
-			<div className="confirm-backdrop" onClick={onCancel} />
-			<dialog
+		<div className="confirm-overlay" onClick={onCancel}>
+			<div
 				className={`confirm-dialog${isDanger ? ' confirm-dialog--danger' : ''}`}
-				open
-				aria-modal="true"
 				role={isDanger ? 'alertdialog' : 'dialog'}
+				aria-modal="true"
 				aria-labelledby="confirm-dialog-title"
 				aria-describedby="confirm-dialog-message"
+				onClick={(e) => e.stopPropagation()}
 			>
 				<div className="confirm-dialog__body">
 					<span className={`confirm-dialog__icon${isDanger ? ' confirm-dialog__icon--danger' : ''}`}>
@@ -71,8 +70,8 @@ function ConfirmDialogEl({ dialog, onConfirm, onCancel }) {
 						{dialog.confirmText || 'Confirmar'}
 					</button>
 				</div>
-			</dialog>
-		</>
+			</div>
+		</div>
 	);
 }
 

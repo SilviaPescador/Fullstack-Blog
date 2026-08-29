@@ -193,6 +193,13 @@
 			"noName": "No name",
 			"you": "You",
 			"changeRole": "Change role",
+			"deleteUser": "Delete account",
+			"deleteUserConfirmTitle": "Delete this account?",
+			"deleteUserConfirmMessage": "The account, posts, waterings and images will be removed. This cannot be undone.",
+			"deleteUserSuccess": "Account deleted",
+			"deleteUserError": "Could not delete the account",
+			"cantDeleteSelf": "Use your profile to delete your own account",
+			"cantDeleteLastAdmin": "The last admin account cannot be deleted",
 			"columns": {
 				"user": "User",
 				"email": "Email",
@@ -319,7 +326,8 @@
 		"deleteConfirmMessage": "Your account, posts, waterings and associated images will be removed. This action is irreversible.",
 		"deleting": "Deleting...",
 		"deleteSuccess": "Your account has been deleted",
-		"deleteError": "Could not delete the account"
+		"deleteError": "Could not delete the account",
+		"deleteLastAdmin": "You cannot delete the last admin account"
 	},
 	"myPosts": {
 		"metaTitle": "My posts - The Garden",

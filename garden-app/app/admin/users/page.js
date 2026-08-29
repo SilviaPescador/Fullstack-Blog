@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { createClient } from '@/lib/supabase/client';
 import { PROFILE_PUBLIC_COLUMNS } from '@/lib/validation';
 import Icon from '@/components/Icons';
+import { useToast } from '@/components/ToastProvider';
 
 export default function AdminUsersPage() {
 	const [users, setUsers] = useState([]);
@@ -18,6 +19,7 @@ export default function AdminUsersPage() {
 	const supabase = createClient();
 	const t = useTranslations('admin.users');
 	const tCommon = useTranslations('common');
+	const { showToast, showConfirm } = useToast();
 
 	useEffect(() => {
 		const init = async () => {
@@ -40,6 +42,31 @@ export default function AdminUsersPage() {
 		if (error) { setError(t('roleError')); }
 		else { setSuccess(t('roleUpdated')); setUsers(users.map((u) => u.id === userId ? { ...u, role: newRole } : u)); }
 		setOpenDropdown(null);
+	};
+
+	const deleteUser = async (userId) => {
+		if (userId === currentUser?.id) { setError(t('cantDeleteSelf')); return; }
+		setOpenDropdown(null);
+		const confirmed = await showConfirm({
+			title: t('deleteUserConfirmTitle'),
+			message: t('deleteUserConfirmMessage'),
+			confirmText: t('deleteUser'),
+			cancelText: tCommon('cancel'),
+			variant: 'danger',
+			icon: 'trash',
+		});
+		if (!confirmed) return;
+		setError(''); setSuccess('');
+		const res = await fetch(`/api/admin/users/${userId}`, { method: 'DELETE' });
+		if (!res.ok) {
+			const body = await res.json().catch(() => ({}));
+			if (body.error === 'LAST_ADMIN') setError(t('cantDeleteLastAdmin'));
+			else if (body.error === 'SELF') setError(t('cantDeleteSelf'));
+			else setError(t('deleteUserError'));
+			return;
+		}
+		setUsers(users.filter((u) => u.id !== userId));
+		showToast('success', t('deleteUserSuccess'));
 	};
 
 	const roleBadge = (role) => {
@@ -110,6 +137,7 @@ export default function AdminUsersPage() {
 														<li><button className="dropdown__item" onClick={() => updateUserRole(user.id, 'admin')} disabled={user.role === 'admin'}><Icon name="shield" size={14} /> {t('roles.admin')}</button></li>
 														<li><div className="dropdown__divider" /></li>
 														<li><button className="dropdown__item dropdown__item--danger" onClick={() => updateUserRole(user.id, 'banned')} disabled={user.role === 'banned'}><Icon name="ban" size={14} /> {t('roles.ban')}</button></li>
+														<li><button className="dropdown__item dropdown__item--danger" onClick={() => deleteUser(user.id)}><Icon name="trash" size={14} /> {t('deleteUser')}</button></li>
 													</ul>
 												</>
 											)}

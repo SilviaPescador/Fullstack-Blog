@@ -193,6 +193,13 @@
 			"noName": "Sin nombre",
 			"you": "Tú",
 			"changeRole": "Cambiar rol",
+			"deleteUser": "Eliminar cuenta",
+			"deleteUserConfirmTitle": "¿Eliminar esta cuenta?",
+			"deleteUserConfirmMessage": "Se borrarán la cuenta, sus posts, riegos e imágenes. Esta acción es irreversible.",
+			"deleteUserSuccess": "Cuenta eliminada",
+			"deleteUserError": "No se pudo eliminar la cuenta",
+			"cantDeleteSelf": "Usa tu perfil para eliminar tu propia cuenta",
+			"cantDeleteLastAdmin": "No se puede eliminar al último administrador",
 			"columns": {
 				"user": "Usuario",
 				"email": "Email",
@@ -319,7 +326,8 @@
 		"deleteConfirmMessage": "Se borrarán tu cuenta, tus posts, tus riegos y las imágenes asociadas. Esta acción es irreversible.",
 		"deleting": "Eliminando...",
 		"deleteSuccess": "Tu cuenta ha sido eliminada",
-		"deleteError": "No se pudo eliminar la cuenta"
+		"deleteError": "No se pudo eliminar la cuenta",
+		"deleteLastAdmin": "No puedes eliminar la última cuenta de administrador"
 	},
 	"myPosts": {
 		"metaTitle": "Mis posts - The Garden",

@@ -31,6 +31,7 @@ export default function ProfileClient({ email, fullName, avatarUrl, createdAt })
 			const res = await fetch('/api/account', { method: 'DELETE' });
 			if (!res.ok) {
 				const body = await res.json().catch(() => ({}));
+				if (body.error === 'LAST_ADMIN') throw new Error(t('deleteLastAdmin'));
 				throw new Error(body.error || t('deleteError'));
 			}
 			showToast('success', t('deleteSuccess'));
