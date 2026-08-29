@@ -6,6 +6,7 @@ import UserMenu from '@/components/UserMenu';
 import LocaleSwitcher from '@/components/LocaleSwitcher';
 import ThemeToggle from '@/components/ThemeToggle';
 import Icon from '@/components/Icons';
+import { useAuth } from '@/hooks/useAuth';
 import styles from '@/components/layout.module.css';
 
 function NavLogo() {
@@ -21,6 +22,7 @@ function NavLogo() {
 
 export default function Navbar() {
 	const t = useTranslations();
+	const { isLoggedIn } = useAuth();
 
 	return (
 		<nav className={styles.nav}>
@@ -28,10 +30,12 @@ export default function Navbar() {
 				<NavLogo />
 			</Link>
 			<div className={styles.navActions}>
-				<Link href="/posts/create-new" className="btn btn--outline btn--sm" title={t('nav.createNewPost')}>
-					<Icon name="plus" size={16} />
-					<span className="hidden sm:inline">{t('nav.newPost')}</span>
-				</Link>
+				{isLoggedIn && (
+					<Link href="/posts/create-new" className="btn btn--outline btn--sm" title={t('nav.createNewPost')}>
+						<Icon name="plus" size={16} />
+						<span className="hidden sm:inline">{t('nav.newPost')}</span>
+					</Link>
+				)}
 				<LocaleSwitcher />
 				<ThemeToggle />
 				<UserMenu />
