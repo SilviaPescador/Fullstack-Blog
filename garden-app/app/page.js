@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { formatPost, getWateredPostIds } from '@/lib/posts';
 import HomeClient from './HomeClient';
 
 export const dynamic = 'force-dynamic';
@@ -28,19 +29,8 @@ async function getPosts() {
 			};
 		}
 
-		const formattedPosts = posts.map((post) => ({
-			id: post.id,
-			title: post.title,
-			content: post.content,
-			image: post.image_url,
-			author: post.profiles?.full_name || 'Anonimo',
-			author_id: post.author_id,
-			post_date: post.created_at,
-			created_at: post.created_at,
-			updated_at: post.updated_at,
-			visual_dna: post.visual_dna,
-			water_count: post.water_count || 0,
-		}));
+		const wateredIds = await getWateredPostIds(supabase);
+		const formattedPosts = posts.map((post) => formatPost(post, wateredIds));
 
 		return { posts: formattedPosts, error: null };
 	} catch (error) {

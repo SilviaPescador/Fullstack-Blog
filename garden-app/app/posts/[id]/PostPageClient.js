@@ -29,6 +29,12 @@ export default function PostPageClient({ initialPost, postId, initialError }) {
 		}
 	};
 
+	const handleWater = (id, newCount, wateredByMe) => {
+		setPostData((prev) => prev
+			? { ...prev, water_count: newCount, watered_by_me: wateredByMe }
+			: prev);
+	};
+
 	useEffect(() => {
 		if (edited) {
 			fetchPostData();
@@ -65,7 +71,7 @@ export default function PostPageClient({ initialPost, postId, initialError }) {
 
 	return (
 		<Layout>
-			<PostArticle postData={postData} setIsEdited={setIsEdited} fullPost />
+			<PostArticle postData={postData} setIsEdited={setIsEdited} fullPost onWater={handleWater} />
 		</Layout>
 	);
 }

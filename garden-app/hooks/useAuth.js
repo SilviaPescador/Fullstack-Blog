@@ -1,86 +1,70 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { PROFILE_PUBLIC_COLUMNS } from '@/lib/validation';
 
-/**
- * Hook para obtener el usuario actual y su perfil
- * @returns {{ user, profile, loading, isAdmin, canEditPost, canDeletePost }}
- */
-export function useAuth() {
+const AuthContext = createContext(null);
+
+export function AuthProvider({ children }) {
 	const [user, setUser] = useState(null);
 	const [profile, setProfile] = useState(null);
 	const [loading, setLoading] = useState(true);
-	const supabase = createClient();
 
 	useEffect(() => {
-		const getUser = async () => {
-			const {
-				data: { user },
-			} = await supabase.auth.getUser();
-			setUser(user);
+		const supabase = createClient();
 
-			if (user) {
-				const { data: profile } = await supabase
-					.from('profiles')
-					.select(PROFILE_PUBLIC_COLUMNS)
-					.eq('id', user.id)
-					.single();
-				setProfile(profile);
-			}
-
-			setLoading(false);
-		};
-
-		getUser();
-
-		// Escuchar cambios en la autenticación
 		const {
 			data: { subscription },
-		} = supabase.auth.onAuthStateChange((_event, session) => {
-			setUser(session?.user ?? null);
-			if (session?.user) {
+		} = supabase.auth.onAuthStateChange((event, session) => {
+			const nextUser = session?.user ?? null;
+			setUser(nextUser);
+
+			if (!nextUser) {
+				setProfile(null);
+				setLoading(false);
+				return;
+			}
+
+			if (event === 'TOKEN_REFRESHED') {
+				setLoading(false);
+				return;
+			}
+
+			setTimeout(() => {
 				supabase
 					.from('profiles')
 					.select(PROFILE_PUBLIC_COLUMNS)
-					.eq('id', session.user.id)
+					.eq('id', nextUser.id)
 					.single()
-					.then(({ data }) => setProfile(data));
-			} else {
-				setProfile(null);
-			}
+					.then(({ data }) => {
+						setProfile(data);
+						setLoading(false);
+					});
+			}, 0);
 		});
 
 		return () => subscription.unsubscribe();
-	}, [supabase]);
+	}, []);
 
 	const isAdmin = profile?.role === 'admin';
 	const isLoggedIn = !!user;
 
-	/**
-	 * Verifica si el usuario puede editar un post
-	 * @param {string} authorId - ID del autor del post
-	 */
-	const canEditPost = (authorId) => {
+	const canEditPost = useCallback((authorId) => {
 		if (!user) return false;
 		if (profile?.role === 'banned') return false;
-		if (isAdmin) return true;
+		if (profile?.role === 'admin') return true;
 		return user.id === authorId;
-	};
+	}, [user, profile]);
 
-	/**
-	 * Verifica si el usuario puede eliminar un post
-	 * @param {string} authorId - ID del autor del post
-	 */
-	const canDeletePost = (authorId) => {
+	const canDeletePost = useCallback((authorId) => {
 		if (!user) return false;
 		if (profile?.role === 'banned') return false;
-		if (isAdmin) return true;
+		if (profile?.role === 'admin') return true;
 		return user.id === authorId;
-	};
+	}, [user, profile]);
 
-	return {
+	const value = useMemo(() => ({
 		user,
 		profile,
 		loading,
@@ -88,6 +72,13 @@ export function useAuth() {
 		isLoggedIn,
 		canEditPost,
 		canDeletePost,
-	};
+	}), [user, profile, loading, isAdmin, isLoggedIn, canEditPost, canDeletePost]);
+
+	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
+export function useAuth() {
+	const ctx = useContext(AuthContext);
+	if (!ctx) throw new Error('useAuth must be used within AuthProvider');
+	return ctx;
+}

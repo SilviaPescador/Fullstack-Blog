@@ -109,6 +109,11 @@
 			"results": "{count, plural, one {# result} other {# results}}",
 			"empty": "No matches",
 			"emptyMessage": "No posts match your search. Try different words."
+		},
+		"water": {
+			"label": "Water this post",
+			"unwater": "Remove watering",
+			"loginRequired": "Sign in to water"
 		}
 	},
 	"home": {

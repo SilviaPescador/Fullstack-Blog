@@ -182,6 +182,50 @@ hr {
   cursor: not-allowed;
 }
 
+.water-btn {
+  position: relative;
+}
+.water-btn.is-watered,
+.water-btn.is-watered:hover {
+  color: var(--color-accent-green);
+}
+.water-btn__icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.water-btn.is-sparkle .water-btn__icon {
+  animation: water-sparkle 0.55s var(--ease-out);
+}
+.water-btn.is-sparkle .water-btn__icon::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--color-accent-teal) 0%, transparent 70%);
+  opacity: 0;
+  animation: water-flash 0.55s ease-out;
+  pointer-events: none;
+}
+
+@keyframes water-sparkle {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+@keyframes water-flash {
+  0% { opacity: 0.9; transform: scale(0.35); }
+  100% { opacity: 0; transform: scale(1.9); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .water-btn.is-sparkle .water-btn__icon,
+  .water-btn.is-sparkle .water-btn__icon::after {
+    animation: none;
+  }
+}
+
 .btn--primary {
   background: var(--color-accent-green);
   color: #0B1220;

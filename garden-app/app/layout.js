@@ -4,6 +4,7 @@ import Particles from '@/components/Particles';
 import CursorGlow from '@/components/CursorGlow';
 import Navbar from '@/components/Navbar';
 import ToastProvider from '@/components/ToastProvider';
+import { AuthProvider } from '@/hooks/useAuth';
 import '../styles/tokens.css';
 import '../styles/global.css';
 import '../styles/garden.css';
@@ -54,10 +55,12 @@ export default async function RootLayout({ children }) {
 				<CursorGlow />
 				<Particles />
 				<NextIntlClientProvider messages={messages}>
-					<ToastProvider>
-						<Navbar />
-						{children}
-					</ToastProvider>
+					<AuthProvider>
+						<ToastProvider>
+							<Navbar />
+							{children}
+						</ToastProvider>
+					</AuthProvider>
 				</NextIntlClientProvider>
 			</body>
 		</html>

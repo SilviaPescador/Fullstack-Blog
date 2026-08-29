@@ -2,7 +2,6 @@
 
 import { useState, useRef, useCallback, useEffect, useMemo, useLayoutEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
 import Plant from './Plant';
 import PlantTooltip from './PlantTooltip';
 import { calculateGardenLayout, defaultVisualDna } from './gardenUtils';
@@ -11,63 +10,17 @@ import Icon from '@/components/Icons';
 const GARDEN_HEIGHT = 340;
 const PAN_RATIO = 0.7;
 
-export default function Garden({ posts: initialPosts = [], newPostIds: initialNewIds = [] }) {
+export default function Garden({ posts = [], newPostIds = [] }) {
 	const router = useRouter();
 	const frameRef = useRef(null);
 	const viewportRef = useRef(null);
 	const stickToNewest = useRef(true);
 	const didInitScroll = useRef(false);
 
-	const [posts, setPosts] = useState(initialPosts);
-	const [newPostIds, setNewPostIds] = useState(initialNewIds);
 	const [dimensions, setDimensions] = useState({ width: 900, height: GARDEN_HEIGHT });
 	const [tooltip, setTooltip] = useState({ visible: false, post: null, x: 0, y: 0 });
 	const [canLeft, setCanLeft] = useState(false);
 	const [canRight, setCanRight] = useState(false);
-
-	useEffect(() => {
-		setPosts(initialPosts);
-	}, [initialPosts]);
-
-	useEffect(() => {
-		const supabase = createClient();
-		const channel = supabase
-			.channel('garden-realtime')
-			.on('postgres_changes', {
-				event: 'UPDATE',
-				schema: 'public',
-				table: 'posts',
-				filter: 'status=eq.approved',
-			}, (payload) => {
-				const updated = payload.new;
-				setPosts(prev => {
-					const exists = prev.find(p => p.id === updated.id);
-					if (exists) {
-						return prev.map(p => p.id === updated.id
-							? { ...p, water_count: updated.water_count ?? p.water_count }
-							: p
-						);
-					}
-					const newPost = {
-						id: updated.id,
-						title: updated.title,
-						content: updated.content,
-						image: updated.image_url,
-						author: 'Nuevo',
-						author_id: updated.author_id,
-						post_date: updated.created_at,
-						created_at: updated.created_at,
-						visual_dna: updated.visual_dna,
-						water_count: updated.water_count || 0,
-					};
-					setNewPostIds(ids => [...ids, updated.id]);
-					return [...prev, newPost];
-				});
-			})
-			.subscribe();
-
-		return () => { supabase.removeChannel(channel); };
-	}, []);
 
 	useEffect(() => {
 		const el = frameRef.current;

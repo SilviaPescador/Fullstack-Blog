@@ -109,6 +109,11 @@
 			"results": "{count, plural, one {# resultado} other {# resultados}}",
 			"empty": "Sin coincidencias",
 			"emptyMessage": "Ningún post coincide con tu búsqueda. Prueba con otras palabras."
+		},
+		"water": {
+			"label": "Regar este post",
+			"unwater": "Quitar riego",
+			"loginRequired": "Inicia sesión para regar"
 		}
 	},
 	"home": {

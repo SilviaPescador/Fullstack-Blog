@@ -5,43 +5,15 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { createClient } from '@/lib/supabase/client';
-import { PROFILE_PUBLIC_COLUMNS } from '@/lib/validation';
+import { useAuth } from '@/hooks/useAuth';
 import Icon from '@/components/Icons';
 
 export default function UserMenu() {
-	const [user, setUser] = useState(null);
-	const [profile, setProfile] = useState(null);
-	const [loading, setLoading] = useState(true);
 	const [showDropdown, setShowDropdown] = useState(false);
 	const ref = useRef(null);
 	const router = useRouter();
-	const supabase = createClient();
+	const { user, profile, loading } = useAuth();
 	const t = useTranslations();
-
-	useEffect(() => {
-		const getUser = async () => {
-			const { data: { user } } = await supabase.auth.getUser();
-			setUser(user);
-			if (user) {
-				const { data: profile } = await supabase
-					.from('profiles').select(PROFILE_PUBLIC_COLUMNS).eq('id', user.id).single();
-				setProfile(profile);
-			}
-			setLoading(false);
-		};
-		getUser();
-
-		const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-			setUser(session?.user ?? null);
-			if (session?.user) {
-				supabase.from('profiles').select(PROFILE_PUBLIC_COLUMNS).eq('id', session.user.id).single()
-					.then(({ data }) => setProfile(data));
-			} else {
-				setProfile(null);
-			}
-		});
-		return () => subscription.unsubscribe();
-	}, [supabase]);
 
 	useEffect(() => {
 		function handleClickOutside(e) {
@@ -52,6 +24,7 @@ export default function UserMenu() {
 	}, []);
 
 	const handleLogout = async () => {
+		const supabase = createClient();
 		await supabase.auth.signOut();
 		setShowDropdown(false);
 		router.push('/');

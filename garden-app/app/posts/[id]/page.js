@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
+import { formatPost, getWateredPostIds } from '@/lib/posts';
 import PostPageClient from './PostPageClient';
 
 export const dynamic = 'force-dynamic';
@@ -33,18 +34,8 @@ async function getPost(id) {
 			};
 		}
 
-		// Formatear el post
-		const formattedPost = {
-			id: post.id,
-			title: post.title,
-			content: post.content,
-			image: post.image_url,
-			author: post.profiles?.full_name || 'Anónimo',
-			author_id: post.author_id,
-			post_date: post.created_at,
-			created_at: post.created_at,
-			updated_at: post.updated_at,
-		};
+		const wateredIds = await getWateredPostIds(supabase);
+		const formattedPost = formatPost(post, wateredIds);
 
 		return { post: formattedPost, error: null };
 	} catch (error) {

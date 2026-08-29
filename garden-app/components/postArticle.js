@@ -166,7 +166,12 @@ export default function PostArticle({ postData, onDelete, onWater, fullPost, set
 			</div>
 
 		<div className="card__footer">
-			<WaterButton postId={postData.id} initialCount={postData.water_count || 0} onWater={onWater} />
+			<WaterButton
+				postId={postData.id}
+				count={postData.water_count || 0}
+				watered={!!postData.watered_by_me}
+				onWater={onWater}
+			/>
 			<div style={{ flex: 1 }} />
 			{isEditing && (
 					<>

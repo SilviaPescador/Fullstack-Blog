@@ -1,104 +1,82 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import Icon from '@/components/Icons';
-import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/components/ToastProvider';
 
-export default function WaterButton({ postId, initialCount = 0, onWater }) {
-	const [count, setCount] = useState(initialCount);
-	const [watered, setWatered] = useState(false);
-	const [loading, setLoading] = useState(true);
-	const [animating, setAnimating] = useState(false);
-	const [authError, setAuthError] = useState(false);
+export default function WaterButton({ postId, count = 0, watered = false, onWater }) {
+	const pendingRef = useRef(false);
+	const sparkleTimer = useRef(null);
+	const [sparkle, setSparkle] = useState(false);
+	const { isLoggedIn, loading: authLoading } = useAuth();
+	const { showToast } = useToast();
+	const t = useTranslations('posts.water');
 
-	useEffect(() => {
-		const checkWatered = async () => {
-			try {
-				const supabase = createClient();
-
-				// Fetch fresh total count from DB (initialCount may be stale)
-				const { data: postData } = await supabase
-					.from('posts')
-					.select('water_count')
-					.eq('id', postId)
-					.single();
-
-				if (postData?.water_count != null) {
-					setCount(postData.water_count);
-				}
-
-				// Check if current user has already watered
-				const { data: { user } } = await supabase.auth.getUser();
-				if (!user) { setLoading(false); return; }
-
-				const { data: watering } = await supabase
-					.from('waterings')
-					.select('id')
-					.eq('post_id', postId)
-					.eq('user_id', user.id)
-					.maybeSingle();
-
-				if (watering) setWatered(true);
-			} catch {
-				// silently fail
-			} finally {
-				setLoading(false);
-			}
-		};
-		checkWatered();
-	}, [postId]);
+	useEffect(() => () => {
+		if (sparkleTimer.current) clearTimeout(sparkleTimer.current);
+	}, []);
 
 	const handleWater = async () => {
-		if (watered || loading) return;
+		if (pendingRef.current || authLoading) return;
 
-		const supabase = createClient();
-		const { data: { user } } = await supabase.auth.getUser();
-		if (!user) {
-			setAuthError(true);
+		if (!isLoggedIn) {
+			showToast('info', t('loginRequired'));
 			return;
 		}
 
-		setAnimating(true);
+		pendingRef.current = true;
+		const adding = !watered;
+		const previousCount = count;
+		if (adding) setSparkle(true);
+
+		onWater?.(postId, adding ? count + 1 : Math.max(0, count - 1), adding);
+
 		try {
 			const res = await fetch('/api/water', {
-				method: 'POST',
+				method: adding ? 'POST' : 'DELETE',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ post_id: postId }),
 			});
 
 			if (res.ok) {
 				const data = await res.json();
-				setCount(data.water_count);
-				setWatered(true);
-				onWater?.(postId, data.water_count);
-			} else if (res.status === 409) {
-				setWatered(true);
+				onWater?.(postId, data.water_count, data.watered);
 			} else if (res.status === 401) {
-				setAuthError(true);
+				onWater?.(postId, previousCount, watered);
+				showToast('info', t('loginRequired'));
+			} else if (res.status === 409 && adding) {
+				onWater?.(postId, previousCount, true);
+			} else if (res.status === 404 && !adding) {
+				onWater?.(postId, previousCount, false);
+			} else {
+				onWater?.(postId, previousCount, watered);
 			}
 		} catch (e) {
 			console.error('Water error:', e);
+			onWater?.(postId, previousCount, watered);
+		} finally {
+			pendingRef.current = false;
+			if (adding) {
+				if (sparkleTimer.current) clearTimeout(sparkleTimer.current);
+				sparkleTimer.current = setTimeout(() => setSparkle(false), 550);
+			}
 		}
-		setTimeout(() => setAnimating(false), 600);
 	};
 
 	return (
-		<>
-			<button
-				className={`btn btn--ghost btn--sm flex items-center gap-2 ${watered ? 'text-accent' : ''}`}
-				onClick={handleWater}
-				disabled={watered || loading}
-				title={watered ? 'Ya regaste este post' : 'Regar este post'}
-				style={animating ? { transform: 'scale(1.2)', transition: 'transform 0.3s ease' } : { transition: 'transform 0.3s ease' }}
-			>
+		<button
+			type="button"
+			className={`water-btn btn btn--ghost btn--sm flex items-center gap-2${watered ? ' is-watered' : ''}${sparkle ? ' is-sparkle' : ''}`}
+			onClick={handleWater}
+			aria-pressed={watered}
+			aria-label={watered ? t('unwater') : t('label')}
+		>
+			<span className="water-btn__icon">
 				<Icon name="droplet" size={16} />
-				<span>{count}</span>
-			</button>
-			{authError && (
-				<span className="text-error text-xs" style={{ marginLeft: 'var(--space-xs)' }}>
-					Inicia sesion para regar
-				</span>
-			)}
-		</>
+			</span>
+			<span>{count}</span>
+		</button>
 	);
 }

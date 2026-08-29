@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import useSWR, { mutate } from 'swr';
 import { useTranslations } from 'next-intl';
 import Layout, { siteTitle } from '@/components/layout';
@@ -8,6 +8,8 @@ import Garden from '@/components/garden/Garden';
 import PostArticle from '@/components/postArticle';
 import PostSearch from '@/components/PostSearch';
 import ErrorMessage from '@/components/ErrorMessage';
+import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 
 const fetcher = async (url) => {
 	const res = await fetch(url);
@@ -37,20 +39,79 @@ export default function HomeClient({ initialPosts, initialError }) {
 	const [visibleCount, setVisibleCount] = useState(POSTS_PER_PAGE);
 	const [query, setQuery] = useState('');
 	const t = useTranslations();
+	const { user, loading: authLoading } = useAuth();
+	const prevUserId = useRef(undefined);
+	const [newPostIds, setNewPostIds] = useState([]);
 
 	const { data, error, isLoading } = useSWR('/api/posts', fetcher, {
 		fallbackData: initialPosts,
 		revalidateOnFocus: false,
+		revalidateOnMount: false,
 		shouldRetryOnError: true,
 		errorRetryCount: 3,
 	});
 
+	useEffect(() => {
+		if (authLoading) return;
+		const next = user?.id ?? null;
+		if (prevUserId.current === undefined) {
+			prevUserId.current = next;
+			return;
+		}
+		if (prevUserId.current !== next) {
+			prevUserId.current = next;
+			mutate('/api/posts');
+		}
+	}, [authLoading, user?.id]);
+
+	useEffect(() => {
+		const supabase = createClient();
+		const channel = supabase
+			.channel('garden-realtime')
+			.on('postgres_changes', {
+				event: 'UPDATE',
+				schema: 'public',
+				table: 'posts',
+				filter: 'status=eq.approved',
+			}, (payload) => {
+				const updated = payload.new;
+				mutate('/api/posts', (current) => {
+					if (!current) return current;
+					const exists = current.find((p) => p.id === updated.id);
+					if (exists) {
+						return current.map((p) => p.id === updated.id
+							? { ...p, water_count: updated.water_count ?? p.water_count }
+							: p);
+					}
+					setNewPostIds((ids) => ids.includes(updated.id) ? ids : [...ids, updated.id]);
+					return [...current, {
+						id: updated.id,
+						title: updated.title,
+						content: updated.content,
+						image: updated.image_url,
+						author: 'Nuevo',
+						author_id: updated.author_id,
+						post_date: updated.created_at,
+						created_at: updated.created_at,
+						visual_dna: updated.visual_dna,
+						water_count: updated.water_count || 0,
+						watered_by_me: false,
+					}];
+				}, false);
+			})
+			.subscribe();
+
+		return () => { supabase.removeChannel(channel); };
+	}, []);
+
 	const handleRetry = () => mutate('/api/posts');
 
-	const handleWater = (postId, newCount) => {
+	const handleWater = (postId, newCount, wateredByMe) => {
 		mutate(
 			'/api/posts',
-			(current) => current?.map(p => p.id === postId ? { ...p, water_count: newCount } : p),
+			(current) => current?.map((p) => p.id === postId
+				? { ...p, water_count: newCount, watered_by_me: wateredByMe }
+				: p),
 			false
 		);
 	};
@@ -122,7 +183,7 @@ export default function HomeClient({ initialPosts, initialError }) {
 			<title>{siteTitle}</title>
 
 			<section className="garden-section">
-				<Garden posts={data} />
+				<Garden posts={data} newPostIds={newPostIds} />
 			</section>
 
 			<section>

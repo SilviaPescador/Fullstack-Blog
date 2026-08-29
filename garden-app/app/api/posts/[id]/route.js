@@ -10,6 +10,7 @@ import {
 	MAX_CONTENT_LENGTH 
 } from '@/lib/validation';
 import { defaultVisualDna } from '@/components/garden/gardenUtils';
+import { formatPost, getWateredPostIds } from '@/lib/posts';
 
 function sanitizeHtml(raw) {
 	return sanitizeHtmlLib(raw || '', {
@@ -56,18 +57,8 @@ export async function GET(request, { params }) {
 			);
 		}
 
-		// Formatear el post para mantener compatibilidad
-		const formattedPost = {
-			id: post.id,
-			title: post.title,
-			content: post.content,
-			image: post.image_url,
-			author: post.profiles?.full_name || 'Anónimo',
-			author_id: post.author_id,
-			post_date: post.created_at,
-			created_at: post.created_at,
-			updated_at: post.updated_at,
-		};
+		const wateredIds = await getWateredPostIds(supabase);
+		const formattedPost = formatPost(post, wateredIds);
 
 		return NextResponse.json(formattedPost);
 	} catch (error) {
