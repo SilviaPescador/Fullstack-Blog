@@ -9,7 +9,7 @@ import '../styles/tokens.css';
 import '../styles/global.css';
 import '../styles/garden.css';
 
-const siteUrl = 'https://fullstack-blog-beta.vercel.app';
+const siteUrl = 'https://the-garden-blog.vercel.app';
 
 export const metadata = {
 	title: 'The Garden',
