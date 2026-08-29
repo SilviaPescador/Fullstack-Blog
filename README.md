@@ -22,6 +22,12 @@ No es un blog. Es un espacio vivo que crece con la comunidad. Cuando un post es 
 
 Hay **20 prototipos** (4 familias x 5 especies). Dos posts con el mismo tipo y complejidad comparten silueta. Color, inclinacion, plano de profundidad y riegos los distinguen.
 
+<p align="center">
+  <a href="https://the-garden-blog.vercel.app">
+    <img src="docs/prototypes.png" alt="Prototipos de flores" width="820">
+  </a>
+</p>
+
 ### Como se elige la flor (estado actual)
 
 Hoy **no llama a ninguna IA**. Al moderar un post se guarda un `visual_dna` en la fila de `posts` (JSONB). El SVG no se almacena como imagen: se regenera en el cliente a partir de ese ADN, el catalogo de prototipos y el contador de riegos.
