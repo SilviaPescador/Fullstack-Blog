@@ -21,6 +21,8 @@ export default function ProfileClient({ email, fullName, avatarUrl, createdAt })
 			message: t('deleteConfirmMessage'),
 			confirmText: t('deleteAccount'),
 			cancelText: t('deleteCancel'),
+			variant: 'danger',
+			icon: 'trash',
 		});
 		if (!confirmed) return;
 

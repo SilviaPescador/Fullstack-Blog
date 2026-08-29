@@ -5,14 +5,25 @@ import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { createClient } from '@/lib/supabase/client';
 import Icon from '@/components/Icons';
+import { useToast } from '@/components/ToastProvider';
 
 export default function BannedPage() {
 	const router = useRouter();
 	const supabase = createClient();
 	const t = useTranslations('auth.banned');
 	const tNav = useTranslations('nav');
+	const tCommon = useTranslations('common');
+	const { showConfirm } = useToast();
 
 	const handleLogout = async () => {
+		const confirmed = await showConfirm({
+			title: tNav('logoutConfirmTitle'),
+			message: tNav('logoutConfirmMessage'),
+			confirmText: tNav('logout'),
+			cancelText: tCommon('cancel'),
+			icon: 'logOut',
+		});
+		if (!confirmed) return;
 		await supabase.auth.signOut();
 		router.push('/');
 		router.refresh();

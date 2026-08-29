@@ -17,6 +17,7 @@ export default function DeleteButton({ id, home, onDelete }) {
 			message: t('message'),
 			confirmText: t('confirm'),
 			cancelText: t('cancel'),
+			variant: 'danger',
 		});
 
 		if (!confirmed) return;

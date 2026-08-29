@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useCallback, useRef } from 'react';
+import { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
 import Icon from '@/components/Icons';
 
 const ToastContext = createContext(null);
@@ -26,7 +26,7 @@ function ToastList({ toasts, onRemove }) {
 					onClick={() => onRemove(t.id)}
 				>
 					<Icon
-						name={t.type === 'success' ? 'check' : t.type === 'error' ? 'alert-triangle' : 'info'}
+						name={t.type === 'success' ? 'check' : t.type === 'error' ? 'alertTriangle' : 'info'}
 						size={16}
 					/>
 					<span>{t.message}</span>
@@ -38,18 +38,38 @@ function ToastList({ toasts, onRemove }) {
 
 function ConfirmDialogEl({ dialog, onConfirm, onCancel }) {
 	if (!dialog) return null;
+	const isDanger = dialog.variant === 'danger';
+	const iconName = dialog.icon || (isDanger ? 'alertTriangle' : 'info');
 	return (
 		<>
 			<div className="confirm-backdrop" onClick={onCancel} />
-			<dialog className="confirm-dialog" open aria-modal="true">
+			<dialog
+				className={`confirm-dialog${isDanger ? ' confirm-dialog--danger' : ''}`}
+				open
+				aria-modal="true"
+				role={isDanger ? 'alertdialog' : 'dialog'}
+				aria-labelledby="confirm-dialog-title"
+				aria-describedby="confirm-dialog-message"
+			>
 				<div className="confirm-dialog__body">
-					<Icon name="alert-triangle" size={32} style={{ color: 'var(--color-warning)', marginBottom: 'var(--space-sm)' }} />
-					<h3 style={{ marginBottom: 'var(--space-xs)' }}>{dialog.title}</h3>
-					<p className="text-muted text-sm">{dialog.message}</p>
+					<span className={`confirm-dialog__icon${isDanger ? ' confirm-dialog__icon--danger' : ''}`}>
+						<Icon name={iconName} size={28} />
+					</span>
+					<h3 id="confirm-dialog-title">{dialog.title}</h3>
+					<p id="confirm-dialog-message" className="text-muted text-sm">{dialog.message}</p>
 				</div>
 				<div className="confirm-dialog__actions">
-					<button className="btn btn--outline" onClick={onCancel}>{dialog.cancelText || 'Cancelar'}</button>
-					<button className="btn btn--danger" onClick={onConfirm}>{dialog.confirmText || 'Confirmar'}</button>
+					<button type="button" className="btn btn--outline" onClick={onCancel} autoFocus={isDanger}>
+						{dialog.cancelText || 'Cancelar'}
+					</button>
+					<button
+						type="button"
+						className={isDanger ? 'btn btn--danger' : 'btn btn--primary'}
+						onClick={onConfirm}
+						autoFocus={!isDanger}
+					>
+						{dialog.confirmText || 'Confirmar'}
+					</button>
 				</div>
 			</dialog>
 		</>
@@ -80,10 +100,10 @@ export default function ToastProvider({ children }) {
 		setToasts(prev => prev.filter(t => t.id !== id));
 	}, []);
 
-	const showConfirm = useCallback(({ title, message, confirmText, cancelText }) => {
+	const showConfirm = useCallback(({ title, message, confirmText, cancelText, variant, icon }) => {
 		return new Promise((resolve) => {
 			resolveRef.current = resolve;
-			setDialog({ title, message, confirmText, cancelText });
+			setDialog({ title, message, confirmText, cancelText, variant, icon });
 		});
 	}, []);
 
@@ -96,6 +116,19 @@ export default function ToastProvider({ children }) {
 		setDialog(null);
 		resolveRef.current?.(false);
 	}, []);
+
+	useEffect(() => {
+		if (!dialog) return;
+		const onKey = (e) => {
+			if (e.key === 'Escape') handleCancel();
+		};
+		document.addEventListener('keydown', onKey);
+		document.body.style.overflow = 'hidden';
+		return () => {
+			document.removeEventListener('keydown', onKey);
+			document.body.style.overflow = '';
+		};
+	}, [dialog, handleCancel]);
 
 	return (
 		<ToastContext.Provider value={{ showToast, showConfirm }}>

@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import Icon from '@/components/Icons';
+import { useToast } from '@/components/ToastProvider';
 
 export default function UserMenu() {
 	const [showDropdown, setShowDropdown] = useState(false);
@@ -14,6 +15,8 @@ export default function UserMenu() {
 	const router = useRouter();
 	const { user, profile, loading } = useAuth();
 	const t = useTranslations();
+	const tCommon = useTranslations('common');
+	const { showConfirm } = useToast();
 
 	useEffect(() => {
 		function handleClickOutside(e) {
@@ -24,9 +27,17 @@ export default function UserMenu() {
 	}, []);
 
 	const handleLogout = async () => {
+		setShowDropdown(false);
+		const confirmed = await showConfirm({
+			title: t('nav.logoutConfirmTitle'),
+			message: t('nav.logoutConfirmMessage'),
+			confirmText: t('nav.logout'),
+			cancelText: tCommon('cancel'),
+			icon: 'logOut',
+		});
+		if (!confirmed) return;
 		const supabase = createClient();
 		await supabase.auth.signOut();
-		setShowDropdown(false);
 		router.push('/');
 		router.refresh();
 	};
